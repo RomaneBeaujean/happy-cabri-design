@@ -1,0 +1,1 @@
+Ne jamais mettre de tirets "—" dans le texte
