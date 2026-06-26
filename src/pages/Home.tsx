@@ -1,5 +1,10 @@
-import { TrendingUp, Mountain, Timer, Plus, MapPin, Flame, Wind } from 'lucide-react'
+import { TrendingUp, Mountain, Timer, MapPin, Flame, Wind, CirclePlus } from 'lucide-react'
 import AppLayout from '../layouts/AppLayout'
+
+function navigateToNewPlan() {
+  window.history.pushState({}, '', '/plans/nouveau')
+  window.dispatchEvent(new PopStateEvent('popstate'))
+}
 
 export default function Home() {
   return (
@@ -8,30 +13,24 @@ export default function Home() {
 
         {/* ── Hero ── */}
         <section className="pt-100">
-          <p className="font-accent text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-90">
-            Trail · Montagne · Endurance
-          </p>
           <h1 className="mt-150 font-heading text-[2.6rem] font-extrabold leading-tight text-neutral-800 lg:text-5xl">
             Bonjour,{' '}
             <span className="text-secondary-500">Romane</span>
           </h1>
-          <p className="mt-150 font-body text-base text-neutral-80">
-            Chaque mètre de dénivelé te rapproche du sommet.
-          </p>
         </section>
 
         {/* ── Actions rapides ── */}
-        <section className="grid grid-cols-3">
-          <button className="cursor-pointer flex items-center justify-between rounded-2xl bg-primary-500/90 px-300 py-200 font-accent text-sm font-semibold text-neutral-0 shadow-widget backdrop-blur-xl transition-colors hover:bg-primary-600">
-            <span>Nouveau plan de course</span>
-            <Plus className="size-5 shrink-0" strokeWidth={2.5} />
+        <section>
+          <button className="btn btn-primary lg:w-auto" onClick={navigateToNewPlan}>
+            <CirclePlus className="size-4 shrink-0" strokeWidth={2.5} />
+            Nouveau plan de course
           </button>
         </section>
         {/* ── Bento stats ── */}
         <section className="grid grid-cols-2 gap-150 lg:grid-cols-3 lg:gap-200">
 
           {/* Km semaine */}
-          <div className="widget-card flex flex-col justify-between p-300">
+          <div className="widget-card flex flex-col items-center justify-between p-300 text-center">
             <p className="widget-label">
               Cette semaine
             </p>
@@ -40,7 +39,7 @@ export default function Home() {
                 42
                 <span className="ml-50 text-lg font-medium text-neutral-400"> km</span>
               </p>
-              <div className="mt-150 flex items-center gap-75 font-accent text-[11px] font-medium text-secondary-500">
+              <div className="mt-150 flex items-center justify-center gap-75 font-accent text-[11px] font-medium text-secondary-500">
                 <TrendingUp className="size-3.5 shrink-0" strokeWidth={2.5} />
                 +12 % vs semaine passée
               </div>
@@ -48,7 +47,7 @@ export default function Home() {
           </div>
 
           {/* Dénivelé */}
-          <div className="widget-card flex flex-col justify-between p-300">
+          <div className="widget-card flex flex-col items-center justify-between p-300 text-center">
             <p className="widget-label">
               Dénivelé
             </p>
@@ -57,7 +56,7 @@ export default function Home() {
                 1 840
                 <span className="ml-50 text-lg font-medium text-neutral-400"> m</span>
               </p>
-              <div className="mt-150 flex items-center gap-75 font-accent text-[11px] font-medium text-neutral-400">
+              <div className="mt-150 flex items-center justify-center gap-75 font-accent text-[11px] font-medium text-neutral-400">
                 <Mountain className="size-3.5 shrink-0" strokeWidth={2} />
                 D+ cumulé
               </div>
@@ -65,7 +64,7 @@ export default function Home() {
           </div>
 
           {/* Prochain objectif — spanning 2 rows sur desktop */}
-          <div className="widget-card-secondary col-span-2 flex flex-col justify-between p-300 lg:col-span-1 lg:row-span-2">
+          <div className="widget-card-secondary col-span-2 flex flex-col items-center justify-between p-300 text-center lg:col-span-1 lg:row-span-2">
             <div>
               <p className="widget-label">
                 Prochain objectif
@@ -74,12 +73,12 @@ export default function Home() {
                 UTMB<br />
                 <span className="text-primary-400">CCC</span>
               </h2>
-              <div className="mt-200 flex items-center gap-100 font-accent text-sm font-semibold text-neutral-50">
+              <div className="mt-200 flex items-center justify-center gap-100 font-accent text-sm font-semibold text-neutral-50">
                 <MapPin className="size-4 shrink-0" strokeWidth={1.75} />
                 Chamonix · 100 km · 6 000 m D+
               </div>
             </div>
-            <div className="mt-400 pt-300">
+            <div>
               <p className="widget-label">
                 Compte à rebours
               </p>
@@ -91,7 +90,7 @@ export default function Home() {
           </div>
 
           {/* Sorties ce mois */}
-          <div className="widget-card flex flex-col justify-between p-300">
+          <div className="widget-card flex flex-col items-center justify-between p-300 text-center">
             <p className="widget-label">
               Ce mois
             </p>
@@ -100,7 +99,7 @@ export default function Home() {
                 3
                 <span className="ml-50 text-lg font-medium text-neutral-400"> sorties</span>
               </p>
-              <div className="mt-150 flex items-center gap-75 font-accent text-[11px] font-medium text-neutral-400">
+              <div className="mt-150 flex items-center justify-center gap-75 font-accent text-[11px] font-medium text-neutral-400">
                 <Flame className="size-3.5 shrink-0" strokeWidth={2} />
                 Objectif : 8 ce mois
               </div>
@@ -108,7 +107,7 @@ export default function Home() {
           </div>
 
           {/* Allure moyenne */}
-          <div className="widget-card flex flex-col justify-between p-300">
+          <div className="widget-card flex flex-col items-center justify-between p-300 text-center">
             <p className="widget-label">
               Allure moy.
             </p>
@@ -117,7 +116,7 @@ export default function Home() {
                 6:12
                 <span className="ml-50 text-lg font-medium text-neutral-400"> /km</span>
               </p>
-              <div className="mt-150 flex items-center gap-75 font-accent text-[11px] font-medium text-neutral-400">
+              <div className="mt-150 flex items-center justify-center gap-75 font-accent text-[11px] font-medium text-neutral-400">
                 <Timer className="size-3.5 shrink-0" strokeWidth={2} />
                 30 derniers jours
               </div>

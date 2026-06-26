@@ -189,7 +189,7 @@ export default function AppLayout({
       {/* ── Mobile bottom nav ── */}
       <nav
         aria-label="Navigation principale"
-        className="fixed inset-x-200 bottom-300 z-20 lg:hidden"
+        className="fixed inset-x-200 bottom-100 z-20 lg:hidden"
       >
         <div className="flex h-[60px] items-stretch gap-[3px] rounded-[999px] border border-neutral-40/40 bg-white/35 px-[5px] py-[5px] shadow-[0_8px_40px_rgba(28,28,28,0.12)] backdrop-blur-2xl">
           {MAIN_NAV_ITEMS.map((item) => (

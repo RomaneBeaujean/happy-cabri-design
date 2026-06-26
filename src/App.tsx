@@ -17,6 +17,11 @@ export default function App() {
   const [path, setPath] = useState(window.location.pathname)
 
   useEffect(() => {
+    const navigate = (pathname: string) => {
+      window.scrollTo(0, 0)
+      setPath(pathname)
+    }
+
     const handleClick = (e: MouseEvent) => {
       const anchor = (e.target as HTMLElement).closest('a')
       if (!anchor) return
@@ -25,10 +30,10 @@ export default function App() {
       if (url.pathname in routes) {
         e.preventDefault()
         window.history.pushState({}, '', url.pathname)
-        setPath(url.pathname)
+        navigate(url.pathname)
       }
     }
-    const handlePopState = () => setPath(window.location.pathname)
+    const handlePopState = () => navigate(window.location.pathname)
 
     document.addEventListener('click', handleClick)
     window.addEventListener('popstate', handlePopState)

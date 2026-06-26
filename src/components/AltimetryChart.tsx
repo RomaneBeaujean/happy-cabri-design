@@ -59,7 +59,7 @@ export default function AltimetryChart({ data, height = 130, segments = [] }: Al
             fontSize: 12,
             fontFamily: 'Manrope, sans-serif',
           }}
-          formatter={(value: number) => [`${value} m`, 'Altitude']}
+          formatter={(value) => [`${value} m`, 'Altitude']}
           labelFormatter={(label) => `${label} km`}
         />
         {segments.map((km) => (

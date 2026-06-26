@@ -60,7 +60,7 @@ export default function RacePlans() {
           <div className="flex items-end justify-between">
             <div>
               <p className="font-accent text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-90">
-                Tes prochaines courses et leurs plans associés
+                Tes prochaines courses
               </p>
               <h1 className="mt-150 font-heading text-[2.6rem] font-extrabold leading-tight text-neutral-800 lg:text-5xl">
                 Plans de course
@@ -71,7 +71,7 @@ export default function RacePlans() {
               Nouveau plan de course
             </button>
           </div>
-          <button className="btn btn-primary btn-full mt-200 lg:hidden" onClick={navigateToNewPlan}>
+          <button className="btn btn-primary mt-200 flex lg:hidden" onClick={navigateToNewPlan}>
             <CirclePlus className="size-4 shrink-0" strokeWidth={2.5} />
             Nouveau plan de course
           </button>
