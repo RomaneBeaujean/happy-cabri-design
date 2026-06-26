@@ -69,7 +69,7 @@ export default function NewRacePlan() {
 
         {/* ── Header ── */}
         <section className="pt-100">
-          <h1 className="font-heading text-[2.6rem] font-extrabold leading-tight text-neutral-800 lg:text-5xl">
+          <h1 className="text-[2.6rem] font-extrabold leading-tight text-neutral-800 lg:text-5xl">
             Nouveau plan
           </h1>
           {/* Stepper desktop — sous le titre, centré */}
@@ -88,7 +88,7 @@ export default function NewRacePlan() {
               ].join(' ')} />
             ))}
           </div>
-          <p className="mt-100 mb-150 font-accent text-[11px] font-semibold text-primary-700">
+          <p className="mt-100 mb-150 text-[11px] font-semibold text-primary-700">
             Étape {step + 1} sur {STEPS.length} — {STEPS[step].label}
           </p>
         </div>
@@ -150,8 +150,8 @@ function Step1({ gpxLoaded, onLoad, onRemove }: {
   return (
     <section className="space-y-300">
       <div>
-        <h2 className="font-heading text-xl font-extrabold text-neutral-800">Importez votre trace</h2>
-        <p className="mt-75 font-accent text-sm text-neutral-90">
+        <h2 className="text-xl font-extrabold text-neutral-800">Importez votre trace</h2>
+        <p className="mt-75 text-sm text-neutral-90">
           {gpxLoaded
             ? 'Trace analysée — vérifiez les données avant de continuer.'
             : 'Chargez le fichier GPX de votre course. La trace sera découpée automatiquement en segments.'}
@@ -168,13 +168,13 @@ function Step1({ gpxLoaded, onLoad, onRemove }: {
             <Upload className="size-5 text-primary-500" strokeWidth={2} />
           </div>
           <div className="text-center">
-            <p className="font-heading text-sm font-extrabold text-neutral-800">Déposez votre fichier GPX ici</p>
-            <p className="mt-75 font-accent text-xs text-neutral-90">
+            <p className="text-sm font-extrabold text-neutral-800">Déposez votre fichier GPX ici</p>
+            <p className="mt-75 text-xs text-neutral-90">
               Glissez-déposez depuis votre explorateur, ou sélectionnez-le manuellement.
             </p>
           </div>
           <button className="btn btn-primary mt-100">Choisir un fichier</button>
-          <p className="font-accent text-[11px] text-neutral-60">Formats acceptés : .gpx · Taille max 10 Mo</p>
+          <p className="text-[11px] text-neutral-60">Formats acceptés : .gpx · Taille max 10 Mo</p>
         </div>
       ) : (
         /* Aperçu GPX chargé */
@@ -186,8 +186,8 @@ function Step1({ gpxLoaded, onLoad, onRemove }: {
                 <FileText className="size-4 text-primary-500" strokeWidth={2} />
               </div>
               <div>
-                <p className="font-heading text-sm font-bold text-neutral-800">{MOCK_GPX_STATS.filename}</p>
-                <p className="font-accent text-[11px] text-neutral-60">{MOCK_GPX_STATS.size}</p>
+                <p className="text-sm font-bold text-neutral-800">{MOCK_GPX_STATS.filename}</p>
+                <p className="text-[11px] text-neutral-60">{MOCK_GPX_STATS.size}</p>
               </div>
             </div>
             <button
@@ -201,7 +201,7 @@ function Step1({ gpxLoaded, onLoad, onRemove }: {
 
           {/* Graphique altimétrique */}
           <div className="px-300 pb-200 pt-200">
-            <p className="mb-150 font-accent text-[10px] font-semibold uppercase tracking-widest text-neutral-80">
+            <p className="mb-150 text-[10px] eyebrow text-neutral-80">
               Profil altimétrique
             </p>
             <AltimetryChart data={MOCK_GPX_DATA} height={220} />
@@ -216,8 +216,8 @@ function Step1({ gpxLoaded, onLoad, onRemove }: {
               { label: 'Point haut', value: `${MOCK_GPX_STATS.highPoint.toLocaleString('fr')}`, unit: 'm' },
             ].map(({ label, value, unit }) => (
               <div key={label} className="flex flex-1 flex-col items-center px-100 py-200 text-center">
-                <p className="whitespace-nowrap font-accent text-[9px] font-semibold uppercase tracking-widest text-neutral-80 lg:text-[10px]">{label}</p>
-                <p className="mt-50 whitespace-nowrap font-heading text-sm font-extrabold text-primary-600 lg:text-lg">
+                <p className="whitespace-nowrap text-[9px] eyebrow text-neutral-80 lg:text-[10px]">{label}</p>
+                <p className="mt-50 whitespace-nowrap text-sm font-extrabold text-primary-600 lg:text-lg">
                   {value} <span className="text-[10px] font-medium text-neutral-90 lg:text-xs">{unit}</span>
                 </p>
               </div>
@@ -252,7 +252,7 @@ function Step2({
   const inputCls = () => 'input'
 
   const labelCls = (id: string) =>
-    `font-accent text-xs font-semibold transition-colors ${focused === id ? 'text-primary-500' : 'text-neutral-500'}`
+    `text-xs font-semibold transition-colors ${focused === id ? 'text-primary-500' : 'text-neutral-500'}`
 
   const convInputCls = (id: string, _readonly: boolean) => [
     'input pl-150 pr-[44px]',
@@ -260,11 +260,11 @@ function Step2({
   ].filter(Boolean).join(' ')
 
   const convLabelCls = (id: string) =>
-    `font-accent text-[10px] font-semibold transition-colors ${focused === id ? 'text-primary-500' : 'text-neutral-80'}`
+    `text-[10px] font-semibold transition-colors ${focused === id ? 'text-primary-500' : 'text-neutral-80'}`
 
   return (
     <section className="space-y-150 lg:space-y-300">
-      <h2 className="font-heading text-xl font-extrabold text-neutral-800">Votre course</h2>
+      <h2 className="text-xl font-extrabold text-neutral-800">Votre course</h2>
 
       {/* Champs course — espacement réduit entre chaque champ */}
       <div className="space-y-100">
@@ -302,8 +302,8 @@ function Step2({
       <div className="widget-card overflow-hidden">
         <div className="flex items-center justify-between px-300 py-200">
           <div>
-            <p className="font-heading text-sm font-bold text-neutral-800">Objectif de temps</p>
-            <p className="mt-50 font-accent text-[11px] text-neutral-90">
+            <p className="text-sm font-bold text-neutral-800">Objectif de temps</p>
+            <p className="mt-50 text-[11px] text-neutral-90">
               Sans objectif, le cabri-bot estime à partir de votre profil coureur
             </p>
           </div>
@@ -342,7 +342,7 @@ function Step2({
                       onFocus={() => setFocused(id)}
                       onBlur={() => setFocused(null)}
                     />
-                    <span className="absolute right-150 top-1/2 -translate-y-1/2 font-accent text-[10px] font-bold text-neutral-60">
+                    <span className="absolute right-150 top-1/2 -translate-y-1/2 text-[10px] font-bold text-neutral-60">
                       {unit}
                     </span>
                   </div>
@@ -350,7 +350,7 @@ function Step2({
               ))}
             </div>
 
-            <p className="font-accent text-[11px] font-semibold text-primary-600">
+            <p className="text-[11px] font-semibold text-primary-600">
               1 km-effort = 1 km plat ou 100 m de D+
             </p>
           </div>
@@ -377,16 +377,16 @@ function Step3({ raceName, raceLocation, raceDate, raceTime, pace }: {
   return (
     <section className="space-y-300">
       <div>
-        <h2 className="font-heading text-xl font-extrabold text-neutral-800">Tout est prêt</h2>
-        <p className="mt-75 font-accent text-sm text-neutral-90">Vérifiez les informations avant de générer votre plan.</p>
+        <h2 className="text-xl font-extrabold text-neutral-800">Tout est prêt</h2>
+        <p className="mt-75 text-sm text-neutral-90">Vérifiez les informations avant de générer votre plan.</p>
       </div>
 
       {/* Recap card */}
       <div className="widget-card overflow-hidden">
         {/* Mini altimétrie + titre */}
         <div className="border-b border-neutral-20 px-300 pb-200 pt-200">
-          <p className="font-heading text-base font-extrabold text-neutral-900">{raceName}</p>
-          <p className="mt-75 font-accent text-[10px] font-semibold uppercase tracking-widest text-neutral-80">
+          <p className="text-base font-extrabold text-neutral-900">{raceName}</p>
+          <p className="mt-75 text-[10px] eyebrow text-neutral-80">
             {formattedDate} · {raceLocation} · Départ {raceTime}
           </p>
           <div className="mt-150">
@@ -402,8 +402,8 @@ function Step3({ raceName, raceLocation, raceDate, raceTime, pace }: {
             { label: 'Segments', value: `${MOCK_GPX_STATS.segments}`,                           unit: 'seg.' },
           ].map(({ label, value, unit }) => (
             <div key={label} className="flex flex-1 flex-col items-center px-100 py-150 text-center">
-              <p className="whitespace-nowrap font-accent text-[9px] font-semibold uppercase tracking-widest text-neutral-80 lg:text-[10px]">{label}</p>
-              <p className="mt-50 whitespace-nowrap font-heading text-sm font-extrabold text-primary-600 lg:text-lg">
+              <p className="whitespace-nowrap text-[9px] eyebrow text-neutral-80 lg:text-[10px]">{label}</p>
+              <p className="mt-50 whitespace-nowrap text-sm font-extrabold text-primary-600 lg:text-lg">
                 {value}{unit && <span className="text-[10px] font-medium text-neutral-90 lg:text-xs"> {unit}</span>}
               </p>
             </div>
@@ -413,14 +413,14 @@ function Step3({ raceName, raceLocation, raceDate, raceTime, pace }: {
         {/* Objectif + Allure */}
         <div className="flex divide-x divide-neutral-20">
           <div className="flex w-1/3 flex-col items-center py-150 text-center">
-            <span className="font-accent text-[9px] font-semibold uppercase tracking-widest text-neutral-80 lg:text-[10px]">Objectif</span>
-            <span className="mt-50 whitespace-nowrap font-heading text-sm font-extrabold text-accent-500 lg:text-lg">
+            <span className="text-[9px] eyebrow text-neutral-80 lg:text-[10px]">Objectif</span>
+            <span className="mt-50 whitespace-nowrap text-sm font-extrabold text-accent-500 lg:text-lg">
               26h 36m
             </span>
           </div>
           <div className="flex w-2/3 flex-col items-center py-150 text-center">
-            <span className="font-accent text-[9px] font-semibold uppercase tracking-widest text-neutral-80 lg:text-[10px]">Allure moyenne</span>
-            <span className="mt-50 whitespace-nowrap font-heading text-sm font-extrabold text-accent-500 lg:text-lg">
+            <span className="text-[9px] eyebrow text-neutral-80 lg:text-[10px]">Allure moyenne</span>
+            <span className="mt-50 whitespace-nowrap text-sm font-extrabold text-accent-500 lg:text-lg">
               {pace} <span className="text-[10px] font-medium text-neutral-90 lg:text-xs">min/km</span> · 6,4 <span className="text-[10px] font-medium text-neutral-90 lg:text-xs">ke/h</span>
             </span>
           </div>
@@ -432,7 +432,7 @@ function Step3({ raceName, raceLocation, raceDate, raceTime, pace }: {
         <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-500">
           <Sparkles className="size-4 text-neutral-0" strokeWidth={2} />
         </div>
-        <p className="font-accent text-sm text-neutral-700 leading-relaxed">
+        <p className="text-sm text-neutral-700 leading-relaxed">
           Le Cabri-Bot va calculer, pour chacun des {MOCK_GPX_STATS.segments} segments, une allure personnalisée basée sur le terrain et la pente, vos aptitudes et votre objectif de 26h 36m. Tout sera librement ajustable ensuite.
         </p>
       </div>

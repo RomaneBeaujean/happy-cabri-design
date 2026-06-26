@@ -10,11 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/dm-serif-display": "^5.2.8",
     "@fontsource/elms-sans": "^5.2.2",
     "@fontsource/funnel-display": "^5.2.8",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/manrope": "^5.2.8",
     "@fontsource/open-sans": "^5.2.7",
+    "@fontsource/outfit": "^5.2.8",
     "@fontsource/plus-jakarta-sans": "^5.2.8",
     "@fontsource/quicksand": "^5.2.10",
     "lucide-react": "^1.21.0",

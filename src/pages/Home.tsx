@@ -1,4 +1,4 @@
-import { TrendingUp, Mountain, Timer, MapPin, Flame, Wind, CirclePlus } from 'lucide-react'
+import { TrendingUp, Mountain, Timer, MapPin, Flame, Wind, Plus } from 'lucide-react'
 import AppLayout from '../layouts/AppLayout'
 
 function navigateToNewPlan() {
@@ -13,7 +13,7 @@ export default function Home() {
 
         {/* ── Hero ── */}
         <section className="pt-100">
-          <h1 className="mt-150 font-heading text-[2.6rem] font-extrabold leading-tight text-neutral-800 lg:text-5xl">
+          <h1 className="mt-150 text-[2.6rem] font-extrabold leading-tight text-neutral-800 lg:text-5xl">
             Bonjour,{' '}
             <span className="text-secondary-500">Romane</span>
           </h1>
@@ -22,7 +22,7 @@ export default function Home() {
         {/* ── Actions rapides ── */}
         <section>
           <button className="btn btn-primary lg:w-auto" onClick={navigateToNewPlan}>
-            <CirclePlus className="size-4 shrink-0" strokeWidth={2.5} />
+            <Plus className="size-4 shrink-0" strokeWidth={2.5} />
             Nouveau plan de course
           </button>
         </section>
@@ -35,11 +35,11 @@ export default function Home() {
               Cette semaine
             </p>
             <div className="mt-200">
-              <p className="font-heading text-4xl font-extrabold text-primary-700">
+              <p className="text-4xl font-extrabold text-primary-700">
                 42
                 <span className="ml-50 text-lg font-medium text-neutral-400"> km</span>
               </p>
-              <div className="mt-150 flex items-center justify-center gap-75 font-accent text-[11px] font-medium text-secondary-500">
+              <div className="mt-150 flex items-center justify-center gap-75 text-[11px] font-medium text-secondary-500">
                 <TrendingUp className="size-3.5 shrink-0" strokeWidth={2.5} />
                 +12 % vs semaine passée
               </div>
@@ -52,11 +52,11 @@ export default function Home() {
               Dénivelé
             </p>
             <div className="mt-200">
-              <p className="font-heading text-4xl font-extrabold text-primary-700">
+              <p className="text-4xl font-extrabold text-primary-700">
                 1 840
                 <span className="ml-50 text-lg font-medium text-neutral-400"> m</span>
               </p>
-              <div className="mt-150 flex items-center justify-center gap-75 font-accent text-[11px] font-medium text-neutral-400">
+              <div className="mt-150 flex items-center justify-center gap-75 text-[11px] font-medium text-neutral-400">
                 <Mountain className="size-3.5 shrink-0" strokeWidth={2} />
                 D+ cumulé
               </div>
@@ -69,23 +69,30 @@ export default function Home() {
               <p className="widget-label">
                 Prochain objectif
               </p>
-              <h2 className="mt-200 font-heading text-3xl font-extrabold leading-none text-neutral-0">
-                UTMB<br />
-                <span className="text-primary-400">CCC</span>
+              <h2 className="mt-200 text-3xl font-extrabold leading-none text-neutral-0">
+                UTMB <span className="text-primary-100">CCC</span>
               </h2>
-              <div className="mt-200 flex items-center justify-center gap-100 font-accent text-sm font-semibold text-neutral-50">
-                <MapPin className="size-4 shrink-0" strokeWidth={1.75} />
-                Chamonix · 100 km · 6 000 m D+
+              <div className="mt-200 flex flex-wrap items-center justify-center gap-100">
+                {[
+                  { Icon: MapPin,   label: 'Chamonix' },
+                  { Icon: Mountain, label: '100 km'   },
+                  { Icon: Mountain, label: '6 000 m D+' },
+                ].map(({ Icon, label }) => (
+                  <span key={label} className="inline-flex items-center gap-50 rounded-full bg-white/20 px-150 py-50 text-xs font-semibold text-neutral-10">
+                    <Icon className="size-3 shrink-0" strokeWidth={2} />
+                    {label}
+                  </span>
+                ))}
               </div>
             </div>
             <div>
               <p className="widget-label">
                 Compte à rebours
               </p>
-              <p className="mt-100 font-heading text-5xl font-extrabold text-neutral-0">
+              <p className="mt-100 text-5xl font-extrabold text-neutral-0">
                 J–61
               </p>
-              <p className="mt-75 font-accent text-sm font-semibold text-neutral-50">23 août 2026</p>
+              <p className="mt-75 text-sm font-semibold text-neutral-50">23 août 2026</p>
             </div>
           </div>
 
@@ -95,11 +102,11 @@ export default function Home() {
               Ce mois
             </p>
             <div className="mt-200">
-              <p className="font-heading text-4xl font-extrabold text-primary-700">
+              <p className="text-4xl font-extrabold text-primary-700">
                 3
                 <span className="ml-50 text-lg font-medium text-neutral-400"> sorties</span>
               </p>
-              <div className="mt-150 flex items-center justify-center gap-75 font-accent text-[11px] font-medium text-neutral-400">
+              <div className="mt-150 flex items-center justify-center gap-75 text-[11px] font-medium text-neutral-400">
                 <Flame className="size-3.5 shrink-0" strokeWidth={2} />
                 Objectif : 8 ce mois
               </div>
@@ -112,11 +119,11 @@ export default function Home() {
               Allure moy.
             </p>
             <div className="mt-200">
-              <p className="font-heading text-4xl font-extrabold text-primary-700">
+              <p className="text-4xl font-extrabold text-primary-700">
                 6:12
                 <span className="ml-50 text-lg font-medium text-neutral-400"> /km</span>
               </p>
-              <div className="mt-150 flex items-center justify-center gap-75 font-accent text-[11px] font-medium text-neutral-400">
+              <div className="mt-150 flex items-center justify-center gap-75 text-[11px] font-medium text-neutral-400">
                 <Timer className="size-3.5 shrink-0" strokeWidth={2} />
                 30 derniers jours
               </div>
@@ -129,7 +136,7 @@ export default function Home() {
         <section className="widget-card overflow-hidden p-100">
           <div className="flex items-center justify-between px-200 py-150">
             <p className="widget-title">Dernières sorties</p>
-            <button className="font-accent text-xs font-medium text-secondary-500 hover:text-secondary-700 transition-colors">
+            <button className="text-xs font-medium text-secondary-500 hover:text-secondary-700 transition-colors">
               Voir tout
             </button>
           </div>
@@ -143,20 +150,20 @@ export default function Home() {
               className="widget-row flex cursor-pointer items-center justify-between px-200 py-200"
             >
               <div>
-                <p className="font-accent text-sm font-semibold text-neutral-800">{run.label}</p>
-                <p className="mt-25 font-body text-xs text-neutral-80">{run.date}</p>
+                <p className="text-sm font-semibold text-neutral-800">{run.label}</p>
+                <p className="mt-25 text-xs text-neutral-80">{run.date}</p>
               </div>
               <div className="flex items-center gap-200 text-right">
                 <div>
-                  <p className="font-heading text-base font-bold text-primary-700">{run.km}</p>
-                  <p className="font-accent text-[10px] text-neutral-80 flex items-center gap-50 justify-end">
+                  <p className="text-base font-bold text-primary-700">{run.km}</p>
+                  <p className="text-[10px] text-neutral-80 flex items-center gap-50 justify-end">
                     <Mountain className="size-3 shrink-0" strokeWidth={2} />
                     {run.d}
                   </p>
                 </div>
                 <div>
-                  <p className="font-heading text-base font-bold text-neutral-4000">{run.time}</p>
-                  <p className="font-accent text-[10px] text-neutral-80 flex items-center gap-50 justify-end">
+                  <p className="text-base font-bold text-neutral-4000">{run.time}</p>
+                  <p className="text-[10px] text-neutral-80 flex items-center gap-50 justify-end">
                     <Wind className="size-3 shrink-0" strokeWidth={2} />
                     durée
                   </p>

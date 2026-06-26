@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Trophy, Award, MapPin, Clock, Mountain, ChevronRight, CirclePlus, Search, MoreVertical, Pencil, Link2 } from 'lucide-react'
+import { Trophy, Award, MapPin, Clock, Mountain, ChevronRight, Search, MoreVertical, Pencil, Link2, Plus } from 'lucide-react'
 import AppLayout from '../layouts/AppLayout'
 
 function navigateToNewPlan() {
@@ -59,20 +59,17 @@ export default function RacePlans() {
         <section className="pt-100">
           <div className="flex items-end justify-between">
             <div>
-              <p className="font-accent text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-90">
-                Tes prochaines courses
-              </p>
-              <h1 className="mt-150 font-heading text-[2.6rem] font-extrabold leading-tight text-neutral-800 lg:text-5xl">
+              <h1 className="mt-150 text-[2.6rem] font-extrabold leading-tight text-neutral-800 lg:text-5xl">
                 Plans de course
               </h1>
             </div>
             <button className="btn btn-primary hidden lg:flex" onClick={navigateToNewPlan}>
-              <CirclePlus className="size-4 shrink-0" strokeWidth={2.5} />
+              <Plus className="size-4 shrink-0" strokeWidth={2.5} />
               Nouveau plan de course
             </button>
           </div>
           <button className="btn btn-primary mt-200 flex lg:hidden" onClick={navigateToNewPlan}>
-            <CirclePlus className="size-4 shrink-0" strokeWidth={2.5} />
+            <Plus className="size-4 shrink-0" strokeWidth={2.5} />
             Nouveau plan de course
           </button>
         </section>
@@ -88,8 +85,8 @@ export default function RacePlans() {
                 className={[
                   'btn whitespace-nowrap rounded-full px-200 py-100 text-xs font-semibold transition-colors',
                   activeFilter === f.id
-                    ? 'bg-neutral-800 text-neutral-0'
-                    : 'border border-neutral-40 bg-white/60 text-neutral-600 hover:border-neutral-60 hover:text-neutral-800',
+                    ? 'bg-secondary-500 text-neutral-0'
+                    : 'border border-neutral-40 bg-white/60 text-secondary-600 hover:border-neutral-60 hover:text-secondary-800',
                 ].join(' ')}
               >
                 {f.label}
@@ -117,7 +114,7 @@ export default function RacePlans() {
           {upcoming.length > 0 && (
             <>
               <div className="px-200 pb-75 pt-100">
-                <p className="font-accent text-[10px] font-semibold uppercase tracking-widest text-neutral-80">À venir</p>
+                <p className="text-[10px] eyebrow text-neutral-80">À venir</p>
               </div>
               {upcoming.map(plan => (
                 <PlanRow key={plan.id} plan={plan} openMenuId={openMenuId} setOpenMenuId={setOpenMenuId} />
@@ -129,7 +126,7 @@ export default function RacePlans() {
           {past.length > 0 && (
             <>
               <div className={['px-200 pb-75', upcoming.length > 0 ? 'pt-200' : 'pt-100'].join(' ')}>
-                <p className="font-accent text-[10px] font-semibold uppercase tracking-widest text-neutral-80">Passées</p>
+                <p className="text-[10px] eyebrow text-neutral-80">Passées</p>
               </div>
               {past.map(plan => (
                 <PlanRow key={plan.id} plan={plan} openMenuId={openMenuId} setOpenMenuId={setOpenMenuId} />
@@ -140,7 +137,7 @@ export default function RacePlans() {
           {/* Aucun résultat */}
           {filtered.length === 0 && (
             <div className="py-400 text-center">
-              <p className="font-accent text-sm text-neutral-80">Aucun plan trouvé</p>
+              <p className="text-sm text-neutral-80">Aucun plan trouvé</p>
             </div>
           )}
         </section>
@@ -178,15 +175,15 @@ function PlanRow({ plan, openMenuId, setOpenMenuId }: {
         <div className="min-w-0">
           <p className="widget-title">{plan.name}</p>
           <div className="mt-75 flex flex-wrap items-center gap-x-150 gap-y-50">
-            <span className="flex items-center gap-50 font-accent text-[11px] text-neutral-80">
+            <span className="flex items-center gap-50 text-[11px] text-neutral-80">
               <MapPin className="size-3 shrink-0" strokeWidth={2} />
               {plan.location}
             </span>
-            <span className="flex items-center gap-50 font-accent text-[11px] text-neutral-80">
+            <span className="flex items-center gap-50 text-[11px] text-neutral-80">
               <Clock className="size-3 shrink-0" strokeWidth={2} />
               {plan.date}
             </span>
-            <span className="flex items-center gap-50 font-accent text-[11px] text-neutral-80">
+            <span className="flex items-center gap-50 text-[11px] text-neutral-80">
               <Mountain className="size-3 shrink-0" strokeWidth={2} />
               {plan.distance} · {plan.elevation}
             </span>
@@ -197,8 +194,8 @@ function PlanRow({ plan, openMenuId, setOpenMenuId }: {
       {/* Droite : J-XX ou date + ellipsis + chevron */}
       <div className="ml-200 flex shrink-0 items-center gap-100">
         {!isPast
-          ? <p className="font-heading text-base font-bold text-primary-700">J–{plan.daysLeft}</p>
-          : <p className="font-accent text-xs text-neutral-80">{plan.date}</p>
+          ? <p className="text-base font-bold text-primary-700">J–{plan.daysLeft}</p>
+          : <p className="text-xs text-neutral-80">{plan.date}</p>
         }
 
         {/* Menu ellipsis */}
@@ -212,11 +209,11 @@ function PlanRow({ plan, openMenuId, setOpenMenuId }: {
 
           {menuOpen && (
             <div className="absolute right-0 top-full z-50 mt-50 overflow-hidden rounded-xl border border-neutral-20 bg-white shadow-widget" style={{ minWidth: 'max-content' }}>
-              <button className="flex w-full items-center gap-150 whitespace-nowrap px-200 py-150 font-accent text-sm text-neutral-700 transition-colors hover:bg-neutral-10">
+              <button className="flex w-full items-center gap-150 whitespace-nowrap px-200 py-150 text-sm text-neutral-700 transition-colors hover:bg-neutral-10">
                 <Pencil className="size-4 shrink-0 text-neutral-400" strokeWidth={1.75} />
                 Renommer
               </button>
-              <button className="flex w-full items-center gap-150 whitespace-nowrap px-200 py-150 font-accent text-sm text-neutral-700 transition-colors hover:bg-neutral-10">
+              <button className="flex w-full items-center gap-150 whitespace-nowrap px-200 py-150 text-sm text-neutral-700 transition-colors hover:bg-neutral-10">
                 <Link2 className="size-4 shrink-0 text-neutral-400" strokeWidth={1.75} />
                 Copier le lien CrewLink
               </button>

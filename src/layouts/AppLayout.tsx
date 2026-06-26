@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react'
+import { type ReactNode, useState, useEffect } from 'react'
 import { Calendar, Home, Trophy, User, Settings, Bell, type LucideIcon } from 'lucide-react'
-import logoMain from '../../docs/logo_main.svg'
+import logoMain from '../assets/logo.svg'
 
 export const MAIN_NAV_ITEMS = [
   { id: 'accueil',    label: 'Accueil',        mobileLabel: 'Accueil',    href: '/',           icon: Home },
@@ -44,7 +44,7 @@ function UserAvatar({
       aria-label="Compte"
       aria-current={isActive ? 'page' : undefined}
       className={[
-        'flex shrink-0 items-center justify-center rounded-full bg-primary-500 font-heading font-semibold text-neutral-0 transition-all',
+        'flex shrink-0 items-center justify-center rounded-full bg-primary-500 font-semibold text-neutral-0 transition-all',
         size === 'md' ? 'size-10 text-sm' : 'size-8 text-xs',
         isActive
           ? 'ring-2 ring-primary-400 ring-offset-2'
@@ -90,11 +90,22 @@ export default function AppLayout({
   activeItem,
   userInitials = 'RB',
 }: AppLayoutProps) {
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
     <div className="min-h-screen bg-gradient-app">
 
       {/* ── Top bar — mobile ── */}
-      <header className="fixed inset-x-0 top-0 z-20 flex h-16 items-center justify-between px-300 lg:hidden">
+      <header className={[
+        'fixed inset-x-0 top-0 z-20 flex h-16 items-center justify-between px-300 lg:hidden transition-all duration-300',
+        scrolled ? 'bg-white/80 backdrop-blur-xl' : '',
+      ].join(' ')}>
         <a href="/">
           <img src={logoMain} alt="Happy Cabri" className="h-11 w-auto" />
         </a>
@@ -121,7 +132,10 @@ export default function AppLayout({
       </header>
 
       {/* ── Top bar — desktop ── */}
-      <header className="fixed inset-x-0 top-0 z-20 hidden h-20 items-center justify-between px-600 lg:flex">
+      <header className={[
+        'fixed inset-x-0 top-0 z-20 hidden h-20 items-center justify-between px-600 lg:flex transition-all duration-300',
+        scrolled ? 'bg-white/80 backdrop-blur-xl' : '',
+      ].join(' ')}>
 
         {/* Logo — gauche, grand */}
         <a href="/" className="shrink-0">
@@ -140,7 +154,7 @@ export default function AppLayout({
                   href={href}
                   aria-current={activeItem === id ? 'page' : undefined}
                   className={[
-                    'flex items-center gap-[7px] rounded-full px-[14px] py-[8px] font-heading text-sm transition-all',
+                    'flex items-center gap-[7px] rounded-full px-[14px] py-[8px] text-sm transition-all',
                     activeItem === id
                       ? 'bg-primary-500 font-semibold text-neutral-0 shadow-sm'
                       : 'font-medium text-neutral-500 hover:text-neutral-800',
@@ -189,7 +203,7 @@ export default function AppLayout({
       {/* ── Mobile bottom nav ── */}
       <nav
         aria-label="Navigation principale"
-        className="fixed inset-x-200 bottom-100 z-20 lg:hidden"
+        className="fixed inset-x-200 bottom-300 z-20 lg:hidden"
       >
         <div className="flex h-[60px] items-stretch gap-[3px] rounded-[999px] border border-neutral-40/40 bg-white/35 px-[5px] py-[5px] shadow-[0_8px_40px_rgba(28,28,28,0.12)] backdrop-blur-2xl">
           {MAIN_NAV_ITEMS.map((item) => (

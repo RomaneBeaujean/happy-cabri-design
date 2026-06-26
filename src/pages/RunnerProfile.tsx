@@ -162,14 +162,14 @@ function PaceCell({ value, editing, onChange }: {
   const isMarche = value === 'marche'
   if (editing) return (
     <input
-      className="w-14 rounded-md border border-neutral-30 bg-neutral-0 px-50 py-25 text-center font-heading text-xs font-bold text-neutral-700 outline-none focus:border-primary-400"
+      className="w-14 rounded-md border border-neutral-30 bg-neutral-0 px-50 py-25 text-center text-xs font-bold text-neutral-700 outline-none focus:border-primary-400"
       value={value}
       onChange={e => onChange(e.target.value)}
     />
   )
   return (
-    <span className={`font-heading text-xs font-bold ${isMarche ? 'italic text-neutral-400' : 'text-neutral-700'}`}>
-      {value}{!isMarche && <span className="ml-25 font-accent text-[9px] font-medium text-neutral-400">/km</span>}
+    <span className={`text-xs font-bold ${isMarche ? 'italic text-neutral-400' : 'text-neutral-700'}`}>
+      {value}{!isMarche && <span className="ml-25 text-[9px] font-medium text-neutral-400">/km</span>}
     </span>
   )
 }
@@ -197,18 +197,18 @@ function PenteTable({
       {/* Header */}
       <div className={`flex items-center gap-100 px-150 py-100 ${headerBg}`}>
         <span className={headerText}>{icon}</span>
-        <p className={`font-accent text-[10px] font-extrabold uppercase tracking-widest ${headerText}`}>{label}</p>
+        <p className={`text-[10px] eyebrow ${headerText}`}>{label}</p>
       </div>
       {/* Column labels */}
       <div className={`grid grid-cols-[1fr_auto_auto] gap-x-150 border-b px-150 py-75 ${colsBg} ${rowBorder}`}>
         <span />
-        <p className={`w-14 text-center font-accent text-[9px] font-bold uppercase tracking-wide ${colsText}`}>Roulant</p>
-        <p className="w-14 text-center font-accent text-[9px] font-bold uppercase tracking-wide text-neutral-400">Technique</p>
+        <p className={`w-14 text-center text-[9px] eyebrow ${colsText}`}>Roulant</p>
+        <p className="w-14 text-center text-[9px] eyebrow text-neutral-400">Technique</p>
       </div>
       {/* Rows */}
       {rows.map((row, k) => (
         <div key={k} className={`grid grid-cols-[1fr_auto_auto] items-center gap-x-150 px-150 py-100 [&:not(:last-child)]:border-b [&:not(:last-child)]:${rowBorder}`}>
-          <span className="font-accent text-[10px] font-semibold text-neutral-500">{row.label}</span>
+          <span className="text-[10px] font-semibold text-neutral-500">{row.label}</span>
           <div className={`flex w-14 justify-center ${isMontee ? 'text-primary-700' : 'text-neutral-700'}`}>
             <PaceCell value={row.roulant}   editing={editing} onChange={v => onEdit(k, 'roulant', v)}   />
           </div>
@@ -250,16 +250,16 @@ export default function RunnerProfile() {
 
         {/* ── Header ── */}
         <section className="pt-100">
-          <p className="font-accent text-[11px] font-semibold uppercase tracking-[0.18em] text-neutral-90">
+          <p className="text-[11px] eyebrow text-neutral-90">
             Mon profil
           </p>
           <div className="mt-200 flex items-center gap-300">
-            <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-primary-500 font-accent text-2xl font-bold text-neutral-0">
+            <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-primary-500 text-2xl font-bold text-neutral-0">
               RB
             </div>
             <div>
-              <h1 className="font-heading text-2xl font-extrabold text-neutral-800">Romane Beaujean</h1>
-              <p className="mt-25 font-body text-sm text-neutral-80">Traileur · Niveau intermédiaire</p>
+              <h1 className="text-2xl font-extrabold text-neutral-800">Romane Beaujean</h1>
+              <p className="mt-25 text-sm text-neutral-80">Traileur · Niveau intermédiaire</p>
             </div>
           </div>
         </section>
@@ -273,7 +273,7 @@ export default function RunnerProfile() {
             </div>
             <button
               onClick={() => setEditAptitudes(v => !v)}
-              className="flex items-center gap-75 rounded-lg px-150 py-75 font-accent text-xs font-semibold text-neutral-600 transition-colors hover:bg-neutral-20"
+              className="flex items-center gap-75 rounded-lg px-150 py-75 text-xs font-semibold text-neutral-600 transition-colors hover:bg-neutral-20"
             >
               {editAptitudes
                 ? <><Check className="size-3.5" strokeWidth={2.5} />Enregistrer</>
@@ -283,9 +283,9 @@ export default function RunnerProfile() {
 
           {/* Column headers */}
           <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-200 px-200 pb-75">
-            <p className="font-accent text-[10px] font-bold uppercase tracking-wide text-neutral-400">Type</p>
-            <p className="text-center font-accent text-[10px] font-bold uppercase tracking-wide text-neutral-400">Allure moy.</p>
-            <p className="text-center font-accent text-[10px] font-bold uppercase tracking-wide text-neutral-400">Km-effort</p>
+            <p className="text-[10px] eyebrow text-neutral-400">Type</p>
+            <p className="text-center text-[10px] eyebrow text-neutral-400">Allure moy.</p>
+            <p className="text-center text-[10px] eyebrow text-neutral-400">Km-effort</p>
             <span />
           </div>
 
@@ -298,32 +298,32 @@ export default function RunnerProfile() {
                   onClick={() => toggleApt(i)}
                   className="widget-row grid w-full grid-cols-[1fr_auto_auto_auto] items-center gap-x-200 px-200 py-150 text-left"
                 >
-                  <p className="font-accent text-xs font-semibold text-neutral-700">{a.type}</p>
+                  <p className="text-xs font-semibold text-neutral-700">{a.type}</p>
                   {editAptitudes ? (
                     <>
                       <div className="flex items-center gap-50" onClick={e => e.stopPropagation()}>
                         <input
-                          className="w-14 rounded-lg border border-neutral-30 bg-neutral-10 px-100 py-50 text-center font-heading text-sm font-bold text-primary-700 outline-none focus:border-primary-400"
+                          className="w-14 rounded-lg border border-neutral-30 bg-neutral-10 px-100 py-50 text-center text-sm font-bold text-primary-700 outline-none focus:border-primary-400"
                           value={a.vitesse}
                           onChange={e => setAptitudes(ap => ap.map((x, j) => j === i ? { ...x, vitesse: e.target.value } : x))}
                         />
-                        <span className="font-accent text-[10px] text-neutral-400">/km</span>
+                        <span className="text-[10px] text-neutral-400">/km</span>
                       </div>
                       <div className="flex items-center gap-50" onClick={e => e.stopPropagation()}>
                         <input
-                          className="w-12 rounded-lg border border-neutral-30 bg-neutral-10 px-100 py-50 text-center font-heading text-sm font-bold text-primary-700 outline-none focus:border-primary-400"
+                          className="w-12 rounded-lg border border-neutral-30 bg-neutral-10 px-100 py-50 text-center text-sm font-bold text-primary-700 outline-none focus:border-primary-400"
                           value={a.kmEffort}
                           onChange={e => setAptitudes(ap => ap.map((x, j) => j === i ? { ...x, kmEffort: e.target.value } : x))}
                         />
-                        <span className="font-accent text-[10px] text-neutral-400">KE</span>
+                        <span className="text-[10px] text-neutral-400">KE</span>
                       </div>
                     </>
                   ) : (
                     <>
-                      <p className="text-center font-heading text-sm font-bold text-primary-700">
+                      <p className="text-center text-sm font-bold text-primary-700">
                         {a.vitesse}<span className="ml-25 text-[10px] font-medium text-neutral-400">/km</span>
                       </p>
-                      <p className="text-center font-heading text-sm font-bold text-secondary-500">
+                      <p className="text-center text-sm font-bold text-secondary-500">
                         {a.kmEffort}<span className="ml-25 text-[10px] font-medium text-neutral-400">KE</span>
                       </p>
                     </>
@@ -377,7 +377,7 @@ export default function RunnerProfile() {
                       <Icon className="size-3 text-neutral-90 shrink-0" strokeWidth={2} />
                       <p className="widget-label">{s.label}</p>
                     </div>
-                    <p className="mt-200 font-heading text-3xl font-extrabold text-primary-700">
+                    <p className="mt-200 text-3xl font-extrabold text-primary-700">
                       {s.value}
                       {s.unit && <span className="ml-50 text-sm font-medium text-neutral-400">{s.unit}</span>}
                     </p>
@@ -392,16 +392,16 @@ export default function RunnerProfile() {
                 <Clock className="size-3 text-neutral-90 shrink-0" strokeWidth={2} />
                 <p className="widget-label">Course la plus longue</p>
               </div>
-              <p className="font-heading text-sm font-bold text-neutral-700">{longestRun.name}</p>
+              <p className="text-sm font-bold text-neutral-700">{longestRun.name}</p>
               <div className="mt-150 flex items-center gap-300">
                 <div>
-                  <p className="font-heading text-3xl font-extrabold text-primary-700">{longestRun.distance}</p>
-                  <p className="mt-25 font-accent text-[10px] text-neutral-400">distance</p>
+                  <p className="text-3xl font-extrabold text-primary-700">{longestRun.distance}</p>
+                  <p className="mt-25 text-[10px] text-neutral-400">distance</p>
                 </div>
                 <div className="h-10 w-px bg-neutral-30" />
                 <div>
-                  <p className="font-heading text-3xl font-extrabold text-primary-700">{longestRun.time}</p>
-                  <p className="mt-25 font-accent text-[10px] text-neutral-400">durée</p>
+                  <p className="text-3xl font-extrabold text-primary-700">{longestRun.time}</p>
+                  <p className="mt-25 text-[10px] text-neutral-400">durée</p>
                 </div>
               </div>
             </div>
@@ -426,7 +426,7 @@ export default function RunnerProfile() {
             </div>
             <button
               onClick={() => setEditChronos(v => !v)}
-              className="flex items-center gap-75 rounded-lg px-150 py-75 font-accent text-xs font-semibold text-neutral-600 transition-colors hover:bg-neutral-20"
+              className="flex items-center gap-75 rounded-lg px-150 py-75 text-xs font-semibold text-neutral-600 transition-colors hover:bg-neutral-20"
             >
               {editChronos
                 ? <><Check className="size-3.5" strokeWidth={2.5} />Enregistrer</>
@@ -435,15 +435,15 @@ export default function RunnerProfile() {
           </div>
           {chronos.map((c, i) => (
             <div key={i} className="widget-row flex items-center justify-between px-200 py-150">
-              <p className="font-heading text-sm font-bold text-neutral-800">{c.label}</p>
+              <p className="text-sm font-bold text-neutral-800">{c.label}</p>
               {editChronos ? (
                 <input
-                  className="w-24 rounded-lg border border-neutral-30 bg-neutral-10 px-150 py-75 text-right font-heading text-sm font-bold text-primary-700 outline-none focus:border-primary-400"
+                  className="w-24 rounded-lg border border-neutral-30 bg-neutral-10 px-150 py-75 text-right text-sm font-bold text-primary-700 outline-none focus:border-primary-400"
                   value={c.time}
                   onChange={e => setChronos(ch => ch.map((x, j) => j === i ? { ...x, time: e.target.value } : x))}
                 />
               ) : (
-                <p className="font-heading text-base font-bold text-primary-700">{c.time}</p>
+                <p className="text-base font-bold text-primary-700">{c.time}</p>
               )}
             </div>
           ))}
@@ -456,7 +456,7 @@ export default function RunnerProfile() {
               <Flame className="size-4 text-secondary-500 shrink-0" strokeWidth={2} />
               <p className="widget-title">Mes produits nutrition</p>
             </div>
-            <span className="font-accent text-[10px] font-semibold uppercase tracking-wide text-neutral-400">
+            <span className="text-[10px] eyebrow text-neutral-400">
               Par préférence
             </span>
           </div>
@@ -464,8 +464,8 @@ export default function RunnerProfile() {
           {/* Column headers */}
           <div className="grid grid-cols-[auto_1fr_auto_auto_auto] items-center gap-x-150 px-200 pb-75">
             <span /><span />
-            <p className="w-14 text-center font-accent text-[10px] font-bold uppercase tracking-wide text-neutral-400">Glucides</p>
-            <p className="w-12 text-center font-accent text-[10px] font-bold uppercase tracking-wide text-neutral-400">Glu:Fru</p>
+            <p className="w-14 text-center text-[10px] eyebrow text-neutral-400">Glucides</p>
+            <p className="w-12 text-center text-[10px] eyebrow text-neutral-400">Glu:Fru</p>
             <span />
           </div>
 
@@ -473,15 +473,15 @@ export default function RunnerProfile() {
             <div key={i} className="widget-row grid grid-cols-[auto_1fr_auto_auto_auto] items-center gap-x-150 px-200 py-150">
               <GripVertical className="size-4 shrink-0 cursor-grab text-neutral-40" strokeWidth={2} />
               <div className="flex items-center gap-100">
-                <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary-100 font-accent text-[10px] font-bold text-primary-700">
+                <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary-100 text-[10px] font-bold text-primary-700">
                   {i + 1}
                 </span>
-                <p className="font-accent text-sm font-semibold text-neutral-800">{p.name}</p>
+                <p className="text-sm font-semibold text-neutral-800">{p.name}</p>
               </div>
-              <p className="w-14 text-center font-heading text-sm font-bold text-primary-700">
+              <p className="w-14 text-center text-sm font-bold text-primary-700">
                 {p.glucides}<span className="ml-25 text-[10px] font-medium text-neutral-400">g</span>
               </p>
-              <p className="w-12 text-center font-accent text-xs font-semibold text-neutral-600">{p.ratio}</p>
+              <p className="w-12 text-center text-xs font-semibold text-neutral-600">{p.ratio}</p>
               <button
                 onClick={() => setProducts(pr => pr.filter((_, j) => j !== i))}
                 className="rounded-lg p-75 text-neutral-40 transition-colors hover:bg-red-50 hover:text-red-500"
@@ -492,7 +492,7 @@ export default function RunnerProfile() {
           ))}
 
           <div className="border-t border-neutral-20 px-200 py-150">
-            <button className="flex items-center gap-100 font-accent text-xs font-semibold text-primary-600 transition-colors hover:text-primary-700">
+            <button className="flex items-center gap-100 text-xs font-semibold text-primary-600 transition-colors hover:text-primary-700">
               <Plus className="size-3.5" strokeWidth={2.5} />
               Ajouter un produit
             </button>
@@ -512,7 +512,7 @@ export default function RunnerProfile() {
                 >
                   <Minus className="size-3" strokeWidth={2.5} />
                 </button>
-                <span className="w-20 text-center font-heading text-base font-bold text-primary-700">
+                <span className="w-20 text-center text-base font-bold text-primary-700">
                   {waterPerHour}
                   <span className="ml-25 text-xs font-medium text-neutral-400">ml</span>
                 </span>
