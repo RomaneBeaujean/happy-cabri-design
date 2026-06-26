@@ -76,11 +76,11 @@ function BottomNavLink({
       className={[
         'flex flex-1 items-center justify-center rounded-[999px] px-50 py-100 transition-all',
         isActive
-          ? 'bg-neutral-0/15 text-neutral-0'
-          : 'text-neutral-400 hover:text-neutral-200',
+          ? 'bg-primary-500 text-neutral-0 shadow-sm'
+          : 'text-neutral-500 hover:text-neutral-800',
       ].join(' ')}
     >
-      <Icon className="size-6 shrink-0" strokeWidth={isActive ? 2 : 1.75} />
+      <Icon className="size-[18px] shrink-0" strokeWidth={isActive ? 2.2 : 1.75} />
     </a>
   )
 }
@@ -98,11 +98,26 @@ export default function AppLayout({
         <a href="/">
           <img src={logoMain} alt="Happy Cabri" className="h-11 w-auto" />
         </a>
-        <UserAvatar
-          initials={userInitials}
-          href={ACCOUNT_NAV.href}
-          isActive={activeItem === ACCOUNT_NAV.id}
-        />
+        <div className="flex items-center gap-[3px] rounded-full border border-neutral-40/50 bg-white/60 px-[5px] py-[5px] backdrop-blur-xl">
+          <button
+            aria-label="Notifications"
+            className="flex size-8 shrink-0 items-center justify-center rounded-full text-neutral-500 transition-all hover:bg-neutral-0/60 hover:text-neutral-800"
+          >
+            <Bell className="size-4" strokeWidth={1.75} />
+          </button>
+          <button
+            aria-label="Paramètres"
+            className="flex size-8 shrink-0 items-center justify-center rounded-full text-neutral-500 transition-all hover:bg-neutral-0/60 hover:text-neutral-800"
+          >
+            <Settings className="size-4" strokeWidth={1.75} />
+          </button>
+          <UserAvatar
+            initials={userInitials}
+            href={ACCOUNT_NAV.href}
+            isActive={activeItem === ACCOUNT_NAV.id}
+            size="sm"
+          />
+        </div>
       </header>
 
       {/* ── Top bar — desktop ── */}
@@ -118,7 +133,7 @@ export default function AppLayout({
 
           {/* Nav pill — beige/transparent avec blur */}
           <nav>
-            <div className="flex items-center gap-[3px] rounded-full border border-neutral-40/50 bg-neutral-0/55 px-[5px] py-[5px] backdrop-blur-lg">
+            <div className="flex items-center gap-[3px] rounded-full border border-neutral-40/40 bg-white/35 px-[5px] py-[5px] backdrop-blur-2xl">
               {MAIN_NAV_ITEMS.map(({ id, label, href, icon: Icon }) => (
                 <a
                   key={id}
@@ -144,7 +159,7 @@ export default function AppLayout({
           {/* Settings */}
           <button
             aria-label="Paramètres"
-            className="flex size-10 shrink-0 items-center justify-center rounded-full border border-neutral-40/50 bg-neutral-0/55 text-neutral-500 backdrop-blur-lg transition-all hover:bg-neutral-0 hover:text-neutral-800"
+            className="flex size-10 shrink-0 items-center justify-center rounded-full border border-neutral-40/50 bg-neutral-0/55 text-neutral-500 backdrop-blur-2xl transition-all hover:bg-neutral-0 hover:text-neutral-800"
           >
             <Settings className="size-[17px]" strokeWidth={1.75} />
           </button>
@@ -152,7 +167,7 @@ export default function AppLayout({
           {/* Notifications */}
           <button
             aria-label="Notifications"
-            className="flex size-10 shrink-0 items-center justify-center rounded-full border border-neutral-40/50 bg-neutral-0/55 text-neutral-500 backdrop-blur-lg transition-all hover:bg-neutral-0 hover:text-neutral-800"
+            className="flex size-10 shrink-0 items-center justify-center rounded-full border border-neutral-40/50 bg-neutral-0/55 text-neutral-500 backdrop-blur-2xl transition-all hover:bg-neutral-0 hover:text-neutral-800"
           >
             <Bell className="size-[17px]" strokeWidth={1.75} />
           </button>
@@ -174,9 +189,9 @@ export default function AppLayout({
       {/* ── Mobile bottom nav ── */}
       <nav
         aria-label="Navigation principale"
-        className="fixed inset-x-300 bottom-300 z-20 lg:hidden"
+        className="fixed inset-x-200 bottom-300 z-20 lg:hidden"
       >
-        <div className="flex h-[70px] items-stretch gap-50 rounded-[999px] bg-primary-500/95 p-100 shadow-[0_8px_40px_rgba(28,28,28,0.30)] backdrop-blur-xl">
+        <div className="flex h-[60px] items-stretch gap-[3px] rounded-[999px] border border-neutral-40/40 bg-white/35 px-[5px] py-[5px] shadow-[0_8px_40px_rgba(28,28,28,0.12)] backdrop-blur-2xl">
           {MAIN_NAV_ITEMS.map((item) => (
             <BottomNavLink
               key={item.id}
@@ -186,13 +201,6 @@ export default function AppLayout({
               isActive={activeItem === item.id}
             />
           ))}
-          <UserAvatar
-            initials={userInitials}
-            href={ACCOUNT_NAV.href}
-            isActive={activeItem === ACCOUNT_NAV.id}
-            size="sm"
-            className="self-center mx-50 bg-neutral-0/15 hover:bg-neutral-0/25"
-          />
         </div>
       </nav>
 

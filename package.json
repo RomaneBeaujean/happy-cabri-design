@@ -10,12 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/elms-sans": "^5.2.2",
+    "@fontsource/funnel-display": "^5.2.8",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/manrope": "^5.2.8",
+    "@fontsource/open-sans": "^5.2.7",
     "@fontsource/plus-jakarta-sans": "^5.2.8",
+    "@fontsource/quicksand": "^5.2.10",
     "lucide-react": "^1.21.0",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "recharts": "^3.9.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

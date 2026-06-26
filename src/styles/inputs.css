@@ -1,0 +1,28 @@
+@layer components {
+  .input {
+    width: 100%;
+    border-radius: 0.75rem; /* rounded-xl */
+    border: 1px solid var(--color-neutral-40);
+    background: rgba(255, 255, 255, 0.7);
+    padding: var(--spacing-150) var(--spacing-200);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-neutral-800);
+    outline: none;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .input:focus {
+    border-color: var(--color-primary-400);
+    background-color: white;
+  }
+
+  .input::placeholder {
+    color: var(--color-neutral-60);
+  }
+
+  /* Décalage gauche pour un icone positionné en absolu */
+  .input-icon {
+    padding-left: 2rem;
+  }
+}

@@ -1,0 +1,72 @@
+/* ─────────────────────────────────────────────────────────────
+   Styles de boutons — source unique de vérité
+   Toute modification ici s'applique à l'ensemble de l'app.
+   Consulter ce fichier avant de styler un nouveau bouton.
+───────────────────────────────────────────────────────────── */
+
+@layer components {
+
+/* Base commune à tous les boutons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-150);
+  font-family: "Manrope", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+
+/* Variante principale — fond primary-500, texte blanc, hauteur 40px */
+.btn-primary {
+  background-color: var(--color-primary-500);
+  color: var(--color-neutral-0);
+  height: 2.5rem;
+  padding-left: var(--spacing-300);
+  padding-right: var(--spacing-300);
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-600);
+}
+
+/* Pleine largeur — hauteur auto, padding vertical confortable pour mobile */
+.btn-full {
+  width: 100%;
+  height: auto;
+  padding: var(--spacing-200);
+}
+
+/* Bouton icône circulaire (navigation, actions utilitaires) */
+.btn-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.6);
+  color: var(--color-neutral-700);
+  box-shadow: var(--shadow-widget);
+  backdrop-filter: blur(12px);
+}
+.btn-icon:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Bouton texte / ghost */
+.btn-ghost {
+  background: transparent;
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-secondary-500);
+  border-radius: 0;
+}
+.btn-ghost:hover {
+  color: var(--color-secondary-700);
+}
+
+} /* end @layer components */

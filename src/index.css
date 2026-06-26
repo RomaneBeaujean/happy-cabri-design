@@ -1,16 +1,43 @@
 @import "tailwindcss";
+@import "./styles/buttons.css";
+@import "./styles/inputs.css";
 
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
 
+@import "@fontsource/open-sans/400.css";
+@import "@fontsource/open-sans/500.css";
+@import "@fontsource/open-sans/600.css";
+@import "@fontsource/open-sans/700.css";
+
 @import "@fontsource/plus-jakarta-sans/600.css";
 @import "@fontsource/plus-jakarta-sans/700.css";
 @import "@fontsource/plus-jakarta-sans/800.css";
 
+@import "@fontsource/elms-sans/400.css";
+@import "@fontsource/elms-sans/500.css";
+@import "@fontsource/elms-sans/600.css";
+@import "@fontsource/elms-sans/700.css";
+
+@import "@fontsource/quicksand/400.css";
+@import "@fontsource/quicksand/500.css";
+@import "@fontsource/quicksand/600.css";
+@import "@fontsource/quicksand/700.css";
+
+@import "@fontsource/funnel-display/400.css";
+@import "@fontsource/funnel-display/500.css";
+@import "@fontsource/funnel-display/600.css";
+@import "@fontsource/funnel-display/700.css";
+@import "@fontsource/funnel-display/800.css";
+
+@import "@fontsource/manrope/200.css";
+@import "@fontsource/manrope/300.css";
+@import "@fontsource/manrope/400.css";
 @import "@fontsource/manrope/500.css";
 @import "@fontsource/manrope/600.css";
 @import "@fontsource/manrope/700.css";
+@import "@fontsource/manrope/800.css";
 
 @theme {
   /* ── Fonts ── */
@@ -19,7 +46,7 @@
   --font-accent:  "Manrope", sans-serif;
 
   /* ── Page background ── */
-  --color-page-bg: #faf8f3;
+  --color-page-bg: #FBFEF9;
 
   /* ── Neutrals ── */
   --color-neutral-0:   #ffffff;
@@ -42,19 +69,20 @@
   --color-neutral-800: #282520;
   --color-neutral-900: #1d1a16;
 
-  /* ── Primary (near-black gray) ── */
-  --color-primary-50:  #f0f8f9;
-  --color-primary-100: #daeff1;
-  --color-primary-200: #c5e4e7;
-  --color-primary-300: #92ced3;
-  --color-primary-400: #55bac3;
-  --color-primary-500: #2ba1ab;
-  --color-primary-600: #208992;
-  --color-primary-700: #18747c;
-  --color-primary-800: #125c63;
-  --color-primary-900: #0c454b;
+  /* ── Primary  ── */
+--color-primary-50:  #E8F5F5;
+--color-primary-100: #C4E8E8;
+--color-primary-200: #96D4D4;
+--color-primary-300: #60BBBB;
+--color-primary-400: #329F9F;
+--color-primary-500: #1E9090;
+--color-primary-600: #187F7F;
+--color-primary-700: #126868;
+--color-primary-800: #0C4F4F;
+--color-primary-900: #073535;
 
-  /* ── Secondary (turquoise) ── */
+
+  /* ── Secondary ── */
   --color-secondary-50:  #F5F6F6;
   --color-secondary-100: #E8EAEA;
   --color-secondary-200: #D0D4D4;
@@ -69,6 +97,13 @@
   /* ── Shadows ── */
   --shadow-card: 0 0 0 1px rgba(29, 26, 22, 0.06), 0 4px 20px rgba(29, 26, 22, 0.08), 0 1px 4px rgba(29, 26, 22, 0.05);
   --shadow-widget: 0 18px 48px rgba(29, 26, 22, 0.10), 0 2px 10px rgba(29, 26, 22, 0.05);
+
+  /* ── Accent orange (altimétrie, courbe GPX) ── */
+  --color-accent-50:  #FEF3EB;
+  --color-accent-100: #FDE0CE;
+  --color-accent-500: #F47425;
+  --color-accent-600: #E6610F;
+  --color-accent-700: #BA5212;
 
   /* ── Semantic ── */
   --color-success: #0db28b;
@@ -101,11 +136,16 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
 }
 
+button {
+  font-family: "Manrope", sans-serif;
+}
+
 .bg-gradient-app {
   background-color: #FBFEF9;
   background-image:
-    radial-gradient(ellipse 180% 120% at -20% 0%, rgba(167, 160, 149, 0.45) 0%, transparent 60%),
-    radial-gradient(ellipse 160% 110% at 120% 55%, rgba(43, 161, 171, 0.30) 0%, transparent 60%);
+    radial-gradient(ellipse 80vw 100vh at -10% 0%, rgba(167, 160, 149, 0.45) 0%, transparent 60%),
+    radial-gradient(ellipse 100vw 80vh at 110% 80%, rgba(43, 161, 171, 0.30) 0%, transparent 60%);
+  background-attachment: fixed;
 }
 
 .widget-card {
@@ -148,5 +188,5 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .widget-row:hover {
-  background: rgba(255, 255, 255, 0.48);
+  background: var(--color-primary-50);
 }

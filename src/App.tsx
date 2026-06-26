@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import Home from './pages/Home'
 import Calendar from './pages/Calendar'
 import RacePlans from './pages/RacePlans'
+import NewRacePlan from './pages/NewRacePlan'
 import RunnerProfile from './pages/RunnerProfile'
 
 const routes: Record<string, () => React.ReactElement> = {
   '/': Home,
   '/calendrier': Calendar,
   '/plans': RacePlans,
+  '/plans/nouveau': NewRacePlan,
   '/profil': RunnerProfile,
 }
 
