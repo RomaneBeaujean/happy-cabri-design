@@ -15,7 +15,7 @@ export default function Home() {
         <section className="pt-100">
           <h1 className="mt-150 text-[2.6rem] font-extrabold leading-tight text-neutral-800 lg:text-5xl">
             Bonjour,{' '}
-            <span className="text-secondary-500">Romane</span>
+            <span className="text-primary-500">Romane</span>
           </h1>
         </section>
 
@@ -35,11 +35,11 @@ export default function Home() {
               Cette semaine
             </p>
             <div className="mt-200">
-              <p className="text-4xl font-extrabold text-primary-700">
+              <p className="text-4xl font-extrabold text-primary-500">
                 42
                 <span className="ml-50 text-lg font-medium text-neutral-400"> km</span>
               </p>
-              <div className="mt-150 flex items-center justify-center gap-75 text-[11px] font-medium text-secondary-500">
+              <div className="mt-150 flex items-center justify-center gap-75 text-[11px] font-medium text-primary-400">
                 <TrendingUp className="size-3.5 shrink-0" strokeWidth={2.5} />
                 +12 % vs semaine passée
               </div>
@@ -52,7 +52,7 @@ export default function Home() {
               Dénivelé
             </p>
             <div className="mt-200">
-              <p className="text-4xl font-extrabold text-primary-700">
+              <p className="text-4xl font-extrabold text-primary-500">
                 1 840
                 <span className="ml-50 text-lg font-medium text-neutral-400"> m</span>
               </p>
@@ -102,7 +102,7 @@ export default function Home() {
               Ce mois
             </p>
             <div className="mt-200">
-              <p className="text-4xl font-extrabold text-primary-700">
+              <p className="text-4xl font-extrabold text-primary-500">
                 3
                 <span className="ml-50 text-lg font-medium text-neutral-400"> sorties</span>
               </p>
@@ -119,7 +119,7 @@ export default function Home() {
               Allure moy.
             </p>
             <div className="mt-200">
-              <p className="text-4xl font-extrabold text-primary-700">
+              <p className="text-4xl font-extrabold text-primary-500">
                 6:12
                 <span className="ml-50 text-lg font-medium text-neutral-400"> /km</span>
               </p>
@@ -136,9 +136,7 @@ export default function Home() {
         <section className="widget-card overflow-hidden p-100">
           <div className="flex items-center justify-between px-200 py-150">
             <p className="widget-title">Dernières sorties</p>
-            <button className="text-xs font-medium text-secondary-500 hover:text-secondary-700 transition-colors">
-              Voir tout
-            </button>
+            <button className="btn btn-ghost text-xs">Voir tout</button>
           </div>
           {[
             { label: 'Sortie longue — Belledonne', date: 'Dim. 22 juin', km: '28 km', d: '1 420 m', time: '3h12' },
@@ -155,7 +153,7 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-200 text-right">
                 <div>
-                  <p className="text-base font-bold text-primary-700">{run.km}</p>
+                  <p className="text-base font-bold text-primary-500">{run.km}</p>
                   <p className="text-[10px] text-neutral-80 flex items-center gap-50 justify-end">
                     <Mountain className="size-3 shrink-0" strokeWidth={2} />
                     {run.d}

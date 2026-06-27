@@ -85,8 +85,8 @@ export default function RacePlans() {
                 className={[
                   'btn whitespace-nowrap rounded-full px-200 py-100 text-xs font-semibold transition-colors',
                   activeFilter === f.id
-                    ? 'bg-secondary-500 text-neutral-0'
-                    : 'border border-neutral-40 bg-white/60 text-secondary-600 hover:border-neutral-60 hover:text-secondary-800',
+                    ? 'bg-primary-500 text-neutral-0'
+                    : 'border border-neutral-40 bg-white/60 text-neutral-600 hover:border-neutral-60 hover:text-neutral-800',
                 ].join(' ')}
               >
                 {f.label}
@@ -165,11 +165,11 @@ function PlanRow({ plan, openMenuId, setOpenMenuId }: {
       <div className="flex min-w-0 flex-1 items-start gap-200">
         <div className={[
           'flex size-10 shrink-0 items-center justify-center rounded-xl',
-          isPast ? 'bg-neutral-20' : 'bg-secondary-100/80',
+          isPast ? 'bg-neutral-20' : 'bg-primary-100/60',
         ].join(' ')}>
           {isPast
             ? <Award  className="size-5 text-neutral-400"   strokeWidth={1.75} />
-            : <Trophy className="size-5 text-secondary-600" strokeWidth={1.75} />
+            : <Trophy className="size-5 text-primary-500" strokeWidth={1.75} />
           }
         </div>
         <div className="min-w-0">

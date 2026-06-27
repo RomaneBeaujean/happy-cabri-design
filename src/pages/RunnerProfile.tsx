@@ -268,7 +268,7 @@ export default function RunnerProfile() {
         <section className="widget-card overflow-hidden p-100">
           <div className="flex items-center justify-between px-200 py-150">
             <div className="flex items-center gap-150">
-              <Zap className="size-4 text-secondary-500 shrink-0" strokeWidth={2} />
+              <Zap className="size-4 text-primary-400 shrink-0" strokeWidth={2} />
               <p className="widget-title">Aptitudes trail</p>
             </div>
             <button
@@ -323,7 +323,7 @@ export default function RunnerProfile() {
                       <p className="text-center text-sm font-bold text-primary-700">
                         {a.vitesse}<span className="ml-25 text-[10px] font-medium text-neutral-400">/km</span>
                       </p>
-                      <p className="text-center text-sm font-bold text-secondary-500">
+                      <p className="text-center text-sm font-bold text-primary-400">
                         {a.kmEffort}<span className="ml-25 text-[10px] font-medium text-neutral-400">KE</span>
                       </p>
                     </>
@@ -421,7 +421,7 @@ export default function RunnerProfile() {
         <section className="widget-card overflow-hidden p-100">
           <div className="flex items-center justify-between px-200 py-150">
             <div className="flex items-center gap-150">
-              <Timer className="size-4 text-secondary-500 shrink-0" strokeWidth={2} />
+              <Timer className="size-4 text-primary-400 shrink-0" strokeWidth={2} />
               <p className="widget-title">Références chronométriques</p>
             </div>
             <button
@@ -453,7 +453,7 @@ export default function RunnerProfile() {
         <section className="widget-card overflow-hidden p-100">
           <div className="flex items-center justify-between px-200 py-150">
             <div className="flex items-center gap-150">
-              <Flame className="size-4 text-secondary-500 shrink-0" strokeWidth={2} />
+              <Flame className="size-4 text-primary-400 shrink-0" strokeWidth={2} />
               <p className="widget-title">Mes produits nutrition</p>
             </div>
             <span className="text-[10px] eyebrow text-neutral-400">

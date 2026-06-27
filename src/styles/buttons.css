@@ -15,22 +15,24 @@
   font-size: 0.875rem;
   font-weight: 500;
   border: none;
-  border-radius: 0.75rem;
+  border-radius: 9999px;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   white-space: nowrap;
 }
 
-/* Variante principale — fond primary-500, texte blanc, hauteur 40px */
+/* Variante principale — dégradé forest green, texte blanc, hauteur 40px */
 .btn-primary {
-  background-color: var(--color-primary-500);
+  background: linear-gradient(135deg, #2C4E41 0%, #203B32 100%);
   color: var(--color-neutral-0);
   height: 2.5rem;
   padding-left: var(--spacing-300);
   padding-right: var(--spacing-300);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 .btn-primary:hover {
-  background-color: var(--color-primary-600);
+  background: linear-gradient(135deg, #344F42 0%, #1A3128 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 /* Pleine largeur — hauteur auto, padding vertical confortable pour mobile */
@@ -61,11 +63,11 @@
   padding: 0;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--color-secondary-500);
+  color: var(--color-primary-500);
   border-radius: 0;
 }
 .btn-ghost:hover {
-  color: var(--color-secondary-700);
+  color: var(--color-primary-600);
 }
 
 } /* end @layer components */

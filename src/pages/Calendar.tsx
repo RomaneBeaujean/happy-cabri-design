@@ -5,10 +5,10 @@ const DAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
 
 const sessions: { day: number; color: string }[] = [
   { day: 2,  color: 'bg-primary-500' },
-  { day: 5,  color: 'bg-secondary-500' },
+  { day: 5,  color: 'bg-primary-400' },
   { day: 9,  color: 'bg-primary-300' },
   { day: 12, color: 'bg-primary-500' },
-  { day: 16, color: 'bg-secondary-500' },
+  { day: 16, color: 'bg-primary-400' },
   { day: 19, color: 'bg-primary-500' },
   { day: 26, color: 'bg-primary-500' },
 ]
@@ -106,7 +106,7 @@ export default function Calendar() {
         <section className="widget-card overflow-hidden p-100">
           <div className="flex items-center justify-between px-200 py-150">
             <p className="widget-title">Prochaines séances</p>
-            <button className="flex items-center gap-75 text-xs font-medium text-secondary-500 transition-colors hover:text-secondary-700">
+            <button className="btn btn-ghost flex items-center gap-75 text-xs">
               <Plus className="size-3.5 shrink-0" strokeWidth={2.5} />
               Ajouter
             </button>
