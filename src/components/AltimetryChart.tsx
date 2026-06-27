@@ -1,4 +1,4 @@
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
+﻿import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 
 export interface AltimetryPoint {
   km: number
@@ -20,7 +20,7 @@ interface AltimetryChartProps {
  *   const data: AltimetryPoint[] = [{ km: 0, alt: 200 }, { km: 20, alt: 2400 }, ...]
  *   <AltimetryChart data={data} height={130} segments={[12, 28, 45, ...]} />
  *
- * - Courbe en accent-500 (orange)
+ * - Courbe en secondary-500 (buttery yellow)
  * - Gradient de remplissage semi-transparent
  * - Séparateurs de segments en pointillés neutres
  * - Tooltip au hover avec altitude en mètres
@@ -39,14 +39,14 @@ export default function AltimetryChart({ data, height = 130, segments = [] }: Al
         <XAxis
           dataKey="km"
           tickFormatter={(v) => `${v}km`}
-          tick={{ fontSize: 9, fill: 'var(--color-neutral-80)', fontFamily: 'Manrope, sans-serif' }}
+          tick={{ fontSize: 9, fill: 'var(--color-neutral-80)', fontFamily: 'Outfit, sans-serif' }}
           axisLine={false}
           tickLine={false}
           interval="preserveStartEnd"
         />
         <YAxis
           tickFormatter={(v) => `${v}m`}
-          tick={{ fontSize: 9, fill: 'var(--color-neutral-80)', fontFamily: 'Manrope, sans-serif' }}
+          tick={{ fontSize: 9, fill: 'var(--color-neutral-80)', fontFamily: 'Outfit, sans-serif' }}
           axisLine={false}
           tickLine={false}
           width={48}
@@ -57,7 +57,7 @@ export default function AltimetryChart({ data, height = 130, segments = [] }: Al
             border: '1px solid var(--color-neutral-20)',
             borderRadius: 8,
             fontSize: 12,
-            fontFamily: 'Manrope, sans-serif',
+            fontFamily: 'Outfit, sans-serif',
           }}
           formatter={(value) => [`${value} m`, 'Altitude']}
           labelFormatter={(label) => `${label} km`}
@@ -66,7 +66,7 @@ export default function AltimetryChart({ data, height = 130, segments = [] }: Al
           <ReferenceLine
             key={km}
             x={km}
-            stroke="var(--color-accent-500)"
+            stroke="var(--color-secondary-500)"
             strokeDasharray="3 3"
             strokeWidth={1}
           />

@@ -35,9 +35,9 @@ Ne jamais recréer des styles de bouton inline avec Tailwind — utiliser les cl
 ## Design tokens
 
 Définis dans `src/index.css` (`@theme`) :
-- Couleurs : `--color-primary-*`, `--color-secondary-*`, `--color-neutral-*`
+- Couleurs : `--color-primary-*` (charcoal, primary-500 = #303030), `--color-secondary-*` (buttery yellow, secondary-500 = #F3C94A), `--color-neutral-*`
 - Spacing : `--spacing-25` (2px) → `--spacing-900` (72px)
-- Fonts : `--font-body` (Inter), `--font-heading` (Plus Jakarta Sans), `--font-accent` (Manrope)
+- Font unique : `--font-body` / `--font-heading` / `--font-accent` → tous "Quicksand", sans-serif
 
 ## Composants réutilisables — `src/components/`
 
@@ -50,7 +50,7 @@ const STEPS: StepConfig[] = [{ label: 'Import GPX' }, { label: 'Infos course' },
 ```
 
 ### `AltimetryChart.tsx`
-Graphique altimétrique basé sur recharts. Courbe en `accent-500` (orange), gradient de remplissage, tooltip interactif.
+Graphique altimétrique basé sur recharts. Courbe en `secondary-500` (buttery yellow), gradient de remplissage, tooltip interactif.
 ```tsx
 import AltimetryChart, { type AltimetryPoint } from '../components/AltimetryChart'
 const data: AltimetryPoint[] = [{ km: 0, alt: 800 }, { km: 40, alt: 2400 }]
@@ -66,10 +66,13 @@ window.dispatchEvent(new PopStateEvent('popstate'))
 ```
 Toute nouvelle page doit être ajoutée dans l'objet `routes` de `App.tsx`.
 
-## Couleurs accent
+## Couleurs secondary
 
-`--color-accent-500` (#F47425, orange) est réservé aux courbes altimétrique et aux graphiques GPX.
-Ne pas l'utiliser pour des boutons ou états UI — utiliser `primary-500` pour ça.
+`--color-secondary-*` (buttery yellow, secondary-500 = #F3C94A) est utilisé pour :
+- Les highlights et textes mis en valeur (tendances positives, stats en avant)
+- Les courbes altimétrique et graphiques GPX (secondary-500 pour le trait)
+- Les chips/badges sur cartes sombres (bg-secondary-400/20, text-secondary-200)
+Ne pas utiliser pour des boutons primaires — utiliser `primary-500` (#303030) pour ça.
 
 ## Breakpoints
 

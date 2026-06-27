@@ -1,4 +1,4 @@
-import { Mountain, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+﻿import { Mountain, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import AppLayout from '../layouts/AppLayout'
 
 const DAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
@@ -42,7 +42,7 @@ export default function Calendar() {
           <p className="text-[11px] eyebrow text-neutral-90">
             Planning · Entraînement
           </p>
-          <h1 className="mt-150 text-[2.6rem] font-extrabold leading-tight text-neutral-800 lg:text-5xl">
+          <h1 className="mt-150 text-[42px] font-extrabold leading-tight text-neutral-800 lg:text-[48px]">
             Calendrier
           </h1>
         </section>
@@ -52,7 +52,7 @@ export default function Calendar() {
           <button className="flex size-9 items-center justify-center rounded-full bg-neutral-0/60 text-neutral-700 shadow-widget backdrop-blur-xl transition-colors hover:bg-neutral-0/80">
             <ChevronLeft className="size-4" strokeWidth={2} />
           </button>
-          <p className="text-base font-bold text-neutral-800">Juillet 2026</p>
+          <p className="text-[16px] font-bold text-neutral-800">Juillet 2026</p>
           <button className="flex size-9 items-center justify-center rounded-full bg-neutral-0/60 text-neutral-700 shadow-widget backdrop-blur-xl transition-colors hover:bg-neutral-0/80">
             <ChevronRight className="size-4" strokeWidth={2} />
           </button>
@@ -85,7 +85,7 @@ export default function Calendar() {
                     {day && (
                       <>
                         <span className={[
-                          'text-xs font-semibold',
+                          'text-[12px] font-semibold',
                           isToday
                             ? 'flex size-6 items-center justify-center rounded-full bg-primary-500 text-neutral-0'
                             : 'text-neutral-600',
@@ -106,7 +106,7 @@ export default function Calendar() {
         <section className="widget-card overflow-hidden p-100">
           <div className="flex items-center justify-between px-200 py-150">
             <p className="widget-title">Prochaines séances</p>
-            <button className="btn btn-ghost flex items-center gap-75 text-xs">
+            <button className="btn btn-text flex items-center gap-75 text-[12px]">
               <Plus className="size-3.5 shrink-0" strokeWidth={2.5} />
               Ajouter
             </button>
@@ -114,11 +114,11 @@ export default function Calendar() {
           {upcoming.map((s, i) => (
             <div key={i} className="widget-row flex cursor-pointer items-center justify-between px-200 py-200">
               <div>
-                <p className="text-sm font-semibold text-neutral-800">{s.label}</p>
-                <p className="mt-25 text-xs text-neutral-80">{s.date}</p>
+                <p className="text-[14px] font-semibold text-neutral-800">{s.label}</p>
+                <p className="mt-25 text-[12px] text-neutral-80">{s.date}</p>
               </div>
               <div className="text-right">
-                <p className="text-base font-bold text-primary-700">{s.km}</p>
+                <p className="text-[16px] font-bold text-primary-700">{s.km}</p>
                 <p className="text-[10px] text-neutral-80 flex items-center gap-50 justify-end">
                   <Mountain className="size-3 shrink-0" strokeWidth={2} />
                   {s.d}

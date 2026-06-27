@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Trophy, Award, MapPin, Clock, Mountain, ChevronRight, Search, MoreVertical, Pencil, Link2, Plus } from 'lucide-react'
 import AppLayout from '../layouts/AppLayout'
 
@@ -59,7 +59,7 @@ export default function RacePlans() {
         <section className="pt-100">
           <div className="flex items-end justify-between">
             <div>
-              <h1 className="mt-150 text-[2.6rem] font-extrabold leading-tight text-neutral-800 lg:text-5xl">
+              <h1 className="mt-150 text-[42px] font-extrabold leading-tight text-neutral-800 lg:text-[48px]">
                 Plans de course
               </h1>
             </div>
@@ -83,7 +83,7 @@ export default function RacePlans() {
                 key={f.id}
                 onClick={() => setActiveFilter(f.id)}
                 className={[
-                  'btn whitespace-nowrap rounded-full px-200 py-100 text-xs font-semibold transition-colors',
+                  'btn whitespace-nowrap rounded-full px-200 py-100 text-[12px] font-semibold transition-colors',
                   activeFilter === f.id
                     ? 'bg-primary-500 text-neutral-0'
                     : 'border border-neutral-40 bg-white/60 text-neutral-600 hover:border-neutral-60 hover:text-neutral-800',
@@ -137,7 +137,7 @@ export default function RacePlans() {
           {/* Aucun résultat */}
           {filtered.length === 0 && (
             <div className="py-400 text-center">
-              <p className="text-sm text-neutral-80">Aucun plan trouvé</p>
+              <p className="text-[14px] text-neutral-80">Aucun plan trouvé</p>
             </div>
           )}
         </section>
@@ -194,8 +194,8 @@ function PlanRow({ plan, openMenuId, setOpenMenuId }: {
       {/* Droite : J-XX ou date + ellipsis + chevron */}
       <div className="ml-200 flex shrink-0 items-center gap-100">
         {!isPast
-          ? <p className="text-base font-bold text-primary-700">J–{plan.daysLeft}</p>
-          : <p className="text-xs text-neutral-80">{plan.date}</p>
+          ? <p className="text-[16px] font-bold text-primary-700">J–{plan.daysLeft}</p>
+          : <p className="text-[12px] text-neutral-80">{plan.date}</p>
         }
 
         {/* Menu ellipsis */}
@@ -209,11 +209,11 @@ function PlanRow({ plan, openMenuId, setOpenMenuId }: {
 
           {menuOpen && (
             <div className="absolute right-0 top-full z-50 mt-50 overflow-hidden rounded-xl border border-neutral-20 bg-white shadow-widget" style={{ minWidth: 'max-content' }}>
-              <button className="flex w-full items-center gap-150 whitespace-nowrap px-200 py-150 text-sm text-neutral-700 transition-colors hover:bg-neutral-10">
+              <button className="flex w-full items-center gap-150 whitespace-nowrap px-200 py-150 text-[14px] text-neutral-700 transition-colors hover:bg-neutral-10">
                 <Pencil className="size-4 shrink-0 text-neutral-400" strokeWidth={1.75} />
                 Renommer
               </button>
-              <button className="flex w-full items-center gap-150 whitespace-nowrap px-200 py-150 text-sm text-neutral-700 transition-colors hover:bg-neutral-10">
+              <button className="flex w-full items-center gap-150 whitespace-nowrap px-200 py-150 text-[14px] text-neutral-700 transition-colors hover:bg-neutral-10">
                 <Link2 className="size-4 shrink-0 text-neutral-400" strokeWidth={1.75} />
                 Copier le lien CrewLink
               </button>

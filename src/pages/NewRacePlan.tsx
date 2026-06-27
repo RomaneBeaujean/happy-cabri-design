@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Upload, FileText, X, ChevronRight, ChevronLeft, Sparkles } from 'lucide-react'
 import AppLayout from '../layouts/AppLayout'
 import Stepper, { type StepConfig } from '../components/Stepper'
@@ -69,7 +69,7 @@ export default function NewRacePlan() {
 
         {/* ── Header ── */}
         <section className="pt-100">
-          <h1 className="text-[2.6rem] font-extrabold leading-tight text-neutral-800 lg:text-5xl">
+          <h1 className="text-[42px] font-extrabold leading-tight text-neutral-800 lg:text-[48px]">
             Nouveau plan
           </h1>
           {/* Stepper desktop — sous le titre, centré */}
@@ -109,7 +109,7 @@ export default function NewRacePlan() {
 
         {/* ── Footer navigation ── */}
         <div className="flex items-center justify-between pb-300">
-          <button className="btn btn-primary flex items-center gap-100 bg-transparent text-neutral-500 shadow-none hover:bg-transparent hover:text-neutral-800" onClick={goBack}>
+          <button className="btn btn-text" onClick={goBack}>
             <ChevronLeft className="size-4" strokeWidth={2.5} />
             {step === 0 ? 'Retour aux plans' : 'Retour'}
           </button>
@@ -150,8 +150,8 @@ function Step1({ gpxLoaded, onLoad, onRemove }: {
   return (
     <section className="space-y-300">
       <div>
-        <h2 className="text-xl font-extrabold text-neutral-800">Importez votre trace</h2>
-        <p className="mt-75 text-sm text-neutral-90">
+        <h2 className="text-[20px] font-extrabold text-neutral-800">Importez votre trace</h2>
+        <p className="mt-75 text-[14px] text-neutral-90">
           {gpxLoaded
             ? 'Trace analysée — vérifiez les données avant de continuer.'
             : 'Chargez le fichier GPX de votre course. La trace sera découpée automatiquement en segments.'}
@@ -168,8 +168,8 @@ function Step1({ gpxLoaded, onLoad, onRemove }: {
             <Upload className="size-5 text-primary-500" strokeWidth={2} />
           </div>
           <div className="text-center">
-            <p className="text-sm font-extrabold text-neutral-800">Déposez votre fichier GPX ici</p>
-            <p className="mt-75 text-xs text-neutral-90">
+            <p className="text-[14px] font-extrabold text-neutral-800">Déposez votre fichier GPX ici</p>
+            <p className="mt-75 text-[12px] text-neutral-90">
               Glissez-déposez depuis votre explorateur, ou sélectionnez-le manuellement.
             </p>
           </div>
@@ -186,13 +186,13 @@ function Step1({ gpxLoaded, onLoad, onRemove }: {
                 <FileText className="size-4 text-primary-500" strokeWidth={2} />
               </div>
               <div>
-                <p className="text-sm font-bold text-neutral-800">{MOCK_GPX_STATS.filename}</p>
+                <p className="text-[14px] font-bold text-neutral-800">{MOCK_GPX_STATS.filename}</p>
                 <p className="text-[11px] text-neutral-60">{MOCK_GPX_STATS.size}</p>
               </div>
             </div>
             <button
               onClick={onRemove}
-              className="btn btn-ghost flex items-center gap-75 text-[11px] text-neutral-60 hover:text-neutral-800"
+              className="btn btn-text flex items-center gap-75 text-[11px] text-neutral-60 hover:text-neutral-800"
             >
               <X className="size-3.5" strokeWidth={2} />
               Supprimer
@@ -217,8 +217,8 @@ function Step1({ gpxLoaded, onLoad, onRemove }: {
             ].map(({ label, value, unit }) => (
               <div key={label} className="flex flex-1 flex-col items-center px-100 py-200 text-center">
                 <p className="whitespace-nowrap text-[9px] eyebrow text-neutral-80 lg:text-[10px]">{label}</p>
-                <p className="mt-50 whitespace-nowrap text-sm font-extrabold text-primary-600 lg:text-lg">
-                  {value} <span className="text-[10px] font-medium text-neutral-90 lg:text-xs">{unit}</span>
+                <p className="mt-50 whitespace-nowrap text-[14px] font-extrabold text-primary-600 lg:text-[18px]">
+                  {value} <span className="text-[10px] font-medium text-neutral-90 lg:text-[12px]">{unit}</span>
                 </p>
               </div>
             ))}
@@ -252,7 +252,7 @@ function Step2({
   const inputCls = () => 'input'
 
   const labelCls = (id: string) =>
-    `text-xs font-semibold transition-colors ${focused === id ? 'text-primary-500' : 'text-neutral-500'}`
+    `text-[12px] font-semibold transition-colors ${focused === id ? 'text-primary-500' : 'text-neutral-500'}`
 
   const convInputCls = (id: string, _readonly: boolean) => [
     'input pl-150 pr-[44px]',
@@ -264,7 +264,7 @@ function Step2({
 
   return (
     <section className="space-y-150 lg:space-y-300">
-      <h2 className="text-xl font-extrabold text-neutral-800">Votre course</h2>
+      <h2 className="text-[20px] font-extrabold text-neutral-800">Votre course</h2>
 
       {/* Champs course — espacement réduit entre chaque champ */}
       <div className="space-y-100">
@@ -302,7 +302,7 @@ function Step2({
       <div className="widget-card overflow-hidden">
         <div className="flex items-center justify-between px-300 py-200">
           <div>
-            <p className="text-sm font-bold text-neutral-800">Objectif de temps</p>
+            <p className="text-[14px] font-bold text-neutral-800">Objectif de temps</p>
             <p className="mt-50 text-[11px] text-neutral-90">
               Sans objectif, le cabri-bot estime à partir de votre profil coureur
             </p>
@@ -377,15 +377,15 @@ function Step3({ raceName, raceLocation, raceDate, raceTime, pace }: {
   return (
     <section className="space-y-300">
       <div>
-        <h2 className="text-xl font-extrabold text-neutral-800">Tout est prêt</h2>
-        <p className="mt-75 text-sm text-neutral-90">Vérifiez les informations avant de générer votre plan.</p>
+        <h2 className="text-[20px] font-extrabold text-neutral-800">Tout est prêt</h2>
+        <p className="mt-75 text-[14px] text-neutral-90">Vérifiez les informations avant de générer votre plan.</p>
       </div>
 
       {/* Recap card */}
       <div className="widget-card overflow-hidden">
         {/* Mini altimétrie + titre */}
         <div className="border-b border-neutral-20 px-300 pb-200 pt-200">
-          <p className="text-base font-extrabold text-neutral-900">{raceName}</p>
+          <p className="text-[16px] font-extrabold text-neutral-900">{raceName}</p>
           <p className="mt-75 text-[10px] eyebrow text-neutral-80">
             {formattedDate} · {raceLocation} · Départ {raceTime}
           </p>
@@ -403,8 +403,8 @@ function Step3({ raceName, raceLocation, raceDate, raceTime, pace }: {
           ].map(({ label, value, unit }) => (
             <div key={label} className="flex flex-1 flex-col items-center px-100 py-150 text-center">
               <p className="whitespace-nowrap text-[9px] eyebrow text-neutral-80 lg:text-[10px]">{label}</p>
-              <p className="mt-50 whitespace-nowrap text-sm font-extrabold text-primary-600 lg:text-lg">
-                {value}{unit && <span className="text-[10px] font-medium text-neutral-90 lg:text-xs"> {unit}</span>}
+              <p className="mt-50 whitespace-nowrap text-[14px] font-extrabold text-primary-600 lg:text-[18px]">
+                {value}{unit && <span className="text-[10px] font-medium text-neutral-90 lg:text-[12px]"> {unit}</span>}
               </p>
             </div>
           ))}
@@ -414,14 +414,14 @@ function Step3({ raceName, raceLocation, raceDate, raceTime, pace }: {
         <div className="flex divide-x divide-neutral-20">
           <div className="flex w-1/3 flex-col items-center py-150 text-center">
             <span className="text-[9px] eyebrow text-neutral-80 lg:text-[10px]">Objectif</span>
-            <span className="mt-50 whitespace-nowrap text-sm font-extrabold text-accent-500 lg:text-lg">
+            <span className="mt-50 whitespace-nowrap text-[14px] font-extrabold text-secondary-600 lg:text-[18px]">
               26h 36m
             </span>
           </div>
           <div className="flex w-2/3 flex-col items-center py-150 text-center">
             <span className="text-[9px] eyebrow text-neutral-80 lg:text-[10px]">Allure moyenne</span>
-            <span className="mt-50 whitespace-nowrap text-sm font-extrabold text-accent-500 lg:text-lg">
-              {pace} <span className="text-[10px] font-medium text-neutral-90 lg:text-xs">min/km</span> · 6,4 <span className="text-[10px] font-medium text-neutral-90 lg:text-xs">ke/h</span>
+            <span className="mt-50 whitespace-nowrap text-[14px] font-extrabold text-secondary-600 lg:text-[18px]">
+              {pace} <span className="text-[10px] font-medium text-neutral-90 lg:text-[12px]">min/km</span> · 6,4 <span className="text-[10px] font-medium text-neutral-90 lg:text-[12px]">ke/h</span>
             </span>
           </div>
         </div>
@@ -432,7 +432,7 @@ function Step3({ raceName, raceLocation, raceDate, raceTime, pace }: {
         <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-500">
           <Sparkles className="size-4 text-neutral-0" strokeWidth={2} />
         </div>
-        <p className="text-sm text-neutral-700 leading-relaxed">
+        <p className="text-[14px] text-neutral-700 leading-relaxed">
           Le Cabri-Bot va calculer, pour chacun des {MOCK_GPX_STATS.segments} segments, une allure personnalisée basée sur le terrain et la pente, vos aptitudes et votre objectif de 26h 36m. Tout sera librement ajustable ensuite.
         </p>
       </div>

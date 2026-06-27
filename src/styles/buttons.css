@@ -2,72 +2,103 @@
    Styles de boutons — source unique de vérité
    Toute modification ici s'applique à l'ensemble de l'app.
    Consulter ce fichier avant de styler un nouveau bouton.
+
+   Variants :
+   - .btn-primary   → fond primary-500, texte blanc
+   - .btn-secondary → transparent + bordure, hover secondary
+   - .btn-text      → transparent, sans bordure
+   - .btn-icon      → cercle utilitaire (icône seule)
+   - .btn-full      → pleine largeur mobile
 ───────────────────────────────────────────────────────────── */
 
 @layer components {
 
-/* Base commune à tous les boutons */
+/* ── Base ── */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-150);
-  font-size: 0.875rem;
+  font-family: var(--font-family);
+  font-size: 14px;
   font-weight: 500;
+  height: 40px;
+  padding-left: var(--spacing-300);
+  padding-right: var(--spacing-300);
   border: none;
   border-radius: 9999px;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Variante principale — dégradé forest green, texte blanc, hauteur 40px */
+/* ── Primary — fond charcoal #303030 ── */
 .btn-primary {
-  background: linear-gradient(135deg, #2C4E41 0%, #203B32 100%);
+  background: var(--color-primary-500);
   color: var(--color-neutral-0);
-  height: 2.5rem;
-  padding-left: var(--spacing-300);
-  padding-right: var(--spacing-300);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 .btn-primary:hover {
-  background: linear-gradient(135deg, #344F42 0%, #1A3128 100%);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  background: var(--color-primary-600);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.btn-primary:active {
+  background: var(--color-primary-700);
+  box-shadow: none;
 }
 
-/* Pleine largeur — hauteur auto, padding vertical confortable pour mobile */
+/* ── Secondary — transparent + bordure, hover secondary ── */
+.btn-secondary {
+  background: transparent;
+  color: var(--color-primary-500);
+  border: 1.5px solid var(--color-neutral-40);
+  box-shadow: none;
+}
+.btn-secondary:hover {
+  background: var(--color-secondary-300);
+  border-color: var(--color-secondary-500);
+  color: var(--color-primary-500);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.btn-secondary:active {
+  background: var(--color-secondary-400);
+  border-color: var(--color-secondary-600);
+}
+
+/* ── Text — transparent, sans bordure ── */
+.btn-text {
+  background: transparent;
+  color: var(--color-neutral-400);
+  height: auto;
+  padding: 0;
+  font-size: 13px;
+}
+.btn-text:hover {
+  color: var(--color-primary-500);
+}
+
+/* ── Full width — mobile ── */
 .btn-full {
   width: 100%;
   height: auto;
-  padding: var(--spacing-200);
+  padding-top: var(--spacing-200);
+  padding-bottom: var(--spacing-200);
 }
 
-/* Bouton icône circulaire (navigation, actions utilitaires) */
+/* ── Icon — cercle utilitaire ── */
 .btn-icon {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 36px;
+  height: 36px;
   padding: 0;
   border-radius: 9999px;
-  background-color: rgba(255, 255, 255, 0.6);
-  color: var(--color-neutral-700);
-  box-shadow: var(--shadow-widget);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--color-neutral-400);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(12px);
 }
 .btn-icon:hover {
-  background-color: rgba(255, 255, 255, 0.8);
-}
-
-/* Bouton texte / ghost */
-.btn-ghost {
-  background: transparent;
-  padding: 0;
-  font-size: 0.75rem;
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.80);
   color: var(--color-primary-500);
-  border-radius: 0;
-}
-.btn-ghost:hover {
-  color: var(--color-primary-600);
 }
 
 } /* end @layer components */

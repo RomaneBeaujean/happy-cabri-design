@@ -1,18 +1,14 @@
 @layer components {
 
-  /* Petit texte en majuscules — titre de section, label, eyebrow.
-     Couleur à définir via Tailwind (text-neutral-80, text-primary-500…). */
   .eyebrow {
-    font-family: "Plus Jakarta Sans", sans-serif;
-    font-weight: 400;
+    font-family: var(--font-family);
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 1.5px;
   }
 
-  /* Titre de page — h1 reçoit déjà cette font via la règle globale h1 {}.
-     Cette classe permet de l'appliquer ponctuellement hors h1. */
   .page-title {
-    font-family: "Plus Jakarta Sans", sans-serif;
+    font-family: var(--font-family);
   }
 
 }

@@ -1,4 +1,4 @@
-import { type ReactNode, useState, useEffect } from 'react'
+﻿import { type ReactNode, useState, useEffect } from 'react'
 import { Calendar, Home, Trophy, User, Settings, Bell, type LucideIcon } from 'lucide-react'
 import logoMain from '../assets/logo.svg'
 
@@ -45,7 +45,7 @@ function UserAvatar({
       aria-current={isActive ? 'page' : undefined}
       className={[
         'flex shrink-0 items-center justify-center rounded-full bg-primary-500 font-semibold text-neutral-0 transition-all',
-        size === 'md' ? 'size-10 text-sm' : 'size-8 text-xs',
+        size === 'md' ? 'size-10 text-[14px]' : 'size-8 text-[12px]',
         isActive
           ? 'ring-2 ring-primary-400 ring-offset-2'
           : 'hover:bg-primary-600',
@@ -145,25 +145,21 @@ export default function AppLayout({
         {/* Droite : nav pill + icônes utilitaires */}
         <div className="flex items-center gap-200">
 
-          {/* Nav pill — beige/transparent avec blur */}
+          {/* Nav pill — propre, sans icônes */}
           <nav>
-            <div className="flex items-center gap-[3px] rounded-full border border-neutral-40/40 bg-white/35 px-[5px] py-[5px] backdrop-blur-2xl">
-              {MAIN_NAV_ITEMS.map(({ id, label, href, icon: Icon }) => (
+            <div className="flex items-center gap-[2px] rounded-full border border-neutral-40/40 bg-white/50 px-[5px] py-[5px] backdrop-blur-2xl">
+              {MAIN_NAV_ITEMS.map(({ id, label, href }) => (
                 <a
                   key={id}
                   href={href}
                   aria-current={activeItem === id ? 'page' : undefined}
                   className={[
-                    'flex items-center gap-[7px] rounded-full px-[14px] py-[8px] text-sm transition-all',
+                    'flex items-center rounded-full px-[16px] py-[7px] text-[15px] tracking-[-0.01em] transition-all',
                     activeItem === id
-                      ? 'bg-primary-500 font-semibold text-neutral-0 shadow-sm'
-                      : 'font-medium text-neutral-500 hover:text-neutral-800',
+                      ? 'bg-primary-500 font-medium text-neutral-0 shadow-sm'
+                      : 'font-normal text-neutral-400 hover:text-neutral-700',
                   ].join(' ')}
                 >
-                  <Icon
-                    className="size-[14px] shrink-0"
-                    strokeWidth={activeItem === id ? 2.2 : 1.75}
-                  />
                   {label}
                 </a>
               ))}

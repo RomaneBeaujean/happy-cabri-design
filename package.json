@@ -19,6 +19,7 @@
     "@fontsource/outfit": "^5.2.8",
     "@fontsource/plus-jakarta-sans": "^5.2.8",
     "@fontsource/quicksand": "^5.2.10",
+    "@fontsource/urbanist": "^5.2.7",
     "lucide-react": "^1.21.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

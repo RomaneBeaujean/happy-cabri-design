@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import {
   Mountain, Edit2, GripVertical, Droplets,
   Plus, Minus, Check, X, Timer, Trophy, TrendingUp,
@@ -162,13 +162,13 @@ function PaceCell({ value, editing, onChange }: {
   const isMarche = value === 'marche'
   if (editing) return (
     <input
-      className="w-14 rounded-md border border-neutral-30 bg-neutral-0 px-50 py-25 text-center text-xs font-bold text-neutral-700 outline-none focus:border-primary-400"
+      className="w-14 rounded-md border border-neutral-30 bg-neutral-0 px-50 py-25 text-center text-[12px] font-bold text-neutral-700 outline-none focus:border-primary-400"
       value={value}
       onChange={e => onChange(e.target.value)}
     />
   )
   return (
-    <span className={`text-xs font-bold ${isMarche ? 'italic text-neutral-400' : 'text-neutral-700'}`}>
+    <span className={`text-[12px] font-bold ${isMarche ? 'italic text-neutral-400' : 'text-neutral-700'}`}>
       {value}{!isMarche && <span className="ml-25 text-[9px] font-medium text-neutral-400">/km</span>}
     </span>
   )
@@ -254,12 +254,12 @@ export default function RunnerProfile() {
             Mon profil
           </p>
           <div className="mt-200 flex items-center gap-300">
-            <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-primary-500 text-2xl font-bold text-neutral-0">
+            <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-primary-500 text-[24px] font-bold text-neutral-0">
               RB
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-neutral-800">Romane Beaujean</h1>
-              <p className="mt-25 text-sm text-neutral-80">Traileur · Niveau intermédiaire</p>
+              <h1 className="text-[24px] font-extrabold text-neutral-800">Romane Beaujean</h1>
+              <p className="mt-25 text-[14px] text-neutral-80">Traileur · Niveau intermédiaire</p>
             </div>
           </div>
         </section>
@@ -273,7 +273,7 @@ export default function RunnerProfile() {
             </div>
             <button
               onClick={() => setEditAptitudes(v => !v)}
-              className="flex items-center gap-75 rounded-lg px-150 py-75 text-xs font-semibold text-neutral-600 transition-colors hover:bg-neutral-20"
+              className="flex items-center gap-75 rounded-lg px-150 py-75 text-[12px] font-semibold text-neutral-600 transition-colors hover:bg-neutral-20"
             >
               {editAptitudes
                 ? <><Check className="size-3.5" strokeWidth={2.5} />Enregistrer</>
@@ -298,12 +298,12 @@ export default function RunnerProfile() {
                   onClick={() => toggleApt(i)}
                   className="widget-row grid w-full grid-cols-[1fr_auto_auto_auto] items-center gap-x-200 px-200 py-150 text-left"
                 >
-                  <p className="text-xs font-semibold text-neutral-700">{a.type}</p>
+                  <p className="text-[12px] font-semibold text-neutral-700">{a.type}</p>
                   {editAptitudes ? (
                     <>
                       <div className="flex items-center gap-50" onClick={e => e.stopPropagation()}>
                         <input
-                          className="w-14 rounded-lg border border-neutral-30 bg-neutral-10 px-100 py-50 text-center text-sm font-bold text-primary-700 outline-none focus:border-primary-400"
+                          className="w-14 rounded-lg border border-neutral-30 bg-neutral-10 px-100 py-50 text-center text-[14px] font-bold text-primary-700 outline-none focus:border-primary-400"
                           value={a.vitesse}
                           onChange={e => setAptitudes(ap => ap.map((x, j) => j === i ? { ...x, vitesse: e.target.value } : x))}
                         />
@@ -311,7 +311,7 @@ export default function RunnerProfile() {
                       </div>
                       <div className="flex items-center gap-50" onClick={e => e.stopPropagation()}>
                         <input
-                          className="w-12 rounded-lg border border-neutral-30 bg-neutral-10 px-100 py-50 text-center text-sm font-bold text-primary-700 outline-none focus:border-primary-400"
+                          className="w-12 rounded-lg border border-neutral-30 bg-neutral-10 px-100 py-50 text-center text-[14px] font-bold text-primary-700 outline-none focus:border-primary-400"
                           value={a.kmEffort}
                           onChange={e => setAptitudes(ap => ap.map((x, j) => j === i ? { ...x, kmEffort: e.target.value } : x))}
                         />
@@ -320,10 +320,10 @@ export default function RunnerProfile() {
                     </>
                   ) : (
                     <>
-                      <p className="text-center text-sm font-bold text-primary-700">
+                      <p className="text-center text-[14px] font-bold text-primary-700">
                         {a.vitesse}<span className="ml-25 text-[10px] font-medium text-neutral-400">/km</span>
                       </p>
-                      <p className="text-center text-sm font-bold text-primary-400">
+                      <p className="text-center text-[14px] font-bold text-primary-400">
                         {a.kmEffort}<span className="ml-25 text-[10px] font-medium text-neutral-400">KE</span>
                       </p>
                     </>
@@ -377,9 +377,9 @@ export default function RunnerProfile() {
                       <Icon className="size-3 text-neutral-90 shrink-0" strokeWidth={2} />
                       <p className="widget-label">{s.label}</p>
                     </div>
-                    <p className="mt-200 text-3xl font-extrabold text-primary-700">
+                    <p className="mt-200 text-[30px] font-extrabold text-primary-700">
                       {s.value}
-                      {s.unit && <span className="ml-50 text-sm font-medium text-neutral-400">{s.unit}</span>}
+                      {s.unit && <span className="ml-50 text-[14px] font-medium text-neutral-400">{s.unit}</span>}
                     </p>
                   </div>
                 )
@@ -392,15 +392,15 @@ export default function RunnerProfile() {
                 <Clock className="size-3 text-neutral-90 shrink-0" strokeWidth={2} />
                 <p className="widget-label">Course la plus longue</p>
               </div>
-              <p className="text-sm font-bold text-neutral-700">{longestRun.name}</p>
+              <p className="text-[14px] font-bold text-neutral-700">{longestRun.name}</p>
               <div className="mt-150 flex items-center gap-300">
                 <div>
-                  <p className="text-3xl font-extrabold text-primary-700">{longestRun.distance}</p>
+                  <p className="text-[30px] font-extrabold text-primary-700">{longestRun.distance}</p>
                   <p className="mt-25 text-[10px] text-neutral-400">distance</p>
                 </div>
                 <div className="h-10 w-px bg-neutral-30" />
                 <div>
-                  <p className="text-3xl font-extrabold text-primary-700">{longestRun.time}</p>
+                  <p className="text-[30px] font-extrabold text-primary-700">{longestRun.time}</p>
                   <p className="mt-25 text-[10px] text-neutral-400">durée</p>
                 </div>
               </div>
@@ -426,7 +426,7 @@ export default function RunnerProfile() {
             </div>
             <button
               onClick={() => setEditChronos(v => !v)}
-              className="flex items-center gap-75 rounded-lg px-150 py-75 text-xs font-semibold text-neutral-600 transition-colors hover:bg-neutral-20"
+              className="flex items-center gap-75 rounded-lg px-150 py-75 text-[12px] font-semibold text-neutral-600 transition-colors hover:bg-neutral-20"
             >
               {editChronos
                 ? <><Check className="size-3.5" strokeWidth={2.5} />Enregistrer</>
@@ -435,15 +435,15 @@ export default function RunnerProfile() {
           </div>
           {chronos.map((c, i) => (
             <div key={i} className="widget-row flex items-center justify-between px-200 py-150">
-              <p className="text-sm font-bold text-neutral-800">{c.label}</p>
+              <p className="text-[14px] font-bold text-neutral-800">{c.label}</p>
               {editChronos ? (
                 <input
-                  className="w-24 rounded-lg border border-neutral-30 bg-neutral-10 px-150 py-75 text-right text-sm font-bold text-primary-700 outline-none focus:border-primary-400"
+                  className="w-24 rounded-lg border border-neutral-30 bg-neutral-10 px-150 py-75 text-right text-[14px] font-bold text-primary-700 outline-none focus:border-primary-400"
                   value={c.time}
                   onChange={e => setChronos(ch => ch.map((x, j) => j === i ? { ...x, time: e.target.value } : x))}
                 />
               ) : (
-                <p className="text-base font-bold text-primary-700">{c.time}</p>
+                <p className="text-[16px] font-bold text-primary-700">{c.time}</p>
               )}
             </div>
           ))}
@@ -476,12 +476,12 @@ export default function RunnerProfile() {
                 <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary-100 text-[10px] font-bold text-primary-700">
                   {i + 1}
                 </span>
-                <p className="text-sm font-semibold text-neutral-800">{p.name}</p>
+                <p className="text-[14px] font-semibold text-neutral-800">{p.name}</p>
               </div>
-              <p className="w-14 text-center text-sm font-bold text-primary-700">
+              <p className="w-14 text-center text-[14px] font-bold text-primary-700">
                 {p.glucides}<span className="ml-25 text-[10px] font-medium text-neutral-400">g</span>
               </p>
-              <p className="w-12 text-center text-xs font-semibold text-neutral-600">{p.ratio}</p>
+              <p className="w-12 text-center text-[12px] font-semibold text-neutral-600">{p.ratio}</p>
               <button
                 onClick={() => setProducts(pr => pr.filter((_, j) => j !== i))}
                 className="rounded-lg p-75 text-neutral-40 transition-colors hover:bg-red-50 hover:text-red-500"
@@ -492,7 +492,7 @@ export default function RunnerProfile() {
           ))}
 
           <div className="border-t border-neutral-20 px-200 py-150">
-            <button className="flex items-center gap-100 text-xs font-semibold text-primary-600 transition-colors hover:text-primary-700">
+            <button className="flex items-center gap-100 text-[12px] font-semibold text-primary-600 transition-colors hover:text-primary-700">
               <Plus className="size-3.5" strokeWidth={2.5} />
               Ajouter un produit
             </button>
@@ -512,9 +512,9 @@ export default function RunnerProfile() {
                 >
                   <Minus className="size-3" strokeWidth={2.5} />
                 </button>
-                <span className="w-20 text-center text-base font-bold text-primary-700">
+                <span className="w-20 text-center text-[16px] font-bold text-primary-700">
                   {waterPerHour}
-                  <span className="ml-25 text-xs font-medium text-neutral-400">ml</span>
+                  <span className="ml-25 text-[12px] font-medium text-neutral-400">ml</span>
                 </span>
                 <button
                   onClick={() => setWaterPerHour(w => w + 50)}

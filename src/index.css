@@ -4,107 +4,82 @@
 @import "./styles/widget-cards.css";
 @import "./styles/typography.css";
 
-@import "@fontsource/inter/400.css";
-@import "@fontsource/inter/500.css";
-@import "@fontsource/inter/600.css";
-
-@import "@fontsource/open-sans/400.css";
-@import "@fontsource/open-sans/500.css";
-@import "@fontsource/open-sans/600.css";
-@import "@fontsource/open-sans/700.css";
-
-@import "@fontsource/plus-jakarta-sans/600.css";
-@import "@fontsource/plus-jakarta-sans/700.css";
-@import "@fontsource/plus-jakarta-sans/800.css";
-
-@import "@fontsource/dm-serif-display/400.css";
-
-@import "@fontsource/elms-sans/400.css";
-@import "@fontsource/elms-sans/500.css";
-@import "@fontsource/elms-sans/600.css";
-@import "@fontsource/elms-sans/700.css";
-
-@import "@fontsource/quicksand/400.css";
-@import "@fontsource/quicksand/500.css";
-@import "@fontsource/quicksand/600.css";
-@import "@fontsource/quicksand/700.css";
-
-@import "@fontsource/funnel-display/400.css";
-@import "@fontsource/funnel-display/500.css";
-@import "@fontsource/funnel-display/600.css";
-@import "@fontsource/funnel-display/700.css";
-@import "@fontsource/funnel-display/800.css";
-
-@import "@fontsource/manrope/200.css";
-@import "@fontsource/manrope/300.css";
-@import "@fontsource/manrope/400.css";
-@import "@fontsource/manrope/500.css";
-@import "@fontsource/manrope/600.css";
-@import "@fontsource/manrope/700.css";
-@import "@fontsource/manrope/800.css";
-
 @import "@fontsource/outfit/300.css";
 @import "@fontsource/outfit/400.css";
 @import "@fontsource/outfit/500.css";
 @import "@fontsource/outfit/600.css";
 @import "@fontsource/outfit/700.css";
 
+@import "@fontsource/quicksand/400.css";
+@import "@fontsource/quicksand/500.css";
+@import "@fontsource/quicksand/600.css";
+@import "@fontsource/quicksand/700.css";
+
+@import "@fontsource/urbanist/400.css";
+@import "@fontsource/urbanist/500.css";
+@import "@fontsource/urbanist/600.css";
+@import "@fontsource/urbanist/700.css";
+
+
 @theme {
   /* ── Fonts ── */
-  --font-body:    "Manrope", sans-serif;
-  --font-heading: "Plus Jakarta Sans", sans-serif;
+  --font-primary: "Outfit", sans-serif;
+  --font-secondary:  "Outfit", sans-serif;
 
-  /* ── Page background ── */
-  --color-page-bg: #EDE8DC;
+  /* ── Neutrals — mélange primary (charcoal) + secondary (buttery yellow) ── */
+  --color-neutral-0:   #FFFFFF;
+  --color-neutral-10:  #FEFCF8;
+  --color-neutral-20:  #F9F6EF;
+  --color-neutral-30:  #F2EDE2;
+  --color-neutral-40:  #E9E2D3;
+  --color-neutral-50:  #DDD4C0;
+  --color-neutral-60:  #C9BFA8;
+  --color-neutral-70:  #B0A58D;
+  --color-neutral-80:  #968B72;
+  --color-neutral-90:  #7D7259;
+  --color-neutral-100: #665C44;
+  --color-neutral-200: #524932;
+  --color-neutral-300: #413923;
+  --color-neutral-400: #312B18;
+  --color-neutral-500: #241F10;
+  --color-neutral-600: #19150A;
+  --color-neutral-700: #110E06;
+  --color-neutral-800: #0A0803;
+  --color-neutral-900: #040301;
 
-  /* ── Neutrals ── */
-  --color-neutral-0:   #ffffff;
-  --color-neutral-10:  #fafaf9;
-  --color-neutral-20:  #f5f5f4;
-  --color-neutral-30:  #efeeec;
-  --color-neutral-40:  #e3e1de;
-  --color-neutral-50:  #cbc8c3;
-  --color-neutral-60:  #bdb9b3;
-  --color-neutral-70:  #b1ada5;
-  --color-neutral-80:  #a5a097;
-  --color-neutral-90:  #99938a;
-  --color-neutral-100: #7f786b;
-  --color-neutral-200: #80786b;
-  --color-neutral-300: #736b5e;
-  --color-neutral-400: #665f52;
-  --color-neutral-500: #585146;
-  --color-neutral-600: #4a443b;
-  --color-neutral-700: #39342d;
-  --color-neutral-800: #282520;
-  --color-neutral-900: #1d1a16;
+  /* ── Primary — charcoal #303030 ── */
+  --color-primary-50:  #F2F2F2;
+  --color-primary-100: #D9D9D9;
+  --color-primary-200: #B8B8B8;
+  --color-primary-300: #919191;
+  --color-primary-400: #606060;
+  --color-primary-500: #303030;
+  --color-primary-600: #242424;
+  --color-primary-700: #161616;
+  --color-primary-800: #0A0A0A;
+  --color-primary-900: #020202;
 
-  /* ── Primary — forest green #203B32 ── */
-  --color-primary-50:  #ECF3F0;
-  --color-primary-100: #CDDFD8;
-  --color-primary-200: #9BBFB2;
-  --color-primary-300: #6A9F8C;
-  --color-primary-400: #3D7A65;
-  --color-primary-500: #203B32;
-  --color-primary-600: #192F28;
-  --color-primary-700: #12231D;
-  --color-primary-800: #0C1813;
-  --color-primary-900: #060C09;
+  /* ── Secondary — buttery yellow ── */
+  --color-secondary-50:  #FFFDF5;
+  --color-secondary-100: #FEF6DC;
+  --color-secondary-200: #FDF0BE;
+  --color-secondary-300: #FCE8AD;
+  --color-secondary-400: #F8D97A;
+  --color-secondary-500: #F3C94A;
+  --color-secondary-600: #D4A017;
+  --color-secondary-700: #B5840F;
+  --color-secondary-800: #8A6209;
+  --color-secondary-900: #5C4006;
 
   /* ── Shadows ── */
-  --shadow-card: 0 0 0 1px rgba(29, 26, 22, 0.05), 0 4px 20px rgba(29, 26, 22, 0.08), 0 1px 4px rgba(29, 26, 22, 0.04);
-  --shadow-widget: 0 0 0 1px rgba(29, 26, 22, 0.04), 0 2px 8px rgba(29, 26, 22, 0.06), 0 8px 32px rgba(29, 26, 22, 0.07);
-
-  /* ── Accent orange (altimétrie, courbe GPX) ── */
-  --color-accent-50:  #FEF3EB;
-  --color-accent-100: #FDE0CE;
-  --color-accent-500: #F47425;
-  --color-accent-600: #E6610F;
-  --color-accent-700: #BA5212;
+  --shadow-card: 0 0 0 1px rgba(20, 16, 10, 0.05), 0 4px 20px rgba(20, 16, 10, 0.07), 0 1px 4px rgba(20, 16, 10, 0.04);
+  --shadow-widget: 0 0 0 1px rgba(20, 16, 10, 0.04), 0 2px 8px rgba(20, 16, 10, 0.05), 0 8px 32px rgba(20, 16, 10, 0.06);
 
   /* ── Semantic ── */
-  --color-success: #0db28b;
-  --color-warning: #e29e21;
-  --color-error:   #c8424e;
+  --color-success: #5FA77A;
+  --color-warning: var(--color-secondary-500);
+  --color-error:   #D37A72;
+  --color-info:    #8BA9C7;
 
   /* ── Spacing ── */
   --spacing-25:  2px;
@@ -123,20 +98,18 @@
 }
 
 body {
-  font-family: "Manrope", sans-serif;
-  background-color: var(--color-page-bg);
-  color: var(--color-neutral-800);
+  font-family: var(--font-primary);
+  color: var(--color-neutral-900);
 }
 
-h1 {
-  font-family: "Plus Jakarta Sans", sans-serif;
-}
+/* .bg-gradient-app {
+  background: linear-gradient(135deg, #E6E8EA 0%, #FCE8AD 100%);
+} */
 
 .bg-gradient-app {
   background-color: var(--color-page-bg);
   background-image:
-    radial-gradient(ellipse 85vw 75vh at 5% 8%,  rgba(172, 182, 152, 0.55) 0%, transparent 60%),
-    radial-gradient(ellipse 60vw 55vh at 92% 78%, rgba(192, 176, 140, 0.42) 0%, transparent 58%),
-    radial-gradient(ellipse 50vw 60vh at 55% 45%, rgba(160, 172, 148, 0.22) 0%, transparent 52%);
+    radial-gradient(ellipse 200vw 200vh at 0% 0%, rgba(230, 232, 234, 0.75) 0%, transparent 60%),
+    radial-gradient(ellipse 300vw 300vh at 100% 70%, rgba(252, 232, 173, 0.85) 0%, transparent 60%);
   background-attachment: fixed;
 }
