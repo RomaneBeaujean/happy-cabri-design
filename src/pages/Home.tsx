@@ -73,7 +73,7 @@ export default function Home() {
                   { Icon: Mountain, label: '100 km'   },
                   { Icon: Mountain, label: '6 000 m D+' },
                 ].map(({ Icon, label }) => (
-                  <span key={label} className="inline-flex items-center gap-50 rounded-full bg-secondary-400/20 px-150 py-50 text-[11px] font-semibold text-secondary-200">
+                  <span key={label} className="inline-flex items-center gap-50 rounded-full bg-neutral-0/20 px-150 py-50 text-[11px] font-semibold text-neutral-10">
                     <Icon className="size-3 shrink-0" strokeWidth={2} />
                     {label}
                   </span>
@@ -85,7 +85,7 @@ export default function Home() {
               <p className="mt-100 text-[48px] font-extrabold text-neutral-0">
                 J–<span className="text-secondary-400">61</span>
               </p>
-              <p className="mt-75 text-[14px] font-medium text-secondary-300/80">23 août 2026</p>
+              <p className="mt-75 text-[14px] font-medium text-neutral-20/80">23 août 2026</p>
             </div>
           </div>
 
@@ -128,7 +128,7 @@ export default function Home() {
         <section className="widget-card overflow-hidden p-100">
           <div className="flex items-center justify-between px-200 py-150">
             <p className="widget-title">Dernières sorties</p>
-            <button className="btn btn-text text-[12px]">Voir tout</button>
+            <button className="btn btn-text">Voir tout</button>
           </div>
           {[
             { label: 'Sortie longue — Belledonne', date: 'Dim. 22 juin', km: '28 km', d: '1 420 m', time: '3h12', Icon: Footprints },

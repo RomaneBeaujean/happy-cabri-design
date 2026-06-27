@@ -34,7 +34,7 @@ export default function Stepper({ steps, current }: StepperProps) {
               <div className={[
                 'flex size-7 items-center justify-center rounded-full text-[12px] font-bold transition-all',
                 done    ? 'bg-primary-500 text-neutral-0'                                    : '',
-                active  ? 'bg-primary-500 text-neutral-0 ring-4 ring-primary-100'           : '',
+                active  ? 'bg-primary-500 text-neutral-0 ring-4 ring-neutral-50'           : '',
                 pending ? 'bg-neutral-20 text-neutral-300'                                  : '',
               ].join(' ')}>
                 {done ? <Check className="size-3.5" strokeWidth={3} /> : i + 1}
@@ -51,7 +51,7 @@ export default function Stepper({ steps, current }: StepperProps) {
             {i < steps.length - 1 && (
               <div className={[
                 'mx-150 h-px w-9 shrink-0',
-                i < current ? 'bg-primary-300' : 'bg-neutral-40',
+                i < current ? 'bg-primary-400' : 'bg-neutral-60',
               ].join(' ')} />
             )}
           </div>

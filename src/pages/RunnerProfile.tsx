@@ -273,7 +273,7 @@ export default function RunnerProfile() {
             </div>
             <button
               onClick={() => setEditAptitudes(v => !v)}
-              className="flex items-center gap-75 rounded-lg px-150 py-75 text-[12px] font-semibold text-neutral-600 transition-colors hover:bg-neutral-20"
+              className="btn btn-text gap-75 text-[12px]"
             >
               {editAptitudes
                 ? <><Check className="size-3.5" strokeWidth={2.5} />Enregistrer</>
@@ -426,7 +426,7 @@ export default function RunnerProfile() {
             </div>
             <button
               onClick={() => setEditChronos(v => !v)}
-              className="flex items-center gap-75 rounded-lg px-150 py-75 text-[12px] font-semibold text-neutral-600 transition-colors hover:bg-neutral-20"
+              className="btn btn-text gap-75 text-[12px]"
             >
               {editChronos
                 ? <><Check className="size-3.5" strokeWidth={2.5} />Enregistrer</>
@@ -484,7 +484,7 @@ export default function RunnerProfile() {
               <p className="w-12 text-center text-[12px] font-semibold text-neutral-600">{p.ratio}</p>
               <button
                 onClick={() => setProducts(pr => pr.filter((_, j) => j !== i))}
-                className="rounded-lg p-75 text-neutral-40 transition-colors hover:bg-red-50 hover:text-red-500"
+                className="btn btn-icon size-7 hover:bg-red-50! hover:text-red-500!"
               >
                 <X className="size-3.5" strokeWidth={2.5} />
               </button>
@@ -492,7 +492,7 @@ export default function RunnerProfile() {
           ))}
 
           <div className="border-t border-neutral-20 px-200 py-150">
-            <button className="flex items-center gap-100 text-[12px] font-semibold text-primary-600 transition-colors hover:text-primary-700">
+            <button className="btn btn-text gap-100 text-[12px] text-primary-600 hover:text-primary-700!">
               <Plus className="size-3.5" strokeWidth={2.5} />
               Ajouter un produit
             </button>

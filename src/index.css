@@ -4,27 +4,66 @@
 @import "./styles/widget-cards.css";
 @import "./styles/typography.css";
 
+/* Outfit — 100→900 */
+@import "@fontsource/outfit/100.css";
+@import "@fontsource/outfit/200.css";
 @import "@fontsource/outfit/300.css";
 @import "@fontsource/outfit/400.css";
 @import "@fontsource/outfit/500.css";
 @import "@fontsource/outfit/600.css";
 @import "@fontsource/outfit/700.css";
+@import "@fontsource/outfit/800.css";
+@import "@fontsource/outfit/900.css";
 
+/* Quicksand — 300→700 */
+@import "@fontsource/quicksand/300.css";
 @import "@fontsource/quicksand/400.css";
 @import "@fontsource/quicksand/500.css";
 @import "@fontsource/quicksand/600.css";
 @import "@fontsource/quicksand/700.css";
 
+/* Urbanist — 100→900 (normal + italic) */
+@import "@fontsource/urbanist/100.css";
+@import "@fontsource/urbanist/100-italic.css";
+@import "@fontsource/urbanist/200.css";
+@import "@fontsource/urbanist/200-italic.css";
+@import "@fontsource/urbanist/300.css";
+@import "@fontsource/urbanist/300-italic.css";
 @import "@fontsource/urbanist/400.css";
+@import "@fontsource/urbanist/400-italic.css";
 @import "@fontsource/urbanist/500.css";
+@import "@fontsource/urbanist/500-italic.css";
 @import "@fontsource/urbanist/600.css";
+@import "@fontsource/urbanist/600-italic.css";
 @import "@fontsource/urbanist/700.css";
+@import "@fontsource/urbanist/700-italic.css";
+@import "@fontsource/urbanist/800.css";
+@import "@fontsource/urbanist/800-italic.css";
+@import "@fontsource/urbanist/900.css";
+@import "@fontsource/urbanist/900-italic.css";
+
+/* Funnel Display — 300→800 */
+@import "@fontsource/funnel-display/300.css";
+@import "@fontsource/funnel-display/400.css";
+@import "@fontsource/funnel-display/500.css";
+@import "@fontsource/funnel-display/600.css";
+@import "@fontsource/funnel-display/700.css";
+@import "@fontsource/funnel-display/800.css";
+
+/* Manrope — 200→800 */
+@import "@fontsource/manrope/200.css";
+@import "@fontsource/manrope/300.css";
+@import "@fontsource/manrope/400.css";
+@import "@fontsource/manrope/500.css";
+@import "@fontsource/manrope/600.css";
+@import "@fontsource/manrope/700.css";
+@import "@fontsource/manrope/800.css";
 
 
 @theme {
   /* ── Fonts ── */
   --font-primary: "Outfit", sans-serif;
-  --font-secondary:  "Outfit", sans-serif;
+  --font-accent:  "Funnel Display", sans-serif;
 
   /* ── Neutrals — mélange primary (charcoal) + secondary (buttery yellow) ── */
   --color-neutral-0:   #FFFFFF;
@@ -102,9 +141,11 @@ body {
   color: var(--color-neutral-900);
 }
 
-/* .bg-gradient-app {
-  background: linear-gradient(135deg, #E6E8EA 0%, #FCE8AD 100%);
-} */
+h1 {
+  font-family: var(--font-accent);
+  font-weight: 400;
+  font-size: 48px;
+}
 
 .bg-gradient-app {
   background-color: var(--color-page-bg);

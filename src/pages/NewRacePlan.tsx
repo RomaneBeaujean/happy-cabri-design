@@ -182,8 +182,8 @@ function Step1({ gpxLoaded, onLoad, onRemove }: {
           {/* Fichier info */}
           <div className="flex items-center justify-between border-b border-neutral-20 px-300 py-200">
             <div className="flex items-center gap-200">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-primary-50">
-                <FileText className="size-4 text-primary-500" strokeWidth={2} />
+              <div className="flex size-8 items-center justify-center rounded-lg bg-primary-500">
+                <FileText className="size-4 text-neutral-0" strokeWidth={2} />
               </div>
               <div>
                 <p className="text-[14px] font-bold text-neutral-800">{MOCK_GPX_STATS.filename}</p>
@@ -192,7 +192,7 @@ function Step1({ gpxLoaded, onLoad, onRemove }: {
             </div>
             <button
               onClick={onRemove}
-              className="btn btn-text flex items-center gap-75 text-[11px] text-neutral-60 hover:text-neutral-800"
+              className="btn btn-text"
             >
               <X className="size-3.5" strokeWidth={2} />
               Supprimer
