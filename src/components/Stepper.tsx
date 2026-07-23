@@ -40,7 +40,7 @@ export default function Stepper({ steps, current }: StepperProps) {
                 {done ? <Check className="size-3.5" strokeWidth={3} /> : i + 1}
               </div>
               <span className={[
-                'text-[12px] font-semibold whitespace-nowrap',
+                'font-accent text-[12px] font-semibold whitespace-nowrap',
                 done    ? 'text-primary-600' : '',
                 active  ? 'text-primary-700' : '',
                 pending ? 'text-neutral-300' : '',

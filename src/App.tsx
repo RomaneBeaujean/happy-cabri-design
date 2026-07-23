@@ -3,6 +3,7 @@ import Home from './pages/Home'
 import Calendar from './pages/Calendar'
 import RacePlans from './pages/RacePlans'
 import NewRacePlan from './pages/NewRacePlan'
+import RacePlan from './pages/RacePlan'
 import RunnerProfile from './pages/RunnerProfile'
 
 const routes: Record<string, () => React.ReactElement> = {
@@ -27,7 +28,7 @@ export default function App() {
       if (!anchor) return
       const url = new URL(anchor.href, window.location.origin)
       if (url.origin !== window.location.origin) return
-      if (url.pathname in routes) {
+      if (url.pathname in routes || /^\/plans\/\d+$/.test(url.pathname)) {
         e.preventDefault()
         window.history.pushState({}, '', url.pathname)
         navigate(url.pathname)
@@ -43,6 +44,7 @@ export default function App() {
     }
   }, [])
 
+  if (/^\/plans\/\d+$/.test(path)) return <RacePlan />
   const Page = routes[path] ?? Home
   return <Page />
 }

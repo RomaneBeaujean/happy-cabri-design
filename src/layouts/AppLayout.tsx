@@ -104,7 +104,7 @@ export default function AppLayout({
       {/* ── Top bar — mobile ── */}
       <header className={[
         'fixed inset-x-0 top-0 z-20 flex h-16 items-center justify-between px-300 lg:hidden transition-all duration-300',
-        scrolled ? 'bg-white/80 backdrop-blur-xl' : '',
+        scrolled ? 'bg-white/30 backdrop-blur-xl' : '',
       ].join(' ')}>
         <a href="/">
           <img src={logoMain} alt="Happy Cabri" className="h-11 w-auto" />

@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react'
-import { Upload, FileText, X, ChevronRight, ChevronLeft, Sparkles } from 'lucide-react'
+import { Upload, FileText, X, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, Sparkles } from 'lucide-react'
 import AppLayout from '../layouts/AppLayout'
 import Stepper, { type StepConfig } from '../components/Stepper'
 import AltimetryChart, { type AltimetryPoint } from '../components/AltimetryChart'
@@ -127,7 +127,13 @@ export default function NewRacePlan() {
               <ChevronRight className="size-4" strokeWidth={2.5} />
             </button>
           ) : (
-            <button className="btn btn-primary flex items-center gap-150">
+            <button
+              className="btn btn-primary flex items-center gap-150"
+              onClick={() => {
+                window.history.pushState({}, '', '/plans/1')
+                window.dispatchEvent(new PopStateEvent('popstate'))
+              }}
+            >
               <Sparkles className="size-4" strokeWidth={2} />
               Générer le plan
             </button>
@@ -164,8 +170,8 @@ function Step1({ gpxLoaded, onLoad, onRemove }: {
           onClick={onLoad}
           className="widget-card flex cursor-pointer flex-col items-center gap-200 px-300 py-[52px] transition-colors hover:bg-white/80"
         >
-          <div className="flex size-12 items-center justify-center rounded-full bg-primary-50">
-            <Upload className="size-5 text-primary-500" strokeWidth={2} />
+          <div className="flex size-12 items-center justify-center rounded-full bg-primary-500">
+            <Upload className="size-5 text-neutral-0" strokeWidth={2} />
           </div>
           <div className="text-center">
             <p className="text-[14px] font-extrabold text-neutral-800">Déposez votre fichier GPX ici</p>
@@ -248,14 +254,38 @@ function Step2({
   pace: string;         setPace: (v: string) => void
 }) {
   const [focused, setFocused] = useState<string | null>(null)
+  const [durationMins, setDurationMins] = useState(26 * 60 + 36)
+  const [keph, setKeph] = useState(6.4)
+
+  function paceToSec(p: string) {
+    const [m, s = '0'] = p.split(':')
+    return parseInt(m) * 60 + parseInt(s)
+  }
+  function secToPace(total: number) {
+    const m = Math.floor(total / 60)
+    const s = total % 60
+    return `${m}:${String(s).padStart(2, '0')}`
+  }
+  function fmtDuration(mins: number) {
+    return `${Math.floor(mins / 60)}h ${String(mins % 60).padStart(2, '0')}m`
+  }
+
+  const [paceUnit, setPaceUnit] = useState<'min/km' | 'km/h'>('min/km')
+
+  function paceToKmh(p: string) {
+    return Math.round((3600 / paceToSec(p)) * 10) / 10
+  }
+  function kmhToPace(kmh: number) {
+    return secToPace(Math.round(3600 / kmh))
+  }
 
   const inputCls = () => 'input'
 
   const labelCls = (id: string) =>
     `text-[12px] font-semibold transition-colors ${focused === id ? 'text-primary-500' : 'text-neutral-500'}`
 
-  const convInputCls = (id: string, _readonly: boolean) => [
-    'input pl-150 pr-[44px]',
+  const convInputCls = (id: string) => [
+    'input pl-150 pr-[64px]',
     focused === id ? 'bg-primary-50/60 font-semibold' : '',
   ].filter(Boolean).join(' ')
 
@@ -326,25 +356,82 @@ function Step2({
         {hasTarget && (
           <div className="space-y-200 border-t border-neutral-20 px-300 py-200">
             <div className="grid grid-cols-3 gap-150">
-              {[
-                { id: 'pace',     label: 'Allure moyenne', value: pace,      unit: 'min/km', readonly: false, onChange: setPace },
-                { id: 'duration', label: 'Durée totale',   value: '26h 36m', unit: 'h',      readonly: true },
-                { id: 'keph',     label: 'km-effort/h',    value: '6,4',     unit: 'ke/h',   readonly: true },
-              ].map(({ id, label, value, unit, readonly, onChange }) => (
+              {([
+                {
+                  id: 'duration', label: 'Durée', unit: 'h',
+                  value: fmtDuration(durationMins),
+                  onChange: undefined,
+                  onUp:   () => setDurationMins(m => m + 1),
+                  onDown: () => setDurationMins(m => Math.max(1, m - 1)),
+                },
+                {
+                  id: 'pace', label: 'Allure', unit: paceUnit,
+                  value: paceUnit === 'min/km' ? pace : paceToKmh(pace).toFixed(1),
+                  onChange: paceUnit === 'min/km' ? (v: string) => setPace(v) : undefined,
+                  onUp: paceUnit === 'min/km'
+                    ? () => setPace(secToPace(paceToSec(pace) + 30))
+                    : () => setPace(kmhToPace(Math.min(99, Math.round((paceToKmh(pace) + 0.1) * 10) / 10))),
+                  onDown: paceUnit === 'min/km'
+                    ? () => setPace(secToPace(Math.max(30, paceToSec(pace) - 30)))
+                    : () => setPace(kmhToPace(Math.max(0.1, Math.round((paceToKmh(pace) - 0.1) * 10) / 10))),
+                },
+                {
+                  id: 'keph', label: 'km-effort/h', unit: 'ke/h',
+                  value: keph.toFixed(1).replace('.', ','),
+                  onChange: undefined,
+                  onUp:   () => setKeph(k => Math.round((k + 0.1) * 10) / 10),
+                  onDown: () => setKeph(k => Math.max(0.1, Math.round((k - 0.1) * 10) / 10)),
+                },
+              ] as { id: string; label: string; unit: string; value: string; onChange?: (v: string) => void; onUp: () => void; onDown: () => void }[]).map(({ id, label, value, unit, onChange, onUp, onDown }) => (
                 <div key={id} className="space-y-75">
-                  <p className={convLabelCls(id)}>{label}</p>
+                  <div className="flex items-center justify-between">
+                    <p className={convLabelCls(id)}>{label}</p>
+                    {id === 'pace' && (
+                      <div className="flex overflow-hidden rounded border border-neutral-30">
+                        {(['min/km', 'km/h'] as const).map(u => (
+                          <button
+                            key={u}
+                            type="button"
+                            onClick={() => setPaceUnit(u)}
+                            className={[
+                              'px-75 py-25 text-[8px] font-semibold transition-colors',
+                              paceUnit === u ? 'bg-neutral-100 text-neutral-600' : 'text-neutral-300 hover:text-neutral-500',
+                            ].join(' ')}
+                          >
+                            {u}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <div className="relative">
                     <input
-                      className={convInputCls(id, readonly)}
-                      readOnly={readonly}
+                      className={convInputCls(id)}
+                      readOnly={!onChange}
                       value={value}
                       onChange={onChange ? e => onChange(e.target.value) : undefined}
                       onFocus={() => setFocused(id)}
                       onBlur={() => setFocused(null)}
                     />
-                    <span className="absolute right-150 top-1/2 -translate-y-1/2 text-[10px] font-bold text-neutral-60">
-                      {unit}
-                    </span>
+                    <div className="absolute inset-y-0 right-0 flex items-center gap-50 pr-150 pointer-events-none">
+                      <span className="text-[11px] font-bold text-neutral-60">{unit}</span>
+                      <div className="flex flex-col items-center pointer-events-auto">
+                        <button
+                          type="button"
+                          onMouseDown={e => { e.preventDefault(); onUp() }}
+                          className="p-25 cursor-pointer text-neutral-400 hover:text-primary-500 transition-colors"
+                        >
+                          <ChevronUp className="size-[11px]" strokeWidth={2.5} />
+                        </button>
+                        <button
+                          type="button"
+                          onMouseDown={e => { e.preventDefault(); onDown() }}
+                          className="p-25 cursor-pointer text-neutral-400 hover:text-primary-500 transition-colors"
+                        >
+                          <ChevronDown className="size-[11px]" strokeWidth={2.5} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -428,7 +515,7 @@ function Step3({ raceName, raceLocation, raceDate, raceTime, pace }: {
       </div>
 
       {/* Bot notice */}
-      <div className="flex gap-200 rounded-2xl border border-primary-100 bg-primary-50/60 px-300 py-200">
+      <div className="flex gap-200 rounded-2xl border border-secondary-600 bg-secondary-100 px-300 py-200">
         <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-500">
           <Sparkles className="size-4 text-neutral-0" strokeWidth={2} />
         </div>

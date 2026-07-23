@@ -31,11 +31,11 @@ export default function Home() {
 
           {/* Km semaine */}
           <div className="widget-card flex flex-col justify-between gap-200 p-300">
-            <div className="flex items-start justify-between">
-              <p className="widget-label">Cette semaine</p>
+            <div className="flex items-center gap-150">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-20/70">
                 <TrendingUp className="size-5 text-neutral-300" strokeWidth={1.5} />
               </div>
+              <p className="widget-label">Cette semaine</p>
             </div>
             <p className="text-[36px] font-bold leading-none text-primary-500">
               42<span className="ml-50 text-[16px] font-normal text-neutral-80"> km</span>
@@ -48,11 +48,11 @@ export default function Home() {
 
           {/* Dénivelé */}
           <div className="widget-card flex flex-col justify-between gap-200 p-300">
-            <div className="flex items-start justify-between">
-              <p className="widget-label">Dénivelé</p>
+            <div className="flex items-center gap-150">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-20/70">
                 <Mountain className="size-5 text-neutral-300" strokeWidth={1.5} />
               </div>
+              <p className="widget-label">Dénivelé</p>
             </div>
             <p className="text-[36px] font-bold leading-none text-primary-500">
               1 840<span className="ml-50 text-[16px] font-normal text-neutral-80"> m</span>
@@ -91,11 +91,11 @@ export default function Home() {
 
           {/* Sorties ce mois */}
           <div className="widget-card flex flex-col justify-between gap-200 p-300">
-            <div className="flex items-start justify-between">
-              <p className="widget-label">Ce mois</p>
+            <div className="flex items-center gap-150">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-20/70">
                 <Target className="size-5 text-neutral-300" strokeWidth={1.5} />
               </div>
+              <p className="widget-label">Ce mois</p>
             </div>
             <p className="text-[36px] font-bold leading-none text-primary-500">
               3<span className="ml-50 text-[16px] font-normal text-neutral-80"> sorties</span>
@@ -110,11 +110,11 @@ export default function Home() {
 
           {/* Allure moyenne */}
           <div className="widget-card flex flex-col justify-between gap-200 p-300">
-            <div className="flex items-start justify-between">
-              <p className="widget-label">Allure moy.</p>
+            <div className="flex items-center gap-150">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-20/70">
                 <Activity className="size-5 text-neutral-300" strokeWidth={1.5} />
               </div>
+              <p className="widget-label">Allure moy.</p>
             </div>
             <p className="text-[36px] font-bold leading-none text-primary-500">
               6:12<span className="ml-50 text-[16px] font-normal text-neutral-80"> /km</span>

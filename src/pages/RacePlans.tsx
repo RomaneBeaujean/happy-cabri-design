@@ -159,17 +159,21 @@ function PlanRow({ plan, openMenuId, setOpenMenuId }: {
   return (
     <div
       className="widget-row relative flex cursor-pointer items-center justify-between px-200 py-200"
-      onClick={() => setOpenMenuId(null)}
+      onClick={() => {
+        if (openMenuId !== null) { setOpenMenuId(null); return }
+        window.history.pushState({}, '', `/plans/${plan.id}`)
+        window.dispatchEvent(new PopStateEvent('popstate'))
+      }}
     >
       {/* Gauche : icône + infos */}
       <div className="flex min-w-0 flex-1 items-start gap-200">
         <div className={[
           'flex size-10 shrink-0 items-center justify-center rounded-xl',
-          isPast ? 'bg-neutral-20' : 'bg-primary-100/60',
+          isPast ? 'bg-primary-500' : 'bg-secondary-700',
         ].join(' ')}>
           {isPast
-            ? <Award  className="size-5 text-neutral-400"   strokeWidth={1.75} />
-            : <Trophy className="size-5 text-primary-500" strokeWidth={1.75} />
+            ? <Award  className="size-5 text-neutral-0"   strokeWidth={1.75} />
+            : <Trophy className="size-5 text-neutral-0" strokeWidth={1.75} />
           }
         </div>
         <div className="min-w-0">
