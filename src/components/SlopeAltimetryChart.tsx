@@ -14,20 +14,38 @@ function getSlopeColor(slopePct: number) {
   return SLOPE_BANDS.find(b => abs < b.max)?.color ?? '#7A1010'
 }
 
+export function SlopeLegend() {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-x-200 gap-y-75">
+      <span className="eyebrow text-[9px] uppercase tracking-wider text-neutral-80">Pente</span>
+      {SLOPE_BANDS.map(b => (
+        <span key={b.label} className="flex items-center gap-50 text-[10px] text-neutral-500">
+          <span className="inline-block size-100 shrink-0 rounded-sm" style={{ background: b.color }} />
+          {b.label}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+export interface ChartPoint { id: string; km: number; isRavito: boolean }
+
 interface Props {
   data: AltimetryPoint[]
   height?: number
-  segments?: number[]
+  points?: ChartPoint[]
   distanceStep?: number
   showLegend?: boolean
+  onAddPoint?: (km: number, clientX: number, clientY: number) => void
 }
 
 export default function SlopeAltimetryChart({
   data,
   height = 200,
-  segments = [],
+  points = [],
   distanceStep = 20,
   showLegend = true,
+  onAddPoint,
 }: Props) {
   const [tooltip, setTooltip] = useState<{ km: number; alt: number; px: number } | null>(null)
 
@@ -77,18 +95,31 @@ export default function SlopeAltimetryChart({
     .map((p, i) => `${i === 0 ? 'M' : 'L'}${toX(p.km).toFixed(1)},${toY(p.alt).toFixed(1)}`)
     .join(' ')
 
-  function handleMouseMove(e: React.MouseEvent<SVGSVGElement>) {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const relX = (e.clientX - rect.left) / rect.width
-    const svgX = relX * VW
-    const km = Math.max(0, Math.min(maxKm, (svgX - ML) / chartW * maxKm))
-
+  function altAtKm(km: number): number {
     let idx = 0
     while (idx < data.length - 2 && data[idx + 1].km <= km) idx++
     const p0 = data[idx], p1 = data[Math.min(idx + 1, data.length - 1)]
     const t = p0.km === p1.km ? 0 : (km - p0.km) / (p1.km - p0.km)
-    const alt = Math.round(p0.alt + t * (p1.alt - p0.alt))
-    setTooltip({ km: Math.round(km * 10) / 10, alt, px: svgX })
+    return p0.alt + t * (p1.alt - p0.alt)
+  }
+
+  function kmFromClientX(e: { clientX: number; currentTarget: SVGSVGElement }): number {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const relX = (e.clientX - rect.left) / rect.width
+    const svgX = relX * VW
+    return Math.max(0, Math.min(maxKm, (svgX - ML) / chartW * maxKm))
+  }
+
+  function handleMouseMove(e: React.MouseEvent<SVGSVGElement>) {
+    const km = kmFromClientX(e)
+    const svgX = ML + (km / maxKm) * chartW
+    setTooltip({ km: Math.round(km * 10) / 10, alt: Math.round(altAtKm(km)), px: svgX })
+  }
+
+  function handleClick(e: React.MouseEvent<SVGSVGElement>) {
+    if (!onAddPoint) return
+    const km = kmFromClientX(e)
+    onAddPoint(Math.round(km * 10) / 10, e.clientX, e.clientY)
   }
 
   return (
@@ -96,10 +127,11 @@ export default function SlopeAltimetryChart({
       <div className="relative select-none">
         <svg
           viewBox={`0 0 ${VW} ${height}`}
-          className="w-full"
+          className={`w-full${onAddPoint ? ' cursor-crosshair' : ''}`}
           style={{ height }}
           onMouseMove={handleMouseMove}
           onMouseLeave={() => setTooltip(null)}
+          onClick={handleClick}
         >
           {/* Altitude grid lines */}
           {altTicks.map(a => (
@@ -140,16 +172,23 @@ export default function SlopeAltimetryChart({
             strokeLinecap="round"
           />
 
-          {/* Segment separators */}
-          {segments.map(km => (
-            <line
-              key={km}
-              x1={toX(km)} y1={MT} x2={toX(km)} y2={baseY}
-              stroke="var(--color-secondary-500)"
-              strokeDasharray="4,3"
-              strokeWidth={1}
-              opacity={0.55}
-            />
+          {/* Séparateurs / ravitaillements — points gris ou roses sur le profil */}
+          {points.map(p => (
+            <g key={p.id} onClick={e => e.stopPropagation()} className="cursor-pointer">
+              <line
+                x1={toX(p.km)} y1={MT} x2={toX(p.km)} y2={baseY}
+                stroke="var(--color-neutral-60)"
+                strokeDasharray="2,3"
+                strokeWidth={0.75}
+                opacity={0.5}
+              />
+              <circle
+                cx={toX(p.km)} cy={toY(altAtKm(p.km))} r={5}
+                fill={p.isRavito ? '#e5afcd' : '#8a9098'}
+                stroke="#fff"
+                strokeWidth={1.5}
+              />
+            </g>
           ))}
 
           {/* Tooltip vertical line */}
@@ -206,15 +245,11 @@ export default function SlopeAltimetryChart({
       </div>
 
       {/* Legend */}
-      {showLegend && <div className="mt-150 flex flex-wrap items-center justify-center gap-x-200 gap-y-75">
-        <span className="eyebrow text-[9px] uppercase tracking-wider text-neutral-80">Pente</span>
-        {SLOPE_BANDS.map(b => (
-          <span key={b.label} className="flex items-center gap-50 text-[10px] text-neutral-500">
-            <span className="inline-block size-100 shrink-0 rounded-sm" style={{ background: b.color }} />
-            {b.label}
-          </span>
-        ))}
-      </div>}
+      {showLegend && (
+        <div className="mt-50">
+          <SlopeLegend />
+        </div>
+      )}
     </div>
   )
 }

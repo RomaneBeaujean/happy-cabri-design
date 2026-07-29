@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 
 export type TagColor =
   | 'primary'
@@ -53,8 +53,13 @@ export interface ColorTagProps {
   variant?: 'soft' | 'strong'
   size?: 'medium' | 'small'
   fluid?: boolean
+  /** Icône affichée à gauche du label. */
   icon?: ReactNode
-  right?: ReactNode
+  /** Icône affichée à droite du label. Devient cliquable si `onRightIconClick` est fourni. */
+  rightIcon?: ReactNode
+  onRightIconClick?: (e: MouseEvent<HTMLButtonElement>) => void
+  /** Rend le tag entier cliquable (ex: pour passer en édition). */
+  onClick?: () => void
   children?: ReactNode
 }
 
@@ -65,14 +70,17 @@ export default function ColorTag({
   size = 'small',
   fluid = false,
   icon,
-  right,
+  rightIcon,
+  onRightIconClick,
+  onClick,
   children,
 }: ColorTagProps) {
   const { background, color: textColor } = getTagColor(color, variant)
 
   return (
     <div
-      className="inline-flex min-w-0 max-w-full shrink-0 items-center gap-75 truncate"
+      onClick={onClick}
+      className={`inline-flex min-w-0 max-w-full shrink-0 items-center gap-75 truncate${onClick ? ' cursor-pointer' : ''}`}
       style={{
         backgroundColor: background,
         color: textColor,
@@ -90,7 +98,20 @@ export default function ColorTag({
       {(label != null || children != null) && (
         <span className="min-w-0 flex-1 truncate">{label ?? children}</span>
       )}
-      {right && <span className="flex shrink-0 items-center">{right}</span>}
+      {rightIcon && (
+        onRightIconClick ? (
+          <button
+            type="button"
+            onClick={e => { e.stopPropagation(); onRightIconClick(e) }}
+            className="-mr-50 ml-25 flex shrink-0 items-center justify-center rounded-full p-25 transition-colors hover:bg-black/10"
+            style={{ color: textColor }}
+          >
+            {rightIcon}
+          </button>
+        ) : (
+          <span className="flex shrink-0 items-center">{rightIcon}</span>
+        )
+      )}
     </div>
   )
 }
