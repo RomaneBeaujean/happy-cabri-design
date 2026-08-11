@@ -1,9 +1,9 @@
 import { useRef, useState, type MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  ChevronUp, ChevronDown, TrendingUp, TrendingDown, Route, Droplets, Gauge, Zap, Timer, Pencil, Check, Plus, X,
+  ChevronUp, ChevronDown, TrendingUp, TrendingDown, Route, Droplets, Gauge, Zap, Timer, Pencil, Check, Plus, X, Trash2, TriangleRight,
 } from 'lucide-react'
-import ColorTag from '../../components/ColorTag'
+import ColorTag, { type TagColor } from '../../components/ColorTag'
 import type { DerivedSegment, SegmentNutrition } from './segmentModel'
 import { RUNNER_PRODUCTS, type RunnerProduct } from './mockData'
 import { fmtTime, fmtQty, sanitizeQtyInput, paceToSec, secToPace } from './format'
@@ -13,13 +13,17 @@ interface Props {
   index: number
   typeLabel: string
   globalEdit: boolean
+  canDelete: boolean
+  cumulDp: number
+  cumulDm: number
   onPaceChange: (pace: string, timeMins: number) => void
   onNutritionChange: (nutrition: SegmentNutrition) => void
+  onDelete: () => void
 }
 
-export default function SegmentCard({ seg, index, typeLabel, globalEdit, onPaceChange, onNutritionChange }: Props) {
-  const [editingPace,       setEditingPace]       = useState(false)
-  const [editingNutrition,  setEditingNutrition]  = useState(false)
+export default function SegmentCard({ seg, index, typeLabel, globalEdit, canDelete, cumulDp, cumulDm, onPaceChange, onNutritionChange, onDelete }: Props) {
+  const [editingCard,       setEditingCard]       = useState(false)
+  const [confirmDelete,     setConfirmDelete]     = useState(false)
   const [editingWater,      setEditingWater]      = useState(false)
   const [waterDraft,        setWaterDraft]        = useState('')
   const [editingQtyIndex,   setEditingQtyIndex]    = useState<number | null>(null)
@@ -29,10 +33,29 @@ export default function SegmentCard({ seg, index, typeLabel, globalEdit, onPaceC
   const [productSearch,     setProductSearch]     = useState('')
   const [menuPos,           setMenuPos]           = useState<{ top: number; left: number } | null>(null)
   const menuBtnRef = useRef<HTMLButtonElement>(null)
+  const editSnapshot = useRef<{ pace: string; timeMins: number; nutrition?: SegmentNutrition } | null>(null)
 
-  const isPaceEditing      = editingPace || globalEdit
-  const isNutritionEditing = editingNutrition || globalEdit
-  const isCardEditing      = isPaceEditing || isNutritionEditing
+  const isCardEditing = editingCard || globalEdit
+
+  function startEdit(e: MouseEvent) {
+    e.stopPropagation()
+    editSnapshot.current = { pace: seg.pace, timeMins: seg.timeMins, nutrition: seg.nutrition }
+    setEditingCard(true)
+  }
+  function saveEdit(e: MouseEvent) {
+    e.stopPropagation()
+    setEditingCard(false)
+    setConfirmDelete(false)
+  }
+  function cancelEdit(e: MouseEvent) {
+    e.stopPropagation()
+    if (editSnapshot.current) {
+      onPaceChange(editSnapshot.current.pace, editSnapshot.current.timeMins)
+      onNutritionChange(editSnapshot.current.nutrition ?? {})
+    }
+    setEditingCard(false)
+    setConfirmDelete(false)
+  }
 
   const localPace     = seg.pace
   const localTimeMins = seg.timeMins
@@ -44,7 +67,11 @@ export default function SegmentCard({ seg, index, typeLabel, globalEdit, onPaceC
   const localVitesse = +((kmEffort / localTimeMins) * 60).toFixed(1)
   const dominantElev = Math.max(seg.dp, seg.dm)
   const avgSlope     = dist > 0 ? +((dominantElev / (dist * 1000)) * 100).toFixed(1) : 0
-  const slopeColor   = seg.dm > seg.dp ? 'teal'
+  const isDescente    = seg.dm > seg.dp
+  const isMontee      = seg.dp > seg.dm
+  // Bordure, badge et tag de type d'un segment de descente sont unifiés sur secondary-700.
+  const descenteTagStyle = { backgroundColor: 'var(--color-secondary-700)', color: '#FFFFFF' }
+  const slopeColor   = isDescente ? 'teal'
                      : avgSlope < 5    ? 'green'
                      : avgSlope < 10   ? 'amber'
                      : avgSlope < 15   ? 'orange'
@@ -141,7 +168,7 @@ export default function SegmentCard({ seg, index, typeLabel, globalEdit, onPaceC
       <div className="relative">
         <input className={iCls(id)} readOnly value={value} onFocus={() => setFocused(id)} onBlur={() => setFocused(null)} />
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center gap-50 pr-150">
-          <span className="text-[11px] font-bold text-neutral-60">{unit}</span>
+          <span className="text-[9px] font-bold text-neutral-60">{unit}</span>
           <div className="pointer-events-auto flex flex-col items-center">
             <button type="button" onMouseDown={e => { e.preventDefault(); onUp() }} className="cursor-pointer p-25 text-neutral-400 transition-colors hover:text-primary-500">
               <ChevronUp className="size-[11px]" strokeWidth={2.5} />
@@ -156,10 +183,10 @@ export default function SegmentCard({ seg, index, typeLabel, globalEdit, onPaceC
   )
 
   const spinGrid = () => (
-    <div className="grid grid-cols-3 gap-150">
-      {spin(`d-${index}`, 'Durée',       fmtTime(localTimeMins),    'h',      () => changeDuration(localTimeMins + 1),          () => changeDuration(localTimeMins - 1))}
+    <div className="grid grid-cols-1 gap-150 lg:grid-cols-3">
       {spin(`p-${index}`, 'Allure',      localPace,                  'min/km', () => changePace(paceToSec(localPace) - 30),      () => changePace(paceToSec(localPace) + 30))}
       {spin(`k-${index}`, 'km-effort/h', localVitesse.toFixed(1),   'ke/h',   () => changeVitesse(localVitesse + 0.1),           () => changeVitesse(localVitesse - 0.1))}
+      {spin(`d-${index}`, 'Durée',       fmtTime(localTimeMins),    'h',      () => changeDuration(localTimeMins + 1),          () => changeDuration(localTimeMins - 1))}
     </div>
   )
 
@@ -271,40 +298,49 @@ export default function SegmentCard({ seg, index, typeLabel, globalEdit, onPaceC
     </div>
   )
 
-  const leftBorderColor = seg.dm > seg.dp
-    ? 'var(--color-secondary-500)'
-    : 'var(--color-primary-500)'
+  const leftBorderColor = isDescente ? 'var(--color-secondary-700)' : 'var(--color-primary-500)'
+
+  const typeColor: TagColor = isMontee ? 'primary' : isDescente ? 'secondary' : 'neutral'
+  const typeTagStyle = isDescente ? descenteTagStyle : undefined
+  // Fond du badge numéro — mêmes teintes que le tag de type, choisies pour un contraste net avec le texte blanc.
+  const badgeColor = isDescente ? 'var(--color-secondary-700)' : isMontee ? 'var(--color-primary-500)' : 'var(--color-neutral-400)'
 
   return (
-    <div
-      className="widget-card overflow-hidden transition-[background-image] duration-200"
-      style={isCardEditing ? { backgroundImage: 'linear-gradient(rgba(248, 217, 122, 0.12), rgba(248, 217, 122, 0.12))' } : undefined}
-    >
+    <div className="relative">
+      <div
+        className="widget-card overflow-hidden transition-[background-image] duration-200"
+        style={isCardEditing ? { backgroundImage: 'linear-gradient(rgba(248, 217, 122, 0.12), rgba(248, 217, 122, 0.12))' } : undefined}
+      >
       <div className="flex">
         <div className="w-[5px] shrink-0" style={{ backgroundColor: leftBorderColor }} />
         <div className="min-w-0 flex-1">
 
       {/* En-tête */}
       <div className="flex items-start gap-150 px-200 pb-150 pt-200">
-        <div
-          className="mt-25 flex size-[22px] shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-neutral-0"
-          style={{ backgroundColor: leftBorderColor }}
-        >
-          {index + 1}
-        </div>
-        <div className="shrink-0">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{typeLabel}</p>
-          <p className="text-[14px] font-bold text-neutral-800">{seg.from} → {seg.to} km</p>
-        </div>
-        <div className="flex flex-1 flex-wrap items-center justify-end gap-75">
-          <ColorTag color="secondary" icon={<Route       className="size-3" strokeWidth={2} />} label={`${dist} km`} />
-          {seg.dp > 0 && <ColorTag color="orange" icon={<TrendingUp   className="size-3" strokeWidth={2} />} label={`+${seg.dp.toLocaleString('fr')} m`} />}
-          {seg.dm > 0 && <ColorTag color="green"  icon={<TrendingDown className="size-3" strokeWidth={2} />} label={`−${seg.dm.toLocaleString('fr')} m`} />}
-          <ColorTag
-            color={slopeColor}
-            icon={seg.dm > seg.dp ? <TrendingDown className="size-3" strokeWidth={2} /> : <TrendingUp className="size-3" strokeWidth={2} />}
-            label={`${seg.dm > seg.dp ? '−' : '+'}${avgSlope}%`}
-          />
+        <div className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-100">
+          <div className="flex min-w-0 flex-wrap items-center gap-75">
+            <ColorTag color={typeColor} label={typeLabel} style={typeTagStyle} />
+            <p className="text-[14px] font-bold text-neutral-800">{seg.from} → {seg.to} km</p>
+          </div>
+          {!globalEdit && (
+            editingCard ? (
+              <div className="group relative">
+                <button
+                  type="button"
+                  aria-label="Annuler"
+                  onClick={cancelEdit}
+                  className="flex size-[22px] items-center justify-center rounded-full text-neutral-300 transition-colors hover:bg-neutral-40 hover:text-neutral-600"
+                >
+                  <X className="size-4" strokeWidth={2} />
+                </button>
+                <span className="pointer-events-none absolute right-0 top-[calc(100%+6px)] z-20 whitespace-nowrap rounded-md bg-neutral-800 px-75 py-25 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
+                  Annuler
+                </span>
+              </div>
+            ) : (
+              smallBtn(startEdit, <Pencil className="size-[11px]" strokeWidth={2} />)
+            )
+          )}
         </div>
       </div>
 
@@ -312,41 +348,86 @@ export default function SegmentCard({ seg, index, typeLabel, globalEdit, onPaceC
       <div className="px-200 pb-200">
         <div className="h-px bg-neutral-40" />
 
+        <div className="mt-150 flex flex-wrap items-stretch gap-y-150">
+          <div className="min-w-40 flex-1 space-y-100 pr-150">
+            <p className="widget-label widget-label-compact">Segment</p>
+            <div className="flex flex-wrap items-center gap-75">
+              <ColorTag color="secondary" icon={<Route        className="size-3" strokeWidth={2} />} label={`${dist} km`} />
+              <ColorTag
+                color={slopeColor}
+                icon={<TriangleRight className="size-3" strokeWidth={2} />}
+                label={`${isDescente ? '−' : '+'}${avgSlope}%`}
+              />
+              {seg.dp > 0 && <ColorTag color="orange" icon={<TrendingUp   className="size-3" strokeWidth={2} />} label={`+${seg.dp.toLocaleString('fr')} m`} />}
+              {seg.dm > 0 && <ColorTag color="green"  icon={<TrendingDown className="size-3" strokeWidth={2} />} label={`−${seg.dm.toLocaleString('fr')} m`} />}
+            </div>
+          </div>
+          <div className="w-px shrink-0 bg-neutral-40" />
+          <div className="min-w-40 flex-1 space-y-100 pl-150">
+            <p className="widget-label widget-label-compact">Depuis le début</p>
+            <div className="flex flex-wrap items-center gap-75">
+              <ColorTag color="orange" icon={<TrendingUp   className="size-3" strokeWidth={2} />} label={`+${cumulDp.toLocaleString('fr')} m`} />
+              <ColorTag color="green"  icon={<TrendingDown className="size-3" strokeWidth={2} />} label={`−${cumulDm.toLocaleString('fr')} m`} />
+            </div>
+          </div>
+        </div>
+        <div className="mt-150 h-px bg-neutral-40" />
+
         {globalEdit ? (
           /* ── Édition globale: allures + nutrition empilés pleine largeur ── */
           <div className="mt-150 space-y-200">
             <div className="space-y-100">
-              <p className="widget-label">Allures</p>
+              <p className="widget-label widget-label-compact">Allures</p>
               {spinGrid()}
             </div>
             <div className="h-px bg-neutral-40" />
             <div className="space-y-100">
-              <p className="widget-label">Nutrition</p>
+              <p className="widget-label widget-label-compact">Nutrition</p>
               {nutritionContent(true)}
             </div>
           </div>
 
-        ) : isPaceEditing ? (
-          /* ── Édition allures individuelle ── */
-          <div className="mt-150 space-y-150">
-            {spinGrid()}
-            <button className="btn btn-primary w-full" onClick={e => { e.stopPropagation(); setEditingPace(false) }}>
-              <Check className="size-4" strokeWidth={2.5} />
-              Terminé
-            </button>
-          </div>
-
-        ) : isNutritionEditing ? (
-          /* ── Édition nutrition individuelle ── */
-          <div className="mt-150 space-y-150">
+        ) : editingCard ? (
+          /* ── Édition individuelle de la card (allures + nutrition + actions) ── */
+          <div className="mt-150 space-y-200">
             <div className="space-y-100">
-              <p className="widget-label">Nutrition</p>
+              <p className="widget-label widget-label-compact">Allures</p>
+              {spinGrid()}
+            </div>
+            <div className="h-px bg-neutral-40" />
+            <div className="space-y-100">
+              <p className="widget-label widget-label-compact">Nutrition</p>
               {nutritionContent(true)}
             </div>
-            <button className="btn btn-primary w-full" onClick={e => { e.stopPropagation(); setEditingNutrition(false) }}>
-              <Check className="size-4" strokeWidth={2.5} />
-              Terminé
-            </button>
+            <div className="h-px bg-neutral-40" />
+
+            {confirmDelete ? (
+              <div className="space-y-100 rounded-xl border-2 border-error p-150">
+                <p className="text-center text-[12px] font-semibold text-error">Supprimer définitivement ce segment ?</p>
+                <div className="flex gap-100">
+                  <button className="btn btn-secondary flex-1" onClick={e => { e.stopPropagation(); setConfirmDelete(false) }}>
+                    Annuler
+                  </button>
+                  <button className="btn btn-danger-solid flex-1" onClick={e => { e.stopPropagation(); onDelete() }}>
+                    <Trash2 className="size-4" strokeWidth={2.5} />
+                    Confirmer
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-100">
+                <button className="btn btn-primary flex-1" onClick={saveEdit}>
+                  <Check className="size-4" strokeWidth={2.5} />
+                  Enregistrer
+                </button>
+                {canDelete && (
+                  <button className="btn btn-danger flex-1" onClick={e => { e.stopPropagation(); setConfirmDelete(true) }}>
+                    <Trash2 className="size-4" strokeWidth={2} />
+                    Supprimer
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
         ) : (
@@ -354,10 +435,7 @@ export default function SegmentCard({ seg, index, typeLabel, globalEdit, onPaceC
           <div className="mt-150 flex items-stretch gap-0">
             {/* Allures */}
             <div className="flex min-w-0 flex-1 flex-col gap-100 pr-150">
-              <div className="flex items-center justify-between">
-                <p className="widget-label">Allures</p>
-                {smallBtn(e => { e.stopPropagation(); setEditingPace(true) }, <Pencil className="size-[11px]" strokeWidth={2} />)}
-              </div>
+              <p className="widget-label widget-label-compact">Allures</p>
               <div className="flex flex-wrap gap-75">
                 <ColorTag color="pink"        icon={<Gauge className="size-3" strokeWidth={2} />} label={`${localPace} /km`} />
                 <ColorTag color="deep-purple" icon={<Zap   className="size-3" strokeWidth={2} />} label={`${localVitesse} km-e/h`} />
@@ -369,20 +447,23 @@ export default function SegmentCard({ seg, index, typeLabel, globalEdit, onPaceC
 
             {/* Nutrition */}
             <div className="flex min-w-0 flex-1 flex-col gap-100 pl-150">
-              <div className="flex items-center justify-between">
-                <p className="widget-label">Nutrition</p>
-                {isNutritionEditing
-                  ? smallBtn(e => { e.stopPropagation(); setEditingNutrition(false) }, <Check  className="size-[11px]" strokeWidth={2.5} />)
-                  : smallBtn(e => { e.stopPropagation(); setEditingNutrition(true)  }, <Pencil className="size-[11px]" strokeWidth={2}   />)
-                }
-              </div>
-              {nutritionContent(isNutritionEditing)}
+              <p className="widget-label widget-label-compact">Nutrition</p>
+              {nutritionContent(false)}
             </div>
           </div>
         )}
       </div>
 
         </div>
+      </div>
+      </div>
+
+      {/* Numéro du segment — centré sur la bordure gauche de la card */}
+      <div
+        className="absolute left-0 top-1/2 flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[12px] font-bold text-neutral-0 ring-2 ring-neutral-10"
+        style={{ backgroundColor: badgeColor }}
+      >
+        {index + 1}
       </div>
 
       {/* Menu produits — portal pour sortir du overflow:hidden */}

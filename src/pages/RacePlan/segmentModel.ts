@@ -23,7 +23,7 @@ export function makeId(prefix: string): string {
   return `${prefix}-${crypto.randomUUID()}`
 }
 
-function altAt(altData: AltimetryPoint[], km: number): number {
+export function altAt(altData: AltimetryPoint[], km: number): number {
   if (km <= altData[0].km) return altData[0].alt
   const last = altData[altData.length - 1]
   if (km >= last.km) return last.alt

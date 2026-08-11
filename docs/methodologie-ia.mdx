@@ -1,0 +1,49 @@
+# Méthodologie IA — suivi rigoureux des demandes
+
+## Pourquoi ce fichier existe
+
+Sur le chantier "profil + carte" (juillet 2026), une demande initiale avec 3 points précis
+(étiquettes km cliquables, courbe d'allure colorée selon l'allure, tooltip du profil façon
+happy-cabri-beta) a été interrompue par plusieurs messages complémentaires envoyés pendant
+qu'un agent de recherche tournait. Résultat : une recherche approfondie a bien été menée et a
+produit des specs concrètes (couleurs, seuils, code), mais seuls les points ajoutés en dernier
+ont été implémentés. Les 3 points d'origine, ceux qui donnaient son identité visuelle à la
+demande, ont été silencieusement oubliés. Ce fichier existe pour que ça ne se reproduise pas.
+
+## Règles à appliquer systématiquement
+
+1. **Transcrire, pas résumer.** Dès qu'un message contient plusieurs demandes (liste à puces,
+   énumération, ou simplement plusieurs points dans un paragraphe), les transcrire une par une
+   dans TodoWrite avant de commencer quoi que ce soit. Une tâche par point, avec la formulation
+   la plus proche possible du message original (pas de fusion, pas de paraphrase qui gomme un
+   détail).
+
+2. **Les messages "mid-turn" s'ajoutent, ils ne remplacent pas.** Quand un message arrive
+   pendant qu'un agent ou un outil tourne encore, il vient compléter la todo list existante, pas
+   la remplacer. Avant de traiter le nouveau message, vérifier que les points précédents sont
+   toujours dans la liste et toujours actifs.
+
+3. **Une recherche n'est pas une implémentation.** Si un agent (Explore, general-purpose, etc.)
+   remonte des specs concrètes (code à porter, couleurs, seuils, algorithmes), transformer
+   immédiatement chaque spec en tâche d'implémentation à part entière dans TodoWrite. Le fait
+   d'avoir "trouvé" l'information ne veut pas dire qu'elle finira dans le code.
+
+4. **Ne pas laisser le périmètre glisser.** Si de nouvelles demandes s'ajoutent en cours de
+   route et élargissent le sujet, garder les anciens points visibles dans la todo jusqu'à leur
+   vérification finale, même si l'attention se porte sur les nouveaux.
+
+5. **Relecture avant d'annoncer "c'est fait".** Avant de dire au client que le travail est
+   terminé, relire chaque message original de la demande (pas le souvenir qu'on en a) et cocher
+   un par un les points, en comparant au diff réel produit, pas à l'intention.
+
+6. **Résumé "demandé vs livré".** En fin de tâche, produire un récapitulatif point par point
+   (ce qui a été demandé, ce qui a été livré, ce qui a été explicitement laissé de côté et
+   pourquoi) avant de clore. Ce récapitulatif sert de garde-fou final, pas de simple politesse.
+
+## Application
+
+Ces règles s'appliquent à toute demande contenant plus d'un point distinct, qu'elle vienne d'un
+seul message ou de plusieurs messages successifs sur le même sujet. Elles s'appliquent en
+particulier aux demandes qui s'appuient sur une référence visuelle (capture d'écran, maquette)
+ou sur un autre dépôt de code à prendre en inspiration : ce sont les demandes où il est le plus
+facile de perdre de vue l'objectif d'ensemble en travaillant point par point.

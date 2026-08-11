@@ -1,0 +1,33 @@
+/* ─────────────────────────────────────────────────────────────
+   Tooltip custom de RouteMap — rendue en React (pas le tooltip
+   natif Leaflet, qui serait rogné par les coins arrondis de la
+   carte).
+───────────────────────────────────────────────────────────── */
+
+.rf-tooltip-card {
+  background: #ffffff;
+  border: 1px solid var(--color-neutral-20);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(20, 16, 10, 0.08), 0 4px 16px rgba(20, 16, 10, 0.10);
+  padding: 10px 12px;
+}
+
+.rf-tt {
+  font-family: var(--font-body);
+  min-width: 168px;
+}
+
+.rf-tt-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.rf-tt-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-neutral-800);
+  white-space: nowrap;
+}
+

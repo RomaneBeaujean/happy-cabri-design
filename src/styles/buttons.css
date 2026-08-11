@@ -4,11 +4,13 @@
    Consulter ce fichier avant de styler un nouveau bouton.
 
    Variants :
-   - .btn-primary   → fond primary-500, texte blanc
-   - .btn-secondary → transparent + bordure, hover secondary
-   - .btn-text      → transparent, sans bordure
-   - .btn-icon      → cercle utilitaire (icône seule)
-   - .btn-full      → pleine largeur mobile
+   - .btn-primary      → fond primary-500, texte blanc
+   - .btn-secondary    → transparent + bordure, hover secondary
+   - .btn-text         → transparent, sans bordure
+   - .btn-danger       → transparent, texte couleur erreur (action destructive)
+   - .btn-danger-solid → fond couleur erreur, texte blanc (confirmation destructive)
+   - .btn-icon         → cercle utilitaire (icône seule)
+   - .btn-full         → pleine largeur mobile
 ───────────────────────────────────────────────────────────── */
 
 @layer components {
@@ -69,6 +71,30 @@
 
 .btn-text:hover {
   color: var(--color-primary-900);
+}
+
+/* ── Danger — texte couleur erreur, sans fond (action destructive) ── */
+.btn-danger {
+  background: transparent;
+  color: var(--color-error);
+}
+.btn-danger:hover {
+  background: rgba(211, 122, 114, 0.12);
+}
+.btn-danger:active {
+  background: rgba(211, 122, 114, 0.20);
+}
+
+/* ── Danger solid — fond couleur erreur (confirmation destructive) ── */
+.btn-danger-solid {
+  background: var(--color-error);
+  color: var(--color-neutral-0);
+}
+.btn-danger-solid:hover {
+  background: #C36358;
+}
+.btn-danger-solid:active {
+  background: #B14F45;
 }
 
 /* ── Full width — mobile ── */

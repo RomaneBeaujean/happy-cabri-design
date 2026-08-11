@@ -37,6 +37,29 @@
   letter-spacing: 1.5px;
 }
 
+/* Variante de .widget-label pour les titres de section des cards de segment : 11px en desktop, réduite en mobile (< lg). */
+.widget-label-compact {
+  font-size: 11px;
+}
+
+@media (max-width: 1023px) {
+  .widget-label-compact {
+    font-size: 10px;
+  }
+}
+
+/* Taille de texte des ColorTag : 12px en desktop, réduite en mobile (< lg). Doit rester une classe
+   (et non un style inline) pour que le media query puisse s'appliquer. */
+.tag-text {
+  font-size: 12px;
+}
+
+@media (max-width: 1023px) {
+  .tag-text {
+    font-size: 11px;
+  }
+}
+
 .widget-row {
   border-radius: 14px;
   transition: background-color 0.2s ease, transform 0.2s ease;

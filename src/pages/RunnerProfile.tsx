@@ -1,84 +1,24 @@
-﻿import { useState } from 'react'
+﻿import { useState, useRef, useLayoutEffect } from 'react'
+import { createPortal } from 'react-dom'
 import {
-  Mountain, Edit2, GripVertical, Droplets,
-  Plus, Minus, Check, X, Timer, Trophy, TrendingUp,
-  Zap, Calendar, Clock, Flame, ChevronDown,
+  Edit2, GripVertical, Droplets, ChevronUp, ChevronDown, Save,
+  Plus, Minus, X, Timer, Flame, AlertTriangle,
 } from 'lucide-react'
 import AppLayout from '../layouts/AppLayout'
+import ColorTag, { type TagColor } from '../components/ColorTag'
+import Dropdown from '../components/Dropdown'
 
-// ── Radar chart ──────────────────────────────────────────────────────────────
-
-const radarAxes = [
-  { label: ['Grimpeur', '/ Descendeur'],    value: 78 },
-  { label: ['Plat-roulant', '/ Technique'], value: 62 },
-  { label: ['Régularité', 'du pacing'],     value: 72 },
-  { label: ['Tolérance', 'à la durée'],     value: 85 },
-  { label: ['Profil de', 'distance'],       value: 68 },
-  { label: ['Expérience'],                  value: 58 },
-]
-
-function RadarChart({ data }: { data: { label: string[]; value: number }[] }) {
-  const cx = 160, cy = 165, r = 85, lr = 110, levels = 4
-  const n = data.length
-  const ang = (i: number) => (i * 2 * Math.PI) / n - Math.PI / 2
-  const pt = (i: number, mag: number) => ({
-    x: cx + mag * Math.cos(ang(i)),
-    y: cy + mag * Math.sin(ang(i)),
-  })
-  const gridPolys = Array.from({ length: levels }, (_, l) =>
-    data.map((_, i) => pt(i, r * (l + 1) / levels))
-      .map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
-  )
-  const dataPoly = data
-    .map((d, i) => pt(i, r * d.value / 100))
-    .map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
-  const lineH = 12.5
-  return (
-    <svg viewBox="0 0 320 318" className="w-full overflow-visible">
-      {data.map((_, i) => {
-        const p = pt(i, r)
-        return <line key={i} x1={cx} y1={cy} x2={p.x.toFixed(1)} y2={p.y.toFixed(1)} stroke="#e3e1de" strokeWidth="1" />
-      })}
-      {gridPolys.map((pts, l) => (
-        <polygon key={l} points={pts} fill="none"
-          stroke={l === levels - 1 ? '#cbc8c3' : '#e3e1de'}
-          strokeWidth={l === levels - 1 ? 1.5 : 1} />
-      ))}
-      <polygon points={dataPoly} fill="rgba(43,161,171,0.13)" stroke="#18747c" strokeWidth="2" strokeLinejoin="round" />
-      {data.map((d, i) => {
-        const p = pt(i, r * d.value / 100)
-        return <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r="3.5" fill="#18747c" />
-      })}
-      {data.map((d, i) => {
-        const p = pt(i, lr)
-        const anchor = p.x < cx - 8 ? 'end' : p.x > cx + 8 ? 'start' : 'middle'
-        const totalH = (d.label.length - 1) * lineH
-        const startY = p.y - totalH / 2
-        return (
-          <text key={i} textAnchor={anchor} fontSize="11"
-            fill="#39342d" fontFamily="Manrope, sans-serif" fontWeight="600">
-            {d.label.map((line, li) => (
-              <tspan key={li} x={p.x.toFixed(1)} y={(startY + li * lineH).toFixed(1)} dominantBaseline="middle">
-                {line}
-              </tspan>
-            ))}
-          </text>
-        )
-      })}
-    </svg>
-  )
+function paceToSec(p: string) {
+  const [m, s = '0'] = p.split(':')
+  return (parseInt(m) || 0) * 60 + (parseInt(s) || 0)
+}
+function secToPace(total: number) {
+  const m = Math.floor(total / 60)
+  const s = total % 60
+  return `${m}:${String(s).padStart(2, '0')}`
 }
 
 // ── Static data ───────────────────────────────────────────────────────────────
-
-const yearStats = [
-  { label: 'Km parcourus',      value: '342',   unit: 'km',     icon: TrendingUp },
-  { label: 'Dénivelé positif',  value: '8 200', unit: 'm',      icon: Mountain   },
-  { label: 'Courses réalisées', value: '3',     unit: '',       icon: Trophy     },
-  { label: 'Volume hebdo',      value: '42',    unit: 'km/sem', icon: Calendar   },
-]
-
-const longestRun = { name: 'Grand Raid Belledonne', distance: '28 km', time: '3h12' }
 
 const initChronos = [
   { label: '1 km',          time: '4:12'  },
@@ -89,134 +29,443 @@ const initChronos = [
   { label: 'Marathon',      time: '3h52'  },
 ]
 
-type Product = { name: string; glucides: number; ratio: string }
+type ProductCategory = 'gel' | 'barre' | 'compote' | 'boisson' | 'autre'
 
-const initProducts: Product[] = [
-  { name: 'Maurten Gel 100',             glucides: 25, ratio: '1:0.8' },
-  { name: 'Spring Energy Awesome Sauce', glucides: 45, ratio: '2:1'   },
-  { name: 'Tailwind Endurance Fuel',     glucides: 50, ratio: '2:1'   },
-  { name: 'Clémentines fraîches',        glucides: 12, ratio: '1:1'   },
-]
-
-type PenteRow = { label: string; roulant: string; technique: string }
-type Aptitude = {
-  type: string
-  vitesse: string
-  kmEffort: string
-  montee: PenteRow[]
-  descente: PenteRow[]
+const categoryConfig: Record<ProductCategory, { label: string; color: TagColor }> = {
+  gel:     { label: 'Gel',     color: 'orange'  },
+  barre:   { label: 'Barre',   color: 'brown'   },
+  compote: { label: 'Compote', color: 'green'   },
+  boisson: { label: 'Boisson', color: 'teal'    },
+  autre:   { label: 'Autre',   color: 'neutral' },
 }
 
-const initAptitudes: Aptitude[] = [
-  {
-    type: 'Courte  (< 25 km)', vitesse: '7:04', kmEffort: '15',
-    montee: [
-      { label: '5 – 10 %',  roulant: '8:30',  technique: '10:00' },
-      { label: '10 – 15 %', roulant: '10:00', technique: '12:30' },
-      { label: '15 – 20 %', roulant: '12:00', technique: '15:00' },
-      { label: '> 20 %',    roulant: '15:00', technique: '17:00' },
-    ],
-    descente: [
-      { label: '5 – 10 %',  roulant: '5:30', technique: '6:30' },
-      { label: '10 – 15 %', roulant: '6:30', technique: '7:30' },
-      { label: '> 15 %',    roulant: '7:30', technique: '9:00' },
-    ],
-  },
-  {
-    type: 'Longue  (25 – 60 km)', vitesse: '8:20', kmEffort: '10',
-    montee: [
-      { label: '5 – 10 %',  roulant: '9:30',  technique: '11:30' },
-      { label: '10 – 15 %', roulant: '11:30', technique: '14:00' },
-      { label: '15 – 20 %', roulant: '13:30', technique: '16:30' },
-      { label: '> 20 %',    roulant: '17:00', technique: '19:00' },
-    ],
-    descente: [
-      { label: '5 – 10 %',  roulant: '6:00', technique: '7:00' },
-      { label: '10 – 15 %', roulant: '7:00', technique: '8:00' },
-      { label: '> 15 %',    roulant: '8:00', technique: '9:30' },
-    ],
-  },
-  {
-    type: 'Ultra   (> 60 km)', vitesse: '9:50', kmEffort: '6',
-    montee: [
-      { label: '5 – 10 %',  roulant: '11:00', technique: '13:00' },
-      { label: '10 – 15 %', roulant: '13:00', technique: '15:30' },
-      { label: '15 – 20 %', roulant: '15:00', technique: '18:00' },
-      { label: '> 20 %',    roulant: '19:00', technique: '21:00' },
-    ],
-    descente: [
-      { label: '5 – 10 %',  roulant: '6:30', technique: '7:30'  },
-      { label: '10 – 15 %', roulant: '7:30', technique: '9:00'  },
-      { label: '> 15 %',    roulant: '9:00', technique: '11:00' },
-    ],
-  },
+type Product = { id: string; name: string; glucides: number; ratio: string; category: ProductCategory }
+
+const initProducts: Product[] = [
+  { id: 'p1', name: 'Maurten Gel 100',             glucides: 25, ratio: '1:0.8', category: 'gel'     },
+  { id: 'p2', name: 'Spring Energy Awesome Sauce', glucides: 45, ratio: '2:1',   category: 'gel'     },
+  { id: 'p3', name: 'Tailwind Endurance Fuel',     glucides: 50, ratio: '2:1',   category: 'boisson' },
+  { id: 'p4', name: 'Clémentines fraîches',        glucides: 12, ratio: '1:1',   category: 'autre'   },
+]
+
+const initAllures = [
+  { id: 'courte', label: 'Courte', range: '< 25 km',    color: 'text-fuchsia-700', dot: 'bg-fuchsia-600', max: '4:15', min: '10:00', descenteTechnique: '6:30', kmEffort: '15' },
+  { id: 'longue', label: 'Longue', range: '25 – 60 km', color: 'text-orange-700',  dot: 'bg-orange-600',  max: '4:40', min: '12:30', descenteTechnique: '7:30', kmEffort: '10' },
+  { id: 'ultra',  label: 'Ultra',  range: '> 60 km',     color: 'text-blue-900',   dot: 'bg-blue-900',    max: '5:10', min: '15:00', descenteTechnique: '9:00', kmEffort: '6'  },
+]
+
+type AllureRow = typeof initAllures[number]
+
+const allureParams: { key: 'max' | 'min' | 'descenteTechnique' | 'kmEffort'; label: string; unit: string; kind: 'pace' | 'number' }[] = [
+  { key: 'max',               label: 'Allure max (plat / descente)', unit: '/km', kind: 'pace'   },
+  { key: 'min',               label: 'Allure min (montée raide)',    unit: '/km', kind: 'pace'   },
+  { key: 'descenteTechnique', label: 'Descente technique',           unit: '/km', kind: 'pace'   },
+  { key: 'kmEffort',          label: 'Km-effort moyen',              unit: '',    kind: 'number' },
+]
+
+type CompetenceRow = { label: string; value: number } // /10
+
+const initCompetences: CompetenceRow[] = [
+  { label: 'Grimpeur',   value: 8 },
+  { label: 'Descendeur', value: 6 },
+  { label: 'Endurance',  value: 7 },
 ]
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-function PaceCell({ value, editing, onChange }: {
+function NumberField({ value, onChange, placeholder, step = 1, min = 0, onEnter, variant = 'box' }: {
   value: string
-  editing: boolean
   onChange: (v: string) => void
+  placeholder?: string
+  step?: number
+  min?: number
+  onEnter?: () => void
+  variant?: 'box' | 'pill'
 }) {
-  const isMarche = value === 'marche'
-  if (editing) return (
-    <input
-      className="w-14 rounded-md border border-neutral-30 bg-neutral-0 px-50 py-25 text-center text-[12px] font-bold text-neutral-700 outline-none focus:border-primary-400"
-      value={value}
-      onChange={e => onChange(e.target.value)}
-    />
-  )
+  function bump(dir: 1 | -1) {
+    const base = parseFloat(value.replace(',', '.'))
+    const next = Math.max(min, (Number.isFinite(base) ? base : 0) + dir * step)
+    onChange(String(next))
+  }
+
+  if (variant === 'pill') {
+    return (
+      <div className="flex min-w-0 flex-1 items-center gap-75 rounded-full border border-neutral-40 bg-white p-50 lg:w-fit lg:flex-none">
+        <button
+          type="button"
+          onMouseDown={e => { e.preventDefault(); bump(-1) }}
+          className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary-200 text-secondary-800 transition-colors hover:bg-secondary-300"
+        >
+          <Minus className="size-3.5" strokeWidth={2.5} />
+        </button>
+        <input
+          type="text"
+          inputMode="decimal"
+          placeholder={placeholder}
+          value={value}
+          onChange={e => onChange(e.target.value.replace(/[^\d.,]/g, ''))}
+          onKeyDown={e => { if (e.key === 'Enter') onEnter?.() }}
+          className="w-full min-w-0 flex-1 bg-transparent text-center text-[14px] font-bold text-neutral-800 outline-none placeholder:text-neutral-60 lg:w-12 lg:flex-none"
+        />
+        <button
+          type="button"
+          onMouseDown={e => { e.preventDefault(); bump(1) }}
+          className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary-200 text-secondary-800 transition-colors hover:bg-secondary-300"
+        >
+          <Plus className="size-3.5" strokeWidth={2.5} />
+        </button>
+      </div>
+    )
+  }
+
   return (
-    <span className={`text-[12px] font-bold ${isMarche ? 'italic text-neutral-400' : 'text-neutral-700'}`}>
-      {value}{!isMarche && <span className="ml-25 text-[9px] font-medium text-neutral-400">/km</span>}
-    </span>
+    <div className="input flex items-center gap-50 py-50 pr-50 pl-150">
+      <input
+        type="text"
+        inputMode="decimal"
+        placeholder={placeholder}
+        value={value}
+        onChange={e => onChange(e.target.value.replace(/[^\d.,]/g, ''))}
+        onKeyDown={e => { if (e.key === 'Enter') onEnter?.() }}
+        className="w-full min-w-0 flex-1 bg-transparent text-[13px] text-neutral-800 outline-none placeholder:text-neutral-60"
+      />
+      <div className="flex shrink-0 items-center gap-25">
+        <button
+          type="button"
+          onMouseDown={e => { e.preventDefault(); bump(-1) }}
+          className="flex size-6 shrink-0 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-neutral-30 hover:text-neutral-700"
+        >
+          <Minus className="size-3" strokeWidth={2.5} />
+        </button>
+        <button
+          type="button"
+          onMouseDown={e => { e.preventDefault(); bump(1) }}
+          className="flex size-6 shrink-0 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-neutral-30 hover:text-neutral-700"
+        >
+          <Plus className="size-3" strokeWidth={2.5} />
+        </button>
+      </div>
+    </div>
   )
 }
 
-function PenteTable({
-  label, icon, rows, editing, variant, onEdit,
-}: {
-  label: string
-  icon: React.ReactNode
-  rows: PenteRow[]
+function AllureCell({ value, editing, unit, kind, color, onChange }: {
+  value: string
   editing: boolean
-  variant: 'montee' | 'descente'
-  onEdit: (k: number, key: 'roulant' | 'technique', val: string) => void
+  unit: string
+  kind: 'pace' | 'number'
+  color: string
+  onChange: (v: string) => void
 }) {
-  const isMontee = variant === 'montee'
-  const borderCls  = isMontee ? 'border-primary-200'  : 'border-neutral-30'
-  const headerBg   = isMontee ? 'bg-primary-100'      : 'bg-neutral-20'
-  const headerText = isMontee ? 'text-primary-800'    : 'text-neutral-600'
-  const colsBg     = isMontee ? 'bg-primary-50'       : 'bg-neutral-10'
-  const colsText   = isMontee ? 'text-primary-600'    : 'text-neutral-500'
-  const rowBorder  = 'border-neutral-20'
+  const step = (dir: 1 | -1) => {
+    if (kind === 'pace') onChange(secToPace(Math.max(30, paceToSec(value) + dir * 15)))
+    else onChange(String(Math.max(1, (parseInt(value) || 0) + dir)))
+  }
+
+  if (!editing) return (
+    <p className={`text-center text-[12px] font-bold lg:text-[14px] ${color}`}>
+      {value}{unit && <span className="ml-25 hidden text-[10px] font-medium text-neutral-400 lg:inline">{unit}</span>}
+    </p>
+  )
 
   return (
-    <div className={`overflow-hidden rounded-xl border ${borderCls}`}>
-      {/* Header */}
-      <div className={`flex items-center gap-100 px-150 py-100 ${headerBg}`}>
-        <span className={headerText}>{icon}</span>
-        <p className={`text-[10px] eyebrow ${headerText}`}>{label}</p>
+    <div className="relative">
+      <input
+        className={`input px-50 pr-8.5 text-center text-[10px] font-semibold lg:px-100 lg:pr-11.5 lg:text-[12px] ${color}`}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+      />
+      <div className="absolute inset-y-0 right-0 flex items-center gap-25 pr-50 pointer-events-none lg:pr-75">
+        {unit && <span className="hidden text-[9px] font-bold text-neutral-60 lg:inline">{unit}</span>}
+        <div className="flex flex-col items-center pointer-events-auto">
+          <button type="button" onMouseDown={e => { e.preventDefault(); step(1) }}
+            className="p-25 cursor-pointer text-neutral-400 hover:text-primary-500 transition-colors">
+            <ChevronUp className="size-2.5" strokeWidth={2.5} />
+          </button>
+          <button type="button" onMouseDown={e => { e.preventDefault(); step(-1) }}
+            className="p-25 cursor-pointer text-neutral-400 hover:text-primary-500 transition-colors">
+            <ChevronDown className="size-2.5" strokeWidth={2.5} />
+          </button>
+        </div>
       </div>
-      {/* Column labels */}
-      <div className={`grid grid-cols-[1fr_auto_auto] gap-x-150 border-b px-150 py-75 ${colsBg} ${rowBorder}`}>
-        <span />
-        <p className={`w-14 text-center text-[9px] eyebrow ${colsText}`}>Roulant</p>
-        <p className="w-14 text-center text-[9px] eyebrow text-neutral-400">Technique</p>
+    </div>
+  )
+}
+
+function StepperStat({ icon, label, value, unit, editing, onInc, onDec, color = 'secondary' }: {
+  icon: React.ReactNode
+  label: string
+  value: number
+  unit: string
+  editing: boolean
+  onInc: () => void
+  onDec: () => void
+  color?: 'teal' | 'orange'
+}) {
+  const palette = color === 'teal'
+    ? { border: 'border-teal-700', bg: 'bg-teal-100', chip: 'bg-teal-200 text-teal-800 hover:bg-teal-300', text: 'text-teal-800' }
+    : { border: 'border-orange-700', bg: 'bg-orange-100', chip: 'bg-orange-200 text-orange-800 hover:bg-orange-300', text: 'text-orange-800' }
+
+  return (
+    <div className={`rounded-2xl border ${palette.border} ${palette.bg} p-200`}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-150">
+          {icon}
+          <p className="widget-label">{label}</p>
+        </div>
+        <div className="flex items-center gap-100">
+          {editing && (
+            <button
+              onClick={onDec}
+              className={`flex size-6 items-center justify-center rounded-full transition-colors ${palette.chip}`}
+            >
+              <Minus className="size-3" strokeWidth={2.5} />
+            </button>
+          )}
+          <span className={`w-16 text-center text-[16px] font-bold ${palette.text}`}>
+            {value}
+            <span className="ml-25 text-[12px] font-medium text-neutral-400">{unit}</span>
+          </span>
+          {editing && (
+            <button
+              onClick={onInc}
+              className={`flex size-6 items-center justify-center rounded-full transition-colors ${palette.chip}`}
+            >
+              <Plus className="size-3" strokeWidth={2.5} />
+            </button>
+          )}
+        </div>
       </div>
-      {/* Rows */}
-      {rows.map((row, k) => (
-        <div key={k} className={`grid grid-cols-[1fr_auto_auto] items-center gap-x-150 px-150 py-100 [&:not(:last-child)]:border-b [&:not(:last-child)]:${rowBorder}`}>
-          <span className="text-[10px] font-semibold text-neutral-500">{row.label}</span>
-          <div className={`flex w-14 justify-center ${isMontee ? 'text-primary-700' : 'text-neutral-700'}`}>
-            <PaceCell value={row.roulant}   editing={editing} onChange={v => onEdit(k, 'roulant', v)}   />
+    </div>
+  )
+}
+
+function EditToggleButton({ editing, onClick }: { editing: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`btn gap-75 px-150 text-[12px] lg:px-300 ${editing ? 'btn-primary' : 'btn-text'}`}
+    >
+      {editing
+        ? <><Save className="size-3.5" strokeWidth={2} /><span className="hidden lg:inline">Enregistrer</span></>
+        : <><Edit2 className="size-3.5" strokeWidth={2} /><span className="hidden lg:inline">Modifier</span></>}
+    </button>
+  )
+}
+
+function AddProductModal({ onAdd, onClose }: {
+  onAdd: (p: Product) => void
+  onClose: () => void
+}) {
+  const [category, setCategory]         = useState<ProductCategory>('gel')
+  const [name, setName]                 = useState('')
+  const [mode, setMode]                 = useState<'unit' | '100g'>('unit')
+  const [glucidesUnit, setGlucidesUnit] = useState('')
+  const [weight, setWeight]             = useState('')
+  const [glucides100g, setGlucides100g] = useState('')
+
+  const computedFrom100g = (() => {
+    const w = parseFloat(weight.replace(',', '.'))
+    const g = parseFloat(glucides100g.replace(',', '.'))
+    if (!Number.isFinite(w) || !Number.isFinite(g) || w <= 0 || g <= 0) return null
+    return Math.round((w * g) / 100)
+  })()
+
+  const finalGlucides = mode === 'unit' ? parseFloat(glucidesUnit.replace(',', '.')) : computedFrom100g
+  const canSubmit = name.trim().length > 0 && finalGlucides != null && Number.isFinite(finalGlucides) && finalGlucides > 0
+
+  function submit() {
+    if (!canSubmit || finalGlucides == null) return
+    onAdd({ id: `p${Date.now()}`, name: name.trim(), glucides: Math.round(finalGlucides), ratio: '—', category })
+  }
+
+  return createPortal(
+    <>
+      <div className="fixed inset-0 z-[998] bg-black/40" onClick={onClose} />
+      <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
+        <div className="w-full max-w-[420px] overflow-hidden rounded-3xl bg-white shadow-lg">
+          <div className="flex items-center justify-between border-b border-neutral-20 px-200 py-200">
+            <p className="font-accent text-[16px] font-bold text-neutral-800">Ajouter un produit</p>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex size-[26px] shrink-0 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-neutral-40 hover:text-neutral-700"
+            >
+              <X className="size-4" strokeWidth={2.5} />
+            </button>
           </div>
-          <div className="flex w-14 justify-center text-neutral-400">
-            <PaceCell value={row.technique} editing={editing} onChange={v => onEdit(k, 'technique', v)} />
+
+          <div className="space-y-200 px-200 py-200">
+            <div className="space-y-75">
+              <p className="widget-label widget-label-compact">Catégorie</p>
+              <Dropdown
+                value={category}
+                onChange={setCategory}
+                className="w-full"
+                options={(Object.keys(categoryConfig) as ProductCategory[]).map(c => ({
+                  value: c,
+                  label: categoryConfig[c].label,
+                }))}
+              />
+            </div>
+
+            <div className="space-y-75">
+              <p className="widget-label widget-label-compact">Nom</p>
+              <input
+                autoFocus
+                type="text"
+                placeholder="ex: Gel Maurten"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && mode === 'unit') submit() }}
+                className="input w-full py-100 text-[13px]"
+              />
+            </div>
+
+            <div className="space-y-75">
+              <div className="flex items-center gap-100">
+                <p className="widget-label widget-label-compact">Glucides</p>
+                <div className="flex items-center gap-50 text-[10px] font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setMode('unit')}
+                    className={`outline-none ${mode === 'unit' ? 'text-neutral-800' : 'text-neutral-40 hover:text-neutral-600'}`}
+                  >
+                    g/unité
+                  </button>
+                  <span className="text-neutral-300">|</span>
+                  <button
+                    type="button"
+                    onClick={() => setMode('100g')}
+                    className={`outline-none ${mode === '100g' ? 'text-neutral-800' : 'text-neutral-40 hover:text-neutral-600'}`}
+                  >
+                    pour 100g
+                  </button>
+                </div>
+              </div>
+
+              {mode === 'unit' ? (
+                <div className="flex items-center gap-75">
+                  <NumberField
+                    placeholder="ex: 10"
+                    value={glucidesUnit}
+                    onChange={setGlucidesUnit}
+                    onEnter={submit}
+                    variant="pill"
+                  />
+                  <span className="shrink-0 text-[13px] font-medium text-neutral-400">g</span>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-75 lg:flex-row lg:items-center">
+                  <div className="flex items-center gap-75">
+                    <NumberField
+                      placeholder="glucides/100g"
+                      value={glucides100g}
+                      onChange={setGlucides100g}
+                    />
+                    <span className="shrink-0 text-[12px] font-medium text-neutral-400">/100g</span>
+                  </div>
+                  <div className="flex items-center gap-75">
+                    <NumberField
+                      placeholder="poids total"
+                      value={weight}
+                      onChange={setWeight}
+                      step={5}
+                    />
+                    <span className="shrink-0 text-[12px] font-medium text-neutral-400">g</span>
+                  </div>
+                  <div className="flex items-center gap-75">
+                    <span className="shrink-0 text-[13px] font-bold text-neutral-400">=</span>
+                    <span className="w-14 shrink-0 text-center text-[13px] font-bold text-primary-700">
+                      {computedFrom100g != null ? `${computedFrom100g} g` : '—'}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-100 border-t border-neutral-20 px-200 py-200">
+            <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
+            <button
+              type="button"
+              className="btn btn-primary disabled:pointer-events-none disabled:opacity-40"
+              disabled={!canSubmit}
+              onClick={submit}
+            >
+              Ajouter
+            </button>
           </div>
         </div>
-      ))}
+      </div>
+    </>,
+    document.body
+  )
+}
+
+function DeleteProductModal({ productName, onConfirm, onClose }: {
+  productName: string
+  onConfirm: () => void
+  onClose: () => void
+}) {
+  return createPortal(
+    <>
+      <div className="fixed inset-0 z-[998] bg-black/40" onClick={onClose} />
+      <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
+        <div className="w-full max-w-[380px] overflow-hidden rounded-3xl bg-white shadow-lg">
+          <div className="flex items-start gap-150 px-200 pt-200">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-500">
+              <AlertTriangle className="size-4.5" strokeWidth={2} />
+            </span>
+            <div>
+              <p className="font-accent text-[16px] font-bold text-neutral-800">Supprimer ce produit ?</p>
+              <p className="mt-50 text-[13px] text-neutral-600">
+                {productName} sera retiré de votre liste de nutrition. Cette action est irréversible.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-100 px-200 py-200">
+            <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
+            <button
+              type="button"
+              className="btn bg-red-500 text-white hover:bg-red-600!"
+              onClick={onConfirm}
+            >
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    </>,
+    document.body
+  )
+}
+
+function RatingBar({ value, max = 10, editing, onChange }: {
+  value: number
+  max?: number
+  editing?: boolean
+  onChange?: (v: number) => void
+}) {
+  return (
+    <div className="flex items-center gap-50">
+      <div className="flex gap-25">
+        {Array.from({ length: max }, (_, i) => editing ? (
+          <button
+            key={i}
+            type="button"
+            onClick={() => onChange?.(i + 1)}
+            className={`h-4 w-2.5 rounded-full transition-colors hover:bg-primary-400 ${i < value ? 'bg-primary-500' : 'bg-neutral-30'}`}
+          />
+        ) : (
+          <span
+            key={i}
+            className={`h-4 w-2.5 rounded-full ${i < value ? 'bg-primary-500' : 'bg-neutral-30'}`}
+          />
+        ))}
+      </div>
+      <span className="ml-75 text-[12px] font-bold text-primary-700">{value}<span className="text-[10px] font-medium text-neutral-400">/{max}</span></span>
     </div>
   )
 }
@@ -227,22 +476,58 @@ export default function RunnerProfile() {
   const [chronos, setChronos]             = useState(initChronos)
   const [editChronos, setEditChronos]     = useState(false)
   const [products, setProducts]           = useState(initProducts)
+  const [editNutrition, setEditNutrition] = useState(false)
   const [waterPerHour, setWaterPerHour]   = useState(650)
-  const [aptitudes, setAptitudes]         = useState(initAptitudes)
-  const [editAptitudes, setEditAptitudes] = useState(false)
-  const [expandedApt, setExpandedApt]     = useState<number | null>(null)
+  const [glucidesPerHour, setGlucidesPerHour] = useState(60)
+  const [allures, setAllures]             = useState(initAllures)
+  const [editAllures, setEditAllures]     = useState(false)
+  const [competences, setCompetences]     = useState(initCompetences)
+  const [editCompetences, setEditCompetences] = useState(false)
+  const [dragId, setDragId]               = useState<string | null>(null)
+  const [showAddProduct, setShowAddProduct] = useState(false)
+  const [productToDelete, setProductToDelete] = useState<number | null>(null)
+  const rowRefs = useRef(new Map<string, HTMLDivElement>())
+  const prevRects = useRef(new Map<string, DOMRect>())
+  const reorderLock = useRef(false)
 
-  const toggleApt = (i: number) => setExpandedApt(prev => prev === i ? null : i)
+  const editAllure = (i: number, key: keyof AllureRow, val: string) =>
+    setAllures(al => al.map((x, j) => j === i ? { ...x, [key]: val } : x))
 
-  const editMontee = (i: number, k: number, key: 'roulant' | 'technique', val: string) =>
-    setAptitudes(ap => ap.map((x, j) => j !== i ? x : {
-      ...x, montee: x.montee.map((m, l) => l === k ? { ...m, [key]: val } : m)
-    }))
+  const editCompetence = (i: number, val: number) =>
+    setCompetences(comp => comp.map((x, j) => j === i ? { ...x, value: val } : x))
 
-  const editDescente = (i: number, k: number, key: 'roulant' | 'technique', val: string) =>
-    setAptitudes(ap => ap.map((x, j) => j !== i ? x : {
-      ...x, descente: x.descente.map((d, l) => l === k ? { ...d, [key]: val } : d)
-    }))
+  function moveProductOver(overId: string) {
+    setProducts(pr => {
+      const from = pr.findIndex(p => p.id === dragId)
+      const to = pr.findIndex(p => p.id === overId)
+      if (from === -1 || to === -1 || from === to) return pr
+      const next = [...pr]
+      const [moved] = next.splice(from, 1)
+      next.splice(to, 0, moved)
+      return next
+    })
+  }
+
+  // FLIP : anime les lignes qui changent de position quand `products` est réordonné.
+  useLayoutEffect(() => {
+    const newRects = new Map<string, DOMRect>()
+    rowRefs.current.forEach((el, id) => newRects.set(id, el.getBoundingClientRect()))
+    prevRects.current.forEach((prevRect, id) => {
+      const el = rowRefs.current.get(id)
+      const newRect = newRects.get(id)
+      if (!el || !newRect) return
+      const dy = prevRect.top - newRect.top
+      if (dy) {
+        el.style.transition = 'none'
+        el.style.transform = `translateY(${dy}px)`
+        requestAnimationFrame(() => {
+          el.style.transition = 'transform 200ms ease'
+          el.style.transform = ''
+        })
+      }
+    })
+    prevRects.current = newRects
+  }, [products])
 
   return (
     <AppLayout activeItem="profil" userInitials="RB">
@@ -264,157 +549,72 @@ export default function RunnerProfile() {
           </div>
         </section>
 
-        {/* ── Aptitudes trail ── */}
+        {/* ── Allures ── */}
         <section className="widget-card overflow-hidden p-100">
           <div className="flex items-center justify-between px-200 py-150">
-            <div className="flex items-center gap-150">
-              <Zap className="size-4 text-primary-400 shrink-0" strokeWidth={2} />
-              <p className="widget-title">Aptitudes trail</p>
-            </div>
-            <button
-              onClick={() => setEditAptitudes(v => !v)}
-              className="btn btn-text gap-75 text-[12px]"
-            >
-              {editAptitudes
-                ? <><Check className="size-3.5" strokeWidth={2.5} />Enregistrer</>
-                : <><Edit2 className="size-3.5" strokeWidth={2} />Modifier</>}
-            </button>
+            <p className="widget-title">Allures</p>
+            <EditToggleButton editing={editAllures} onClick={() => setEditAllures(v => !v)} />
           </div>
 
-          {/* Column headers */}
-          <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-200 px-200 pb-75">
-            <p className="text-[10px] eyebrow text-neutral-400">Type</p>
-            <p className="text-center text-[10px] eyebrow text-neutral-400">Allure moy.</p>
-            <p className="text-center text-[10px] eyebrow text-neutral-400">Km-effort</p>
-            <span />
-          </div>
-
-          {aptitudes.map((a, i) => {
-            const expanded = expandedApt === i
-            return (
-              <div key={i}>
-                {/* Summary row */}
-                <button
-                  onClick={() => toggleApt(i)}
-                  className="widget-row grid w-full grid-cols-[1fr_auto_auto_auto] items-center gap-x-200 px-200 py-150 text-left"
-                >
-                  <p className="text-[12px] font-semibold text-neutral-700">{a.type}</p>
-                  {editAptitudes ? (
-                    <>
-                      <div className="flex items-center gap-50" onClick={e => e.stopPropagation()}>
-                        <input
-                          className="w-14 rounded-lg border border-neutral-30 bg-neutral-10 px-100 py-50 text-center text-[14px] font-bold text-primary-700 outline-none focus:border-primary-400"
-                          value={a.vitesse}
-                          onChange={e => setAptitudes(ap => ap.map((x, j) => j === i ? { ...x, vitesse: e.target.value } : x))}
-                        />
-                        <span className="text-[10px] text-neutral-400">/km</span>
-                      </div>
-                      <div className="flex items-center gap-50" onClick={e => e.stopPropagation()}>
-                        <input
-                          className="w-12 rounded-lg border border-neutral-30 bg-neutral-10 px-100 py-50 text-center text-[14px] font-bold text-primary-700 outline-none focus:border-primary-400"
-                          value={a.kmEffort}
-                          onChange={e => setAptitudes(ap => ap.map((x, j) => j === i ? { ...x, kmEffort: e.target.value } : x))}
-                        />
-                        <span className="text-[10px] text-neutral-400">KE</span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <p className="text-center text-[14px] font-bold text-primary-700">
-                        {a.vitesse}<span className="ml-25 text-[10px] font-medium text-neutral-400">/km</span>
-                      </p>
-                      <p className="text-center text-[14px] font-bold text-primary-400">
-                        {a.kmEffort}<span className="ml-25 text-[10px] font-medium text-neutral-400">KE</span>
-                      </p>
-                    </>
-                  )}
-                  <ChevronDown
-                    className={`size-4 shrink-0 text-neutral-40 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
-                    strokeWidth={2}
-                  />
-                </button>
-
-                {/* Expanded detail */}
-                {expanded && (
-                  <div className="border-t border-neutral-20 bg-neutral-10/50 px-200 py-200">
-                    <div className="grid grid-cols-1 gap-150 sm:grid-cols-2">
-                      <PenteTable
-                        label="Montée"
-                        variant="montee"
-                        icon={<TrendingUp className="size-3 shrink-0" strokeWidth={2} />}
-                        rows={a.montee}
-                        editing={editAptitudes}
-                        onEdit={(k, key, val) => editMontee(i, k, key, val)}
-                      />
-                      <PenteTable
-                        label="Descente"
-                        variant="descente"
-                        icon={<TrendingUp className="size-3 shrink-0 rotate-180" strokeWidth={2} />}
-                        rows={a.descente}
-                        editing={editAptitudes}
-                        onEdit={(k, key, val) => editDescente(i, k, key, val)}
-                      />
-                    </div>
+          <div className="px-150 pb-150 lg:px-200 lg:pb-200">
+            <div>
+              {/* Header row — types de distance */}
+              <div className="grid grid-cols-[52px_repeat(3,1fr)] pb-75 lg:grid-cols-[76px_repeat(3,1fr)]">
+                <span />
+                {allures.map(a => (
+                  <div key={a.id} className="px-25 text-center lg:px-75">
+                    <p className="flex items-center justify-center gap-50 text-[10px] font-bold text-neutral-800 lg:text-[11px]">
+                      <span className={`size-1.5 shrink-0 rounded-full ${a.dot}`} />
+                      {a.label}
+                    </p>
+                    <p className="hidden text-[9px] text-neutral-400 lg:block">{a.range}</p>
                   </div>
-                )}
+                ))}
               </div>
-            )
-          })}
+
+              {/* Lignes — paramètres */}
+              <div className="space-y-75">
+                {allureParams.map(param => (
+                  <div
+                    key={param.key}
+                    className="grid grid-cols-[52px_repeat(3,1fr)] items-center overflow-hidden rounded-xl bg-neutral-10/50 lg:grid-cols-[76px_repeat(3,1fr)]"
+                  >
+                    <p className="px-50 py-75 text-[9px] font-semibold leading-tight text-neutral-600 lg:px-75 lg:py-100 lg:text-[10px]">
+                      {param.label}
+                    </p>
+                    {allures.map((a, i) => (
+                      <div key={a.id} className="px-25 py-75 lg:px-75 lg:py-100">
+                        <AllureCell
+                          value={a[param.key] ?? ''}
+                          editing={editAllures}
+                          unit={param.unit}
+                          kind={param.kind}
+                          color={a.color}
+                          onChange={v => editAllure(i, param.key, v)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </section>
 
-        {/* ── Cette année + Profil athlétique ── */}
-        <section className="grid grid-cols-1 gap-200 lg:grid-cols-5">
-
-          {/* Left — Cette année */}
-          <div className="flex flex-col gap-150 lg:col-span-3">
-            <p className="widget-title">Cette année</p>
-            <div className="grid grid-cols-2 gap-150">
-              {yearStats.map((s, i) => {
-                const Icon = s.icon
-                return (
-                  <div key={i} className="widget-card flex flex-col justify-between p-300">
-                    <div className="flex items-center gap-75">
-                      <Icon className="size-3 text-neutral-90 shrink-0" strokeWidth={2} />
-                      <p className="widget-label">{s.label}</p>
-                    </div>
-                    <p className="mt-200 text-[30px] font-extrabold text-primary-700">
-                      {s.value}
-                      {s.unit && <span className="ml-50 text-[14px] font-medium text-neutral-400">{s.unit}</span>}
-                    </p>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Course la plus longue */}
-            <div className="widget-card p-300">
-              <div className="flex items-center gap-75 mb-150">
-                <Clock className="size-3 text-neutral-90 shrink-0" strokeWidth={2} />
-                <p className="widget-label">Course la plus longue</p>
-              </div>
-              <p className="text-[14px] font-bold text-neutral-700">{longestRun.name}</p>
-              <div className="mt-150 flex items-center gap-300">
-                <div>
-                  <p className="text-[30px] font-extrabold text-primary-700">{longestRun.distance}</p>
-                  <p className="mt-25 text-[10px] text-neutral-400">distance</p>
-                </div>
-                <div className="h-10 w-px bg-neutral-30" />
-                <div>
-                  <p className="text-[30px] font-extrabold text-primary-700">{longestRun.time}</p>
-                  <p className="mt-25 text-[10px] text-neutral-400">durée</p>
-                </div>
-              </div>
-            </div>
+        {/* ── Aptitudes ── */}
+        <section className="widget-card p-300">
+          <div className="mb-150 flex items-center justify-between">
+            <p className="widget-title">Aptitudes</p>
+            <EditToggleButton editing={editCompetences} onClick={() => setEditCompetences(v => !v)} />
           </div>
-
-          {/* Right — Profil athlétique */}
-          <div className="widget-card flex flex-col p-300 lg:col-span-2">
-            <p className="widget-title mb-100">Profil athlétique</p>
-            <div className="flex flex-1 items-center">
-              <RadarChart data={radarAxes} />
-            </div>
+          <div className="space-y-150">
+            {competences.map((c, i) => (
+              <div key={i} className="flex items-center justify-between">
+                <p className="text-[13px] font-semibold text-neutral-700">{c.label}</p>
+                <RatingBar value={c.value} editing={editCompetences} onChange={v => editCompetence(i, v)} />
+              </div>
+            ))}
           </div>
-
         </section>
 
         {/* ── Références chronométriques ── */}
@@ -424,14 +624,7 @@ export default function RunnerProfile() {
               <Timer className="size-4 text-primary-400 shrink-0" strokeWidth={2} />
               <p className="widget-title">Références chronométriques</p>
             </div>
-            <button
-              onClick={() => setEditChronos(v => !v)}
-              className="btn btn-text gap-75 text-[12px]"
-            >
-              {editChronos
-                ? <><Check className="size-3.5" strokeWidth={2.5} />Enregistrer</>
-                : <><Edit2 className="size-3.5" strokeWidth={2} />Modifier</>}
-            </button>
+            <EditToggleButton editing={editChronos} onClick={() => setEditChronos(v => !v)} />
           </div>
           {chronos.map((c, i) => (
             <div key={i} className="widget-row flex items-center justify-between px-200 py-150">
@@ -449,85 +642,123 @@ export default function RunnerProfile() {
           ))}
         </section>
 
-        {/* ── Mes produits nutrition ── */}
+        {/* ── Nutrition ── */}
         <section className="widget-card overflow-hidden p-100">
           <div className="flex items-center justify-between px-200 py-150">
-            <div className="flex items-center gap-150">
-              <Flame className="size-4 text-primary-400 shrink-0" strokeWidth={2} />
-              <p className="widget-title">Mes produits nutrition</p>
-            </div>
-            <span className="text-[10px] eyebrow text-neutral-400">
-              Par préférence
-            </span>
+            <p className="widget-title">Nutrition</p>
+            <EditToggleButton editing={editNutrition} onClick={() => setEditNutrition(v => !v)} />
           </div>
+
+          {/* Glucides + Eau */}
+          <div className="grid grid-cols-1 gap-100 px-200 pb-150 sm:grid-cols-2">
+            <StepperStat
+              icon={<Flame className="size-4 shrink-0 text-orange-700" strokeWidth={2} />}
+              label="Glucides / heure"
+              value={glucidesPerHour}
+              unit="g"
+              editing={editNutrition}
+              onDec={() => setGlucidesPerHour(g => Math.max(0, g - 5))}
+              onInc={() => setGlucidesPerHour(g => g + 5)}
+              color="orange"
+            />
+            <StepperStat
+              icon={<Droplets className="size-4 shrink-0 text-teal-700" strokeWidth={2} />}
+              label="Eau / heure"
+              value={waterPerHour}
+              unit="ml"
+              editing={editNutrition}
+              onDec={() => setWaterPerHour(w => Math.max(100, w - 50))}
+              onInc={() => setWaterPerHour(w => w + 50)}
+              color="teal"
+            />
+          </div>
+
+          <p className="px-200 pt-150 pb-75 text-[10px] eyebrow text-neutral-400">
+            Produits par préférence
+          </p>
 
           {/* Column headers */}
-          <div className="grid grid-cols-[auto_1fr_auto_auto_auto] items-center gap-x-150 px-200 pb-75">
-            <span /><span />
+          <div className={`grid items-center gap-x-150 px-200 pb-75 ${editNutrition ? 'grid-cols-[auto_1fr_auto_auto_auto]' : 'grid-cols-[1fr_auto_auto]'}`}>
+            {editNutrition && <span />}
+            <span />
             <p className="w-14 text-center text-[10px] eyebrow text-neutral-400">Glucides</p>
             <p className="w-12 text-center text-[10px] eyebrow text-neutral-400">Glu:Fru</p>
-            <span />
+            {editNutrition && <span />}
           </div>
 
-          {products.map((p, i) => (
-            <div key={i} className="widget-row grid grid-cols-[auto_1fr_auto_auto_auto] items-center gap-x-150 px-200 py-150">
-              <GripVertical className="size-4 shrink-0 cursor-grab text-neutral-40" strokeWidth={2} />
-              <div className="flex items-center gap-100">
-                <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary-100 text-[10px] font-bold text-primary-700">
-                  {i + 1}
-                </span>
-                <p className="text-[14px] font-semibold text-neutral-800">{p.name}</p>
-              </div>
-              <p className="w-14 text-center text-[14px] font-bold text-primary-700">
-                {p.glucides}<span className="ml-25 text-[10px] font-medium text-neutral-400">g</span>
-              </p>
-              <p className="w-12 text-center text-[12px] font-semibold text-neutral-600">{p.ratio}</p>
-              <button
-                onClick={() => setProducts(pr => pr.filter((_, j) => j !== i))}
-                className="btn btn-icon size-7 hover:bg-red-50! hover:text-red-500!"
+          {products.map((p, i) => {
+            const isGhost = editNutrition && dragId === p.id
+            return (
+              <div
+                key={p.id}
+                ref={el => { if (el) rowRefs.current.set(p.id, el); else rowRefs.current.delete(p.id) }}
+                draggable={editNutrition}
+                onDragStart={e => { e.dataTransfer.effectAllowed = 'move'; setDragId(p.id) }}
+                onDragOver={e => {
+                  if (!editNutrition || dragId === null) return
+                  e.preventDefault()
+                  if (dragId === p.id || reorderLock.current) return
+                  reorderLock.current = true
+                  moveProductOver(p.id)
+                  window.setTimeout(() => { reorderLock.current = false }, 220)
+                }}
+                onDrop={e => e.preventDefault()}
+                onDragEnd={() => setDragId(null)}
+                className={`widget-row grid items-center gap-x-150 px-200 py-150 ${editNutrition ? 'grid-cols-[auto_1fr_auto_auto_auto]' : 'grid-cols-[1fr_auto_auto]'} ${isGhost ? 'rounded-xl border border-dashed border-secondary-700 bg-secondary-50 opacity-50' : ''}`}
               >
-                <X className="size-3.5" strokeWidth={2.5} />
+                {editNutrition && <GripVertical className="size-4 shrink-0 cursor-grab text-neutral-40" strokeWidth={2} />}
+                <div className="flex min-w-0 items-center gap-100">
+                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-secondary-700 text-[10px] font-bold text-white">
+                    {i + 1}
+                  </span>
+                  <p className="min-w-0 flex-1 truncate text-[14px] font-semibold text-neutral-800">{p.name}</p>
+                  <ColorTag label={categoryConfig[p.category].label} color={categoryConfig[p.category].color} size="small" />
+                </div>
+                <p className="w-14 text-center text-[14px] font-bold text-primary-700">
+                  {p.glucides}<span className="ml-25 text-[10px] font-medium text-neutral-400">g</span>
+                </p>
+                <p className="w-12 text-center text-[12px] font-semibold text-neutral-600">{p.ratio}</p>
+                {editNutrition && (
+                  <button
+                    onClick={() => setProductToDelete(i)}
+                    className="btn btn-icon size-7 hover:bg-red-50! hover:text-red-500!"
+                  >
+                    <X className="size-3.5" strokeWidth={2.5} />
+                  </button>
+                )}
+              </div>
+            )
+          })}
+
+          {editNutrition && (
+            <div className="border-t border-neutral-20 px-200 py-150">
+              <button
+                onClick={() => setShowAddProduct(true)}
+                className="btn btn-text gap-100 text-[12px] text-primary-600 hover:text-primary-700!"
+              >
+                <Plus className="size-3.5" strokeWidth={2.5} />
+                Ajouter un produit
               </button>
             </div>
-          ))}
-
-          <div className="border-t border-neutral-20 px-200 py-150">
-            <button className="btn btn-text gap-100 text-[12px] text-primary-600 hover:text-primary-700!">
-              <Plus className="size-3.5" strokeWidth={2.5} />
-              Ajouter un produit
-            </button>
-          </div>
-
-          {/* Eau */}
-          <div className="mx-200 mb-150 rounded-2xl bg-primary-50 p-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-150">
-                <Droplets className="size-4 shrink-0 text-primary-500" strokeWidth={2} />
-                <p className="widget-label">Eau moyenne / heure</p>
-              </div>
-              <div className="flex items-center gap-100">
-                <button
-                  onClick={() => setWaterPerHour(w => Math.max(100, w - 50))}
-                  className="flex size-6 items-center justify-center rounded-full bg-primary-100 text-primary-700 transition-colors hover:bg-primary-200"
-                >
-                  <Minus className="size-3" strokeWidth={2.5} />
-                </button>
-                <span className="w-20 text-center text-[16px] font-bold text-primary-700">
-                  {waterPerHour}
-                  <span className="ml-25 text-[12px] font-medium text-neutral-400">ml</span>
-                </span>
-                <button
-                  onClick={() => setWaterPerHour(w => w + 50)}
-                  className="flex size-6 items-center justify-center rounded-full bg-primary-100 text-primary-700 transition-colors hover:bg-primary-200"
-                >
-                  <Plus className="size-3" strokeWidth={2.5} />
-                </button>
-              </div>
-            </div>
-          </div>
+          )}
         </section>
 
       </div>
+
+      {showAddProduct && (
+        <AddProductModal
+          onAdd={p => { setProducts(pr => [...pr, p]); setShowAddProduct(false) }}
+          onClose={() => setShowAddProduct(false)}
+        />
+      )}
+
+      {productToDelete !== null && (
+        <DeleteProductModal
+          productName={products[productToDelete].name}
+          onConfirm={() => { setProducts(pr => pr.filter((_, j) => j !== productToDelete)); setProductToDelete(null) }}
+          onClose={() => setProductToDelete(null)}
+        />
+      )}
     </AppLayout>
   )
 }

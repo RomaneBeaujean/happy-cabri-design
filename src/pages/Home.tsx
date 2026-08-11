@@ -1,4 +1,4 @@
-﻿import { TrendingUp, Mountain, MapPin, Wind, Plus, Footprints, Bike, Activity, Target } from 'lucide-react'
+﻿import { TrendingUp, Mountain, MapPin, Wind, Plus, Footprints, Bike, Activity, Target, Trophy, Clock } from 'lucide-react'
 import AppLayout from '../layouts/AppLayout'
 
 function navigateToNewPlan() {
@@ -13,7 +13,7 @@ export default function Home() {
 
         {/* ── Hero ── */}
         <section className="pt-100">
-          <h1 className="mt-150 text-[42px] text-primary-500 lg:text-[48px]">
+          <h1 className="mt-150 text-[36px] text-primary-500 lg:text-[48px]">
             Bonjour,{' '}
             <span className="text-primary-900 font-semibold">Romane</span>
           </h1>
@@ -122,6 +122,54 @@ export default function Home() {
             <p className="text-[12px] text-neutral-80">30 derniers jours</p>
           </div>
 
+        </section>
+
+        {/* ── Cette année ── */}
+        <section className="space-y-150">
+          <p className="widget-title">Cette année</p>
+          <div className="grid grid-cols-2 gap-150 lg:grid-cols-3">
+            {[
+              { label: 'Km parcourus',      value: '342',   unit: 'km',     Icon: TrendingUp },
+              { label: 'Dénivelé positif',  value: '8 200', unit: 'm',      Icon: Mountain   },
+              { label: 'Courses réalisées', value: '3',     unit: '',       Icon: Trophy     },
+            ].map(({ label, value, unit, Icon }) => (
+              <div key={label} className="widget-card flex flex-col justify-between gap-200 p-300">
+                <div className="flex items-center gap-150">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-20/70">
+                    <Icon className="size-5 text-neutral-300" strokeWidth={1.5} />
+                  </div>
+                  <p className="widget-label">{label}</p>
+                </div>
+                <p className="text-[36px] font-bold leading-none text-primary-500">
+                  {value}{unit && <span className="ml-50 text-[16px] font-normal text-neutral-80"> {unit}</span>}
+                </p>
+              </div>
+            ))}
+
+            {/* Course la plus longue — spanning */}
+            <div className="widget-card col-span-2 flex flex-col justify-between gap-200 p-300 lg:col-span-3">
+              <div className="flex items-center gap-150">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-20/70">
+                  <Clock className="size-5 text-neutral-300" strokeWidth={1.5} />
+                </div>
+                <div>
+                  <p className="widget-label">Course la plus longue</p>
+                  <p className="mt-25 text-[14px] font-semibold text-neutral-800">Grand Raid Belledonne</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-300">
+                <div>
+                  <p className="text-[30px] font-bold leading-none text-primary-500">28<span className="ml-50 text-[16px] font-normal text-neutral-80"> km</span></p>
+                  <p className="mt-75 text-[11px] text-neutral-80">distance</p>
+                </div>
+                <div className="h-10 w-px bg-neutral-30" />
+                <div>
+                  <p className="text-[30px] font-bold leading-none text-primary-500">3h12</p>
+                  <p className="mt-75 text-[11px] text-neutral-80">durée</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ── Dernières sorties ── */}

@@ -1,5 +1,14 @@
 # Happy Cabri Design — Guide de développement
 
+## Méthodologie IA — `docs/methodologie-ia.mdx`
+
+**Avant de traiter toute demande contenant plusieurs points distincts** (liste à puces, énumération,
+ou plusieurs demandes envoyées sur plusieurs messages successifs sur le même sujet, y compris des
+messages arrivant pendant qu'un agent tourne), lire `docs/methodologie-ia.mdx` et transcrire chaque
+point dans TodoWrite avant de commencer. Ne jamais annoncer un travail terminé sans avoir relu les
+messages originaux et vérifié un par un que chaque point a été livré dans le code, pas seulement
+recherché ou compris.
+
 ## Styles partagés
 
 ### Boutons — `src/styles/buttons.css`

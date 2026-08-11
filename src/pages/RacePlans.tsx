@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react'
-import { Trophy, Award, MapPin, Clock, Mountain, ChevronRight, Search, MoreVertical, Pencil, Link2, Plus } from 'lucide-react'
+import { Award, MapPin, Clock, Mountain, ChevronRight, Search, MoreVertical, Pencil, Link2, Plus } from 'lucide-react'
 import AppLayout from '../layouts/AppLayout'
 
 function navigateToNewPlan() {
@@ -59,7 +59,7 @@ export default function RacePlans() {
         <section className="pt-100">
           <div className="flex items-end justify-between">
             <div>
-              <h1 className="mt-150 text-[42px] font-extrabold leading-tight text-neutral-800 lg:text-[48px]">
+              <h1 className="mt-150 text-[36px] leading-tight text-neutral-800 lg:text-[48px]">
                 Plans de course
               </h1>
             </div>
@@ -173,7 +173,7 @@ function PlanRow({ plan, openMenuId, setOpenMenuId }: {
         ].join(' ')}>
           {isPast
             ? <Award  className="size-5 text-neutral-0"   strokeWidth={1.75} />
-            : <Trophy className="size-5 text-neutral-0" strokeWidth={1.75} />
+            : <Mountain className="size-5 text-neutral-0" strokeWidth={1.75} />
           }
         </div>
         <div className="min-w-0">

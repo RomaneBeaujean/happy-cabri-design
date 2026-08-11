@@ -178,13 +178,6 @@ export default function SegmentSeparator({
     <ColorTag color="primary" label={`${km} km`} onClick={startKmEdit} />
   )
 
-  const heureChronoNode = (
-    <div className="flex min-w-0 flex-wrap items-center gap-50">
-      <ColorTag color="purple" icon={<Clock className="size-3" strokeWidth={2} />} label={passageLabel} />
-      <ColorTag color="teal" icon={<Timer className="size-3" strokeWidth={2} />} label={elapsedLabel} />
-    </div>
-  )
-
   // Le check est le seul moyen de valider — un clic en dehors (blur) annule sans rien modifier.
   function startRavitoEdit() {
     setRavitoDraft(isRavito ? ravitoStop : '3')
@@ -217,19 +210,21 @@ export default function SegmentSeparator({
     setEditingCutoff(false)
   }
 
-  // Tag ravitaillement déjà ajouté — affichage compact ou édition de la durée d'arrêt
+  // Tag ravitaillement déjà ajouté — affichage compact (logo + arrêt séparés) ou édition
   const ravitoDisplay = isRavito && (
     editingRavito ? (
       <RavitoTag value={ravitoDraft} onChange={setRavitoDraft} onSave={saveRavito} onCancel={cancelRavito} />
     ) : (
-      <ColorTag
-        color="pink"
-        icon={<Droplets className="size-3" strokeWidth={2} />}
-        label={parseInt(ravitoStop, 10) > 0 ? `Ravitaillement · ${ravitoStop} min` : 'Ravitaillement'}
-        rightIcon={<X className="size-[9px]" strokeWidth={2.5} />}
-        onRightIconClick={onRemoveRavito}
-        onClick={startRavitoEdit}
-      />
+      <div className="flex items-center gap-50">
+        <ColorTag color="fuchsia" icon={<Droplets className="size-3" strokeWidth={2} />} />
+        <ColorTag
+          color="fuchsia"
+          label={parseInt(ravitoStop, 10) > 0 ? `Arrêt ${ravitoStop} min` : 'Arrêt'}
+          rightIcon={<X className="size-[9px]" strokeWidth={2.5} />}
+          onRightIconClick={onRemoveRavito}
+          onClick={startRavitoEdit}
+        />
+      </div>
     )
   )
 
@@ -241,7 +236,7 @@ export default function SegmentSeparator({
       <ColorTag
         color="red"
         icon={<Fence className="size-3" strokeWidth={2} />}
-        label={cutoffTime ? cutoffTime.replace(':', 'h') : 'Barrière horaire'}
+        label={cutoffTime ? `Max: ${cutoffTime.replace(':', 'h')}` : 'Barrière horaire'}
         rightIcon={<X className="size-[9px]" strokeWidth={2.5} />}
         onRightIconClick={onRemoveCutoff}
         onClick={startCutoffEdit}
@@ -249,7 +244,7 @@ export default function SegmentSeparator({
     )
   )
 
-  // Bouton d'ajout ravitaillement (masqué une fois ajouté) — s'agrandit en place vers la gauche
+  // Bouton d'ajout ravitaillement (masqué une fois ajouté)
   const ravitoAction = !isRavito && (
     editingRavito ? (
       <RavitoTag value={ravitoDraft} onChange={setRavitoDraft} onSave={saveRavito} onCancel={cancelRavito} />
@@ -279,24 +274,20 @@ export default function SegmentSeparator({
 
   return (
     <div className="flex flex-col gap-50 py-50">
-      {/* Rail collé à gauche à tous les breakpoints — tags km/heure/chrono sur une ligne, ravito/barrière en dessous, boutons d'ajout en position absolue tout à droite */}
-      <div className="relative flex flex-col gap-50 pr-900">
-        <div className="flex items-center gap-75">
-          <div className="flex w-[16px] shrink-0 items-center justify-center">
-            {dot}
-          </div>
-          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-50">
-            {kmNode}
-            {heureChronoNode}
-          </div>
+      {/* Rail centré (le trait vertical global dans RacePlan/index.tsx est aligné sur left-1/2
+          pour passer par ce point) — 3 div : gauche (flex-1) / point (largeur fixe) / droite
+          (flex-1), sans padding asymétrique, pour que le point reste toujours pile au centre. */}
+      <div className="relative flex items-center gap-75">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-50">
+          <ColorTag color="teal" icon={<Timer className="size-3" strokeWidth={2} />} label={elapsedLabel} />
+          <ColorTag color="purple" icon={<Clock className="size-3" strokeWidth={2} />} label={passageLabel} />
+          {cutoffDisplay}
         </div>
-
-        {(ravitoDisplay || cutoffDisplay) && (
-          <div className="flex flex-wrap items-center gap-50 pl-[24px]">
-            {ravitoDisplay}
-            {cutoffDisplay}
-          </div>
-        )}
+        {dot}
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-50">
+          {kmNode}
+          {ravitoDisplay}
+        </div>
 
         <div className="absolute right-0 top-0 flex items-center gap-75">
           {ravitoAction}

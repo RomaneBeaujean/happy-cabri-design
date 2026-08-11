@@ -1,4 +1,4 @@
-import type { MouseEvent, ReactNode } from 'react'
+import type { CSSProperties, MouseEvent, ReactNode } from 'react'
 
 export type TagColor =
   | 'primary'
@@ -6,6 +6,7 @@ export type TagColor =
   | 'neutral'
   | 'red'
   | 'pink'
+  | 'fuchsia'
   | 'purple'
   | 'deep-purple'
   | 'cyan'
@@ -29,6 +30,7 @@ const palette: Record<TagColor, Record<'soft' | 'strong', TagPalette>> = {
   white:        { soft: { background: '#ffffff', color: '#354750' }, strong: { background: '#ffffff', color: '#354750' } },
   red:          { soft: { background: '#FEE2E2', color: '#82181A' }, strong: { background: '#e6a8ae', color: '#541c21' } },
   pink:         { soft: { background: '#f9eef4', color: '#8d3a68' }, strong: { background: '#e5afcd', color: '#54223e' } },
+  fuchsia:      { soft: { background: '#F5D0FE', color: '#C026D3' }, strong: { background: '#f0abfc', color: '#701a75' } },
   purple:       { soft: { background: '#f7eff6', color: '#61325c' }, strong: { background: '#dbb3d7', color: '#4a2646' } },
   'deep-purple':{ soft: { background: '#f4f0f8', color: '#513764' }, strong: { background: '#cdb8dd', color: '#3e2a4c' } },
   cyan:         { soft: { background: '#e6f8ff', color: '#014d6b' }, strong: { background: '#8bdeff', color: '#014d6b' } },
@@ -61,6 +63,8 @@ export interface ColorTagProps {
   /** Rend le tag entier cliquable (ex: pour passer en édition). */
   onClick?: () => void
   children?: ReactNode
+  /** Surcharge ponctuelle (ex: couleur hors palette) — fusionnée par-dessus le style de `color`/`variant`. */
+  style?: CSSProperties
 }
 
 export default function ColorTag({
@@ -74,13 +78,14 @@ export default function ColorTag({
   onRightIconClick,
   onClick,
   children,
+  style,
 }: ColorTagProps) {
   const { background, color: textColor } = getTagColor(color, variant)
 
   return (
     <div
       onClick={onClick}
-      className={`inline-flex min-w-0 max-w-full shrink-0 items-center gap-75 truncate${onClick ? ' cursor-pointer' : ''}`}
+      className={`tag-text inline-flex min-w-0 max-w-full shrink-0 items-center gap-75 truncate${onClick ? ' cursor-pointer' : ''}`}
       style={{
         backgroundColor: background,
         color: textColor,
@@ -89,9 +94,9 @@ export default function ColorTag({
         padding: '4px 10px',
         borderRadius: '9999px',
         fontFamily: 'var(--font-accent)',
-        fontSize: '12px',
         fontWeight: 500,
         lineHeight: 1,
+        ...style,
       }}
     >
       {icon && <span className="flex shrink-0 items-center">{icon}</span>}

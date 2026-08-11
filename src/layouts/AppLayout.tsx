@@ -1,11 +1,11 @@
 ﻿import { type ReactNode, useState, useEffect } from 'react'
-import { Calendar, Home, Trophy, User, Settings, Bell, type LucideIcon } from 'lucide-react'
+import { Calendar, Home, Mountain, User, Settings, Bell, type LucideIcon } from 'lucide-react'
 import logoMain from '../assets/logo.svg'
 
 export const MAIN_NAV_ITEMS = [
   { id: 'accueil',    label: 'Accueil',        mobileLabel: 'Accueil',    href: '/',           icon: Home },
   { id: 'calendrier', label: 'Calendrier',      mobileLabel: 'Calendrier', href: '/calendrier',  icon: Calendar },
-  { id: 'plans',      label: 'Plans de course', mobileLabel: 'Plans',      href: '/plans',       icon: Trophy },
+  { id: 'plans',      label: 'Plans de course', mobileLabel: 'Plans',      href: '/plans',       icon: Mountain },
   { id: 'profil',     label: 'Profil coureur',  mobileLabel: 'Profil',     href: '/profil',      icon: User },
 ] as const
 

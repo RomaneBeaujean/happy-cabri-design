@@ -1,24 +1,26 @@
 import { useMemo, useState, Fragment } from 'react'
 import {
   ChevronLeft, ChevronDown, TrendingUp, TrendingDown, Link2,
-  MapPin, Calendar, Route, Pencil, Check, Layers,
-  Rows2, Columns2,
+  MapPin, Calendar, Route, Pencil, Check, Plus,
 } from 'lucide-react'
 import AppLayout from '../../layouts/AppLayout'
-import SlopeAltimetryChart, { type ChartPoint } from '../../components/SlopeAltimetryChart'
+import SlopeAltimetryChart, { type ChartPoint, type HoverSegment } from '../../components/SlopeAltimetryChart'
 import RouteMap, { type MapSegment } from '../../components/RouteMap'
 import ColorTag from '../../components/ColorTag'
 import SegmentCard from './SegmentCard'
 import SegmentSeparator from './SegmentSeparator'
-import RedefineSegmentsModal from './RedefineSegmentsModal'
 import AddPointPopup from './AddPointPopup'
+import ExistingPointMenu from './ExistingPointMenu'
+import AddCoursePointModal from './AddCoursePointModal'
 import { ALT_DATA, TRACK } from './mockData'
 import { buildInitialData } from './mockData'
 import {
-  deriveSegments, moveCutPoint, rebuildCutPoints, pruneRecordByIds, insertCutPoint,
+  deriveSegments, moveCutPoint, insertCutPoint, removeCutPoint,
   type CutPoint, type SegmentData, type SegmentNutrition,
 } from './segmentModel'
+import { makeStatsAtKm, makePointLabels } from './trackStats'
 import { fmtTime, fmtPassage, parseTimeToMins, fmtDateFr } from './format'
+import { useIsMobile } from '../../hooks/useIsMobile'
 
 const INITIAL = buildInitialData()
 
@@ -30,9 +32,9 @@ function navigate(path: string) {
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 export default function RacePlan() {
+  const isMobile = useIsMobile()
   const [globalEdit, setGlobalEdit] = useState(false)
   const [profileExpanded, setProfileExpanded] = useState(true)
-  const [sideBySide, setSideBySide] = useState(false)
 
   const [cutPoints, setCutPoints] = useState<CutPoint[]>(INITIAL.cutPoints)
   const [segmentData, setSegmentData] = useState<Record<string, SegmentData>>(INITIAL.segmentData)
@@ -85,6 +87,45 @@ export default function RacePlan() {
     setCutPoints(prev => moveCutPoint(prev, id, newKm))
   }
 
+  function handleDeleteSegment(id: string, idx: number) {
+    if (segments.length <= 1) return
+    if (idx < segments.length - 1) {
+      // Cas général : le segment fusionne dans le suivant, qui garde sa propre allure.
+      const result = removeCutPoint(cutPoints, segmentData, id)
+      setCutPoints(result.cutPoints)
+      setSegmentData(result.segmentData)
+      removeRavito(id)
+      removeCutoff(id)
+    } else {
+      // Dernier segment : sa borne de fin (arrivée) est protégée, on retire donc sa borne de
+      // départ et le segment précédent absorbe la distance en gardant sa propre allure.
+      const prevId = segments[idx - 1].id
+      const prevData = segmentData[prevId]
+      const result = removeCutPoint(cutPoints, segmentData, prevId)
+      setCutPoints(result.cutPoints)
+      setSegmentData(prevData
+        ? { ...result.segmentData, [id]: { ...result.segmentData[id], pace: prevData.pace } }
+        : result.segmentData)
+      removeRavito(prevId)
+      removeCutoff(prevId)
+    }
+  }
+
+  const [showAddPointModal, setShowAddPointModal] = useState(false)
+
+  function handleAddCoursePoint(
+    km: number,
+    ravito: { enabled: boolean; mins: string },
+    cutoff: { enabled: boolean; time: string }
+  ) {
+    const result = insertCutPoint(cutPoints, segmentData, km)
+    setCutPoints(result.cutPoints)
+    setSegmentData(result.segmentData)
+    if (ravito.enabled) addRavito(result.newId, ravito.mins)
+    if (cutoff.enabled) addCutoff(result.newId, cutoff.time)
+    setShowAddPointModal(false)
+  }
+
   const [pendingPoint, setPendingPoint] = useState<{ km: number; x: number; y: number } | null>(null)
 
   function handleAddPointRequest(km: number, x: number, y: number) {
@@ -100,19 +141,43 @@ export default function RacePlan() {
     setPendingPoint(null)
   }
 
-  const [redefineOpen, setRedefineOpen] = useState(false)
+  const [pendingExistingPoint, setPendingExistingPoint] = useState<{ id: string; km: number; x: number; y: number } | null>(null)
 
-  function handleApplyRedefine(newKms: number[]) {
-    const totalKm = cutPoints.length > 0 ? Math.max(...cutPoints.map(c => c.km)) : 0
-    const result = rebuildCutPoints(cutPoints, segmentData, [0, ...newKms, totalKm])
-    const survivingIds = new Set(result.cutPoints.map(c => c.id))
+  function handlePointClick(id: string, x: number, y: number) {
+    const cp = cutPoints.find(c => c.id === id)
+    if (!cp) return
+    setPendingExistingPoint({ id, km: cp.km, x, y })
+  }
+
+  function handleConvertPoint() {
+    if (!pendingExistingPoint) return
+    const { id } = pendingExistingPoint
+    if (ravitoIds.has(id)) removeRavito(id)
+    else addRavito(id, '3')
+    setPendingExistingPoint(null)
+  }
+
+  function handleDeletePoint() {
+    if (!pendingExistingPoint) return
+    const { id } = pendingExistingPoint
+    const result = removeCutPoint(cutPoints, segmentData, id)
     setCutPoints(result.cutPoints)
     setSegmentData(result.segmentData)
-    setRavitoIds(prev => new Set([...prev].filter(id => survivingIds.has(id))))
-    setRavitoStops(prev => pruneRecordByIds(prev, survivingIds))
-    setCutoffTimes(prev => pruneRecordByIds(prev, survivingIds))
-    setRedefineOpen(false)
+    removeRavito(id)
+    removeCutoff(id)
+    setPendingExistingPoint(null)
   }
+
+  // Un scroll (zoom/pan du profil) invalide la position figée des popups de clic — on les ferme.
+  function closePointPopups() {
+    setPendingPoint(null)
+    setPendingExistingPoint(null)
+  }
+
+  const [hoverKm, setHoverKm] = useState<number | null>(null)
+  // Tooltip épinglée en mobile (lecture seule) — partagée entre la carte et le profil pour
+  // qu'un tap dans une vue ferme/synchronise la tooltip de l'autre.
+  const [pinnedPointId, setPinnedPointId] = useState<string | null>(null)
 
   const [headerGlobalEdit, setHeaderGlobalEdit] = useState(false)
   const [localTitle,    setLocalTitle]    = useState('Luchon Aneto Trail 2025')
@@ -121,20 +186,6 @@ export default function RacePlan() {
   const [localTime,     setLocalTime]     = useState('04:00')
 
   const segments = useMemo(() => deriveSegments(cutPoints, segmentData, ALT_DATA), [cutPoints, segmentData])
-  const interiorKms = useMemo(() => {
-    const sorted = [...cutPoints].sort((a, b) => a.km - b.km)
-    return sorted.slice(1, -1).map(c => c.km)
-  }, [cutPoints])
-
-  const chartPoints: ChartPoint[] = useMemo(() => {
-    const sorted = [...cutPoints].sort((a, b) => a.km - b.km)
-    return sorted.slice(1, -1).map(c => ({ id: c.id, km: c.km, isRavito: ravitoIds.has(c.id) }))
-  }, [cutPoints, ravitoIds])
-
-  const mapSegments: MapSegment[] = useMemo(
-    () => segments.map(seg => ({ from: seg.from, to: seg.to, isClimb: seg.dp >= seg.dm })),
-    [segments]
-  )
 
   const totalKm = segments.length > 0 ? segments[segments.length - 1].to : 0
   const totalDp = segments.reduce((sum, s) => sum + s.dp, 0)
@@ -145,8 +196,16 @@ export default function RacePlan() {
     acc.push((acc[i - 1] ?? 0) + seg.timeMins)
     return acc
   }, [])
+  const cumulDp = segments.reduce<number[]>((acc, seg, i) => {
+    acc.push((acc[i - 1] ?? 0) + seg.dp)
+    return acc
+  }, [])
+  const cumulDm = segments.reduce<number[]>((acc, seg, i) => {
+    acc.push((acc[i - 1] ?? 0) + seg.dm)
+    return acc
+  }, [])
 
-  const typeLabels = (() => {
+  const typeLabels = useMemo(() => {
     const counts = { montée: 0, descente: 0, plat: 0 }
     return segments.map(seg => {
       const t = seg.dp > seg.dm ? 'montée' as const
@@ -157,11 +216,38 @@ export default function RacePlan() {
            : t === 'descente' ? `Descente ${counts.descente}`
            : `Plat ${counts.plat}`
     })
-  })()
+  }, [segments])
+
+  // Stats (heure, temps écoulé, D+/D-, allure) à un km donné — partagées par le profil et la carte
+  const getStats = useMemo(() => makeStatsAtKm(segments, ALT_DATA, startMins), [segments, startMins])
+
+  const pointLabels = useMemo(() => makePointLabels(cutPoints, ravitoIds), [cutPoints, ravitoIds])
+
+  const chartPoints: ChartPoint[] = useMemo(() => {
+    const sorted = [...cutPoints].sort((a, b) => a.km - b.km)
+    return sorted.slice(1, -1).map(c => ({
+      id: c.id, km: c.km, isRavito: ravitoIds.has(c.id), label: pointLabels.get(c.id) ?? '',
+    }))
+  }, [cutPoints, ravitoIds, pointLabels])
+
+  const mapSegments: MapSegment[] = useMemo(
+    () => segments.map((seg, i) => ({
+      id: seg.id, from: seg.from, to: seg.to, isClimb: seg.dp >= seg.dm,
+      label: typeLabels[i], dp: seg.dp, dm: seg.dm, pace: seg.pace,
+    })),
+    [segments, typeLabels]
+  )
+
+  const chartSegments: HoverSegment[] = useMemo(
+    () => segments.map((seg, i) => ({
+      id: seg.id, from: seg.from, to: seg.to, label: typeLabels[i], dp: seg.dp, dm: seg.dm, timeMins: seg.timeMins, pace: seg.pace,
+    })),
+    [segments, typeLabels]
+  )
 
   return (
     <AppLayout activeItem="plans" userInitials="RB">
-      <div className="mx-auto max-w-3xl space-y-300 pb-400">
+      <div className="mx-auto max-w-3xl space-y-300 pb-400 lg:max-w-237.5">
 
         {/* ── Header ── */}
         <section className="pt-100">
@@ -194,10 +280,10 @@ export default function RacePlan() {
               value={localTitle}
               onChange={e => setLocalTitle(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && (e.currentTarget as HTMLInputElement).blur()}
-              className="input w-full py-100 text-[18px] font-extrabold text-neutral-800 lg:text-[22px]"
+              className="input w-full py-100 text-[18px] text-neutral-800 lg:text-[22px]"
             />
           ) : (
-            <h1 className="text-[22px] font-extrabold leading-tight text-neutral-800 lg:text-[26px]">
+            <h1 className="text-[36px] lg:text-[48px] font-normal leading-tight text-neutral-800">
               {localTitle}
             </h1>
           )}
@@ -237,8 +323,7 @@ export default function RacePlan() {
                 label={`${fmtDateFr(localDate)} · ${localTime.replace(':', 'h')}`}
               />
             )}
-          </div>
-          <div className="mt-100 flex flex-wrap gap-100">
+
             <ColorTag color="secondary" icon={<Route        className="size-3" strokeWidth={2} />} label={`${totalKm} km`} />
             <ColorTag color="orange"    icon={<TrendingUp   className="size-3" strokeWidth={2} />} label={`+${totalDp.toLocaleString('fr')} m`} />
             <ColorTag color="green"     icon={<TrendingDown className="size-3" strokeWidth={2} />} label={`−${totalDm.toLocaleString('fr')} m`} />
@@ -246,72 +331,53 @@ export default function RacePlan() {
         </section>
 
         {/* ── Profil et carte ── */}
-        <div
-          className={`widget-card px-300 py-300${
-            sideBySide && profileExpanded
-              ? ' lg:relative lg:left-1/2 lg:w-[calc(100vw-16px)] lg:max-w-none lg:-translate-x-1/2'
-              : ''
-          }`}
-        >
+        <div className="widget-card">
           <div
-            className="flex cursor-pointer items-center justify-between gap-100"
+            className="flex cursor-pointer items-center justify-between gap-100 px-300 py-200"
             onClick={() => setProfileExpanded(v => !v)}
           >
             <p className="widget-title shrink-0">Profil et carte</p>
-            <div className="flex items-center gap-150">
-              {profileExpanded && (
-                <div
-                  className="hidden items-center gap-25 rounded-full border border-neutral-40 bg-white p-25 lg:flex"
-                  onClick={e => e.stopPropagation()}
-                >
-                  <button
-                    type="button"
-                    aria-label="Affichage empilé"
-                    aria-pressed={!sideBySide}
-                    onClick={() => setSideBySide(false)}
-                    className={`flex size-[26px] items-center justify-center rounded-full transition-colors ${
-                      !sideBySide ? 'bg-primary-500 text-white' : 'text-neutral-400 hover:text-neutral-600'
-                    }`}
-                  >
-                    <Rows2 className="size-[14px]" strokeWidth={2} />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Affichage côte à côte"
-                    aria-pressed={sideBySide}
-                    onClick={() => setSideBySide(true)}
-                    className={`flex size-[26px] items-center justify-center rounded-full transition-colors ${
-                      sideBySide ? 'bg-primary-500 text-white' : 'text-neutral-400 hover:text-neutral-600'
-                    }`}
-                  >
-                    <Columns2 className="size-[14px]" strokeWidth={2} />
-                  </button>
-                </div>
-              )}
-              <ChevronDown
-                className={`size-4 shrink-0 text-neutral-300 transition-transform duration-200${profileExpanded ? ' rotate-180' : ''}`}
-                strokeWidth={2}
-              />
-            </div>
+            <ChevronDown
+              className={`size-4 shrink-0 text-neutral-300 transition-transform duration-200${profileExpanded ? ' rotate-180' : ''}`}
+              strokeWidth={2}
+            />
           </div>
           {profileExpanded && (
-            <div className={sideBySide ? 'mt-200 flex flex-col gap-300 lg:grid lg:grid-cols-2 lg:items-start' : 'mt-200 flex flex-col gap-300'}>
+            <div className="flex flex-col gap-300 pb-300">
+              <RouteMap
+                height={isMobile ? 240 : 320}
+                track={TRACK}
+                segments={mapSegments}
+                points={chartPoints}
+                getStats={getStats}
+                onAddPoint={handleAddPointRequest}
+                onPointClick={handlePointClick}
+                onPointMove={handleKmChange}
+                hoverKm={hoverKm}
+                onHoverKmChange={setHoverKm}
+                pendingKm={pendingPoint?.km ?? null}
+                activePointId={pendingExistingPoint?.id ?? null}
+                pinnedPointId={pinnedPointId}
+                onPinnedPointChange={setPinnedPointId}
+              />
               <SlopeAltimetryChart
                 data={ALT_DATA}
-                height={sideBySide ? 260 : 200}
+                height={isMobile ? 160 : 200}
                 points={chartPoints}
+                segments={chartSegments}
                 distanceStep={20}
+                getStats={getStats}
                 onAddPoint={handleAddPointRequest}
+                onPointClick={handlePointClick}
+                onPointMove={handleKmChange}
+                hoverKm={hoverKm}
+                onHoverKmChange={setHoverKm}
+                pendingKm={pendingPoint?.km ?? null}
+                activePointId={pendingExistingPoint?.id ?? null}
+                pinnedPointId={pinnedPointId}
+                onPinnedPointChange={setPinnedPointId}
+                onScroll={closePointPopups}
               />
-              <div className="overflow-hidden rounded-2xl">
-                <RouteMap
-                  height={sideBySide ? 296 : 320}
-                  track={TRACK}
-                  segments={mapSegments}
-                  points={chartPoints}
-                  onAddPoint={handleAddPointRequest}
-                />
-              </div>
             </div>
           )}
         </div>
@@ -321,27 +387,30 @@ export default function RacePlan() {
           <div className="flex items-center justify-between gap-100">
             <h2 className="font-accent text-[18px] font-extrabold text-neutral-800">Segments</h2>
             <div className="flex shrink-0 items-center gap-100">
+              <button
+                className="btn btn-secondary px-[10px] lg:px-300"
+                onClick={() => setShowAddPointModal(true)}
+              >
+                <Plus className="size-4" strokeWidth={2} />
+                <span className="hidden lg:inline">Ajouter un point de parcours</span>
+              </button>
               {globalEdit ? (
                 <button className="btn btn-primary" onClick={() => setGlobalEdit(false)}>
                   <Check className="size-4" strokeWidth={2.5} />
                   Enregistrer
                 </button>
               ) : (
-                <button className="btn btn-secondary" onClick={() => setGlobalEdit(true)}>
+                <button className="btn btn-secondary px-[10px] lg:px-300" onClick={() => setGlobalEdit(true)}>
                   <Pencil className="size-4" strokeWidth={2} />
-                  Édition multiple
+                  <span className="hidden lg:inline">Édition multiple</span>
                 </button>
               )}
-              <button className="btn btn-secondary" onClick={() => setRedefineOpen(true)}>
-                <Layers className="size-4" strokeWidth={2} />
-                Redéfinir les segments
-              </button>
             </div>
           </div>
 
           <div className="relative space-y-100">
-            {/* Rail vertical continu — collé au bord gauche, à tous les breakpoints */}
-            <div className="pointer-events-none absolute bottom-0 left-100 top-0 w-px -translate-x-1/2 bg-neutral-60" />
+            {/* Rail vertical continu — centré, aligné sur le point du SegmentSeparator */}
+            <div className="pointer-events-none absolute bottom-0 left-1/2 top-0 w-px -translate-x-1/2 bg-neutral-60" />
 
             {segments.map((seg, i) => (
               <Fragment key={seg.id}>
@@ -350,8 +419,12 @@ export default function RacePlan() {
                   index={i}
                   typeLabel={typeLabels[i]}
                   globalEdit={globalEdit}
+                  canDelete={segments.length > 1}
+                  cumulDp={cumulDp[i]}
+                  cumulDm={cumulDm[i]}
                   onPaceChange={(pace, timeMins) => updateSegmentPace(seg.id, pace, timeMins)}
                   onNutritionChange={nutrition => updateSegmentNutrition(seg.id, nutrition)}
+                  onDelete={() => handleDeleteSegment(seg.id, i)}
                 />
                 {i < segments.length - 1 && (
                   <SegmentSeparator
@@ -377,16 +450,6 @@ export default function RacePlan() {
 
       </div>
 
-      {redefineOpen && (
-        <RedefineSegmentsModal
-          totalKm={totalKm}
-          initialKms={interiorKms}
-          altData={ALT_DATA}
-          onApply={handleApplyRedefine}
-          onClose={() => setRedefineOpen(false)}
-        />
-      )}
-
       {pendingPoint && (
         <AddPointPopup
           x={pendingPoint.x}
@@ -394,6 +457,27 @@ export default function RacePlan() {
           km={pendingPoint.km}
           onChoose={handleChoosePoint}
           onClose={() => setPendingPoint(null)}
+        />
+      )}
+
+      {pendingExistingPoint && (
+        <ExistingPointMenu
+          x={pendingExistingPoint.x}
+          y={pendingExistingPoint.y}
+          km={pendingExistingPoint.km}
+          label={pointLabels.get(pendingExistingPoint.id) ?? ''}
+          isRavito={ravitoIds.has(pendingExistingPoint.id)}
+          onConvert={handleConvertPoint}
+          onDelete={handleDeletePoint}
+          onClose={() => setPendingExistingPoint(null)}
+        />
+      )}
+
+      {showAddPointModal && (
+        <AddCoursePointModal
+          totalKm={totalKm}
+          onAdd={handleAddCoursePoint}
+          onClose={() => setShowAddPointModal(false)}
         />
       )}
     </AppLayout>

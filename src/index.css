@@ -3,6 +3,7 @@
 @import "./styles/inputs.css";
 @import "./styles/widget-cards.css";
 @import "./styles/typography.css";
+@import "./styles/leaflet-tooltip.css";
 
 /* Outfit — 100→900 */
 @import "@fontsource/outfit/100.css";
@@ -141,10 +142,18 @@ body {
   color: var(--color-neutral-900);
 }
 
-h1 {
-  font-family: var(--font-accent);
-  font-weight: 400;
-  font-size: 48px;
+@layer base {
+  h1 {
+    font-family: var(--font-accent);
+    font-weight: 400;
+    font-size: 36px;
+  }
+
+  @media (min-width: 1024px) {
+    h1 {
+      font-size: 48px;
+    }
+  }
 }
 
 .bg-gradient-app {
