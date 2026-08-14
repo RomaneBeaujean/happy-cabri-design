@@ -55,8 +55,8 @@ export default function AddCoursePointModal({ totalKm, onAdd, onClose }: Props) 
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="w-full max-w-[420px] overflow-hidden rounded-3xl bg-white shadow-lg">
-          <div className="flex items-center justify-between border-b border-neutral-20 px-200 py-200">
+        <div className="modal-surface-taupe w-full max-w-[420px] overflow-hidden rounded-3xl shadow-lg">
+          <div className="flex items-center justify-between px-200 py-200">
             <p className="font-accent text-[16px] font-bold text-neutral-800">Ajouter un point de parcours</p>
             <button
               type="button"
@@ -67,8 +67,8 @@ export default function AddCoursePointModal({ totalKm, onAdd, onClose }: Props) 
             </button>
           </div>
 
-          <div className="space-y-200 px-200 py-200">
-            <div className="space-y-75">
+          <div className="space-y-150 px-200 py-200">
+            <div className="widget-card-glass space-y-75 p-150">
               <p className="widget-label widget-label-compact">Distance</p>
               <div className="flex items-center gap-75">
                 <input
@@ -85,11 +85,11 @@ export default function AddCoursePointModal({ totalKm, onAdd, onClose }: Props) 
               </div>
             </div>
 
-            <div className="space-y-100">
-              <div className="flex items-center justify-between rounded-xl bg-neutral-10 px-150 py-100">
+            <div className="widget-card-glass space-y-100 p-150">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-75">
                   <Droplets className="size-4 shrink-0" strokeWidth={2} style={{ color: ravitoEnabled ? RAVITO_COLOR : 'var(--color-neutral-300)' }} />
-                  <span className="text-[13px] font-medium text-neutral-800">Ravitaillement</span>
+                  <span className="widget-card-title">Ravitaillement</span>
                 </div>
                 <Switch checked={ravitoEnabled} onChange={() => setRavitoEnabled(v => !v)} color={RAVITO_COLOR} />
               </div>
@@ -109,11 +109,11 @@ export default function AddCoursePointModal({ totalKm, onAdd, onClose }: Props) 
               )}
             </div>
 
-            <div className="space-y-100">
-              <div className="flex items-center justify-between rounded-xl bg-neutral-10 px-150 py-100">
+            <div className="widget-card-glass space-y-100 p-150">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-75">
                   <Fence className="size-4 shrink-0" strokeWidth={2} style={{ color: cutoffEnabled ? CUTOFF_COLOR : 'var(--color-neutral-300)' }} />
-                  <span className="text-[13px] font-medium text-neutral-800">Barrière horaire</span>
+                  <span className="widget-card-title">Barrière horaire</span>
                 </div>
                 <Switch checked={cutoffEnabled} onChange={() => setCutoffEnabled(v => !v)} color={CUTOFF_COLOR} />
               </div>
@@ -133,7 +133,7 @@ export default function AddCoursePointModal({ totalKm, onAdd, onClose }: Props) 
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-100 border-t border-neutral-20 px-200 py-200">
+          <div className="flex items-center justify-end gap-100 px-200 py-200">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
             <button
               type="button"

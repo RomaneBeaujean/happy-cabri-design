@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type Key } from 'react'
 import { createPortal } from 'react-dom'
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { ChevronLeft, ChevronRight, Bike, Dumbbell, Pencil } from 'lucide-react'
@@ -127,13 +127,13 @@ function WeeklyVolumeChart({ sport, selectedWeek, onSelectWeek }: {
           <ReferenceLine x={selectedWeek} stroke="var(--color-secondary-500)" strokeWidth={1} />
           <XAxis
             dataKey="week"
-            tick={(props: { x?: number; y?: number; payload?: { value?: number } }) => {
+            tick={(props: { x?: string | number; y?: string | number; payload?: { value?: number } }) => {
               const label = MONTH_BY_WEEK[props.payload?.value ?? -1]
               if (!label) return <g />
               return (
                 <text
                   x={props.x}
-                  y={(props.y ?? 0) + 12}
+                  y={Number(props.y ?? 0) + 12}
                   textAnchor="start"
                   fontSize={10}
                   fill="var(--color-neutral-80)"
@@ -163,7 +163,7 @@ function WeeklyVolumeChart({ sport, selectedWeek, onSelectWeek }: {
             strokeWidth={2.5}
             fill="url(#volumeGradient)"
             isAnimationActive={false}
-            dot={(props: { cx?: number; cy?: number; index?: number; key?: string }) => {
+            dot={(props: { cx?: number; cy?: number; index?: number; key?: Key | null }) => {
               const { cx = 0, cy = 0, index = 0, key } = props
               const isSelected = index === selectedWeek
               const textAnchor = index === 0 ? 'start' : index === data.length - 1 ? 'end' : 'middle'
@@ -354,25 +354,25 @@ function GoalModal({ goals, elevationGoal, enabled, onSave, onClose }: {
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="w-full max-w-[380px] overflow-hidden rounded-3xl bg-white shadow-lg">
+        <div className="modal-surface-taupe w-full max-w-[380px] overflow-hidden rounded-3xl shadow-lg">
           <div className="px-200 pt-200">
             <p className="font-accent text-[16px] font-bold text-neutral-800">Objectif hebdomadaire</p>
             <p className="mt-50 text-[13px] text-neutral-600">Définissez votre volume cible pour chaque sport.</p>
           </div>
 
-          <div className="divide-y divide-neutral-40 px-200 py-200">
+          <div className="space-y-150 px-200 py-200">
             {(Object.keys(SPORT_META) as SportFilter[]).map(sport => {
               const meta = SPORT_META[sport]
               const sportEnabled = enabledDraft[sport]
               return (
-                <div key={sport} className="py-150 first:pt-0 last:pb-0">
+                <div key={sport} className="widget-card-glass p-150">
                   <div className="mb-150 flex items-center gap-100">
                     <Switch
                       checked={sportEnabled}
                       onChange={() => setEnabledDraft(e => ({ ...e, [sport]: !e[sport] }))}
                       color={meta.color}
                     />
-                    <span className="flex items-center gap-75 text-[13px] font-medium text-neutral-700">
+                    <span className="widget-card-title flex items-center gap-75">
                       <meta.icon className="size-4" strokeWidth={2} style={{ color: sportEnabled ? meta.color : 'var(--color-neutral-300)' }} />
                       {meta.label}
                     </span>

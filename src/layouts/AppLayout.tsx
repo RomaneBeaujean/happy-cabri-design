@@ -5,8 +5,8 @@ import logoMain from '../assets/logo.svg'
 import { getAvatarUrl, subscribeAvatarUrl } from '../stores/userAvatar'
 
 export const ACCOUNT_MENU_ITEMS = [
-  { label: 'Modifier les paramètres du compte', sublabel: 'Email, mot de passe, téléphone', href: '/compte/parametres', icon: Settings },
-  { label: 'Gérer l’abonnement et les achats', sublabel: 'Formule, moyens de paiement, factures', href: '/compte/abonnement', icon: CreditCard },
+  { label: 'Paramètres du compte', sublabel: 'Email, mot de passe, téléphone', href: '/compte/parametres', icon: Settings },
+  { label: 'Abonnement et achats', sublabel: 'Formule, moyens de paiement, factures', href: '/compte/abonnement', icon: CreditCard },
 ] as const
 
 export const MAIN_NAV_ITEMS = [
@@ -109,9 +109,9 @@ function UserAvatar({
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-75 px-150 py-100 text-left hover:bg-neutral-20"
+                className="flex items-start gap-75 px-150 py-100 text-left hover:bg-neutral-20"
               >
-                <item.icon className="size-3.5 shrink-0 text-neutral-400" strokeWidth={1.75} />
+                <item.icon className="mt-25 size-3.5 shrink-0 text-neutral-400" strokeWidth={1.75} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13px] font-medium text-neutral-700">{item.label}</span>
                   <span className="block truncate text-[11px] text-neutral-400">{item.sublabel}</span>

@@ -21,11 +21,34 @@
   color: var(--color-neutral-10)
 }
 
+/* Fond dégradé taupe clair pour l'intérieur d'une modale — habille la modale comme le reste de
+   l'app (bg-gradient-app), pour que les cards internes puissent rester en transparence. */
+.modal-surface-taupe {
+  background: linear-gradient(160deg, var(--color-neutral-10), var(--color-neutral-40));
+}
+
+/* Translucide comme .widget-card, mais sans ombre — pour des cards imbriquées dans une surface
+   déjà teintée (ex. .modal-surface-taupe), où une ombre supplémentaire ferait doublon. */
+.widget-card-glass {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.40);
+  backdrop-filter: blur(20px);
+}
+
 .widget-title {
   font-size: 18px;
   font-weight: 600;
   color: var(--color-neutral-700);
   font-family: var(--font-accent);
+}
+
+/* Titre de section à l'intérieur d'une card — Funnel Display, couleur primary, casse normale
+   (contrairement à .widget-label, qui reste en petites majuscules pour les libellés d'unité). */
+.widget-card-title {
+  font-family: var(--font-accent);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary-500);
 }
 
 .widget-label {

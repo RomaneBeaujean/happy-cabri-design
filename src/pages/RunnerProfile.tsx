@@ -28,7 +28,7 @@ const categoryConfig: Record<ProductCategory, { label: string; color: TagColor }
   barre:   { label: 'Barre',   color: 'brown'   },
   compote: { label: 'Compote', color: 'green'   },
   boisson: { label: 'Boisson', color: 'teal'    },
-  autre:   { label: 'Autre',   color: 'neutral' },
+  autre:   { label: 'Autre',   color: 'white'   },
 }
 
 type Product = { id: string; name: string; glucides: number; ratio: string; category: ProductCategory }
@@ -41,9 +41,9 @@ const initProducts: Product[] = [
 ]
 
 export const initAllures = [
-  { id: 'courte', label: 'Courte', range: '< 25 km',    color: 'text-fuchsia-700', dot: 'bg-fuchsia-600', max: '4:15', min: '10:00', plat: '4:45', descenteTechnique: '6:30', kmEffort: '15' },
-  { id: 'longue', label: 'Longue', range: '25 – 60 km', color: 'text-orange-700',  dot: 'bg-orange-600',  max: '4:40', min: '12:30', plat: '5:10', descenteTechnique: '7:30', kmEffort: '10' },
-  { id: 'ultra',  label: 'Ultra',  range: '> 60 km',     color: 'text-blue-900',   dot: 'bg-blue-900',    max: '5:10', min: '15:00', plat: '5:40', descenteTechnique: '9:00', kmEffort: '6'  },
+  { id: 'courte', label: 'Courte', range: '< 25 km',    color: 'text-[#C3BBAD]', dot: 'bg-[#C3BBAD]', max: '4:15', min: '10:00', plat: '4:45', descenteTechnique: '6:30', kmEffort: '15' },
+  { id: 'longue', label: 'Longue', range: '25 – 60 km', color: 'text-[#87775A]', dot: 'bg-[#87775A]', max: '4:40', min: '12:30', plat: '5:10', descenteTechnique: '7:30', kmEffort: '10' },
+  { id: 'ultra',  label: 'Ultra',  range: '> 60 km',     color: 'text-[#433523]', dot: 'bg-[#433523]', max: '5:10', min: '15:00', plat: '5:40', descenteTechnique: '9:00', kmEffort: '6'  },
 ]
 
 export type AllureRow = typeof initAllures[number]
@@ -187,7 +187,7 @@ function AllureCell({ value, editing, unit, kind, color, onChange }: {
   )
 }
 
-function StepperStat({ icon, label, value, unit, editing, onInc, onDec, color = 'secondary' }: {
+function StepperStat({ icon, label, value, unit, editing, onInc, onDec, color = 'orange' }: {
   icon: React.ReactNode
   label: string
   value: number
@@ -285,8 +285,8 @@ function AddProductModal({ initial, onAdd, onClose }: {
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="w-full max-w-[420px] overflow-hidden rounded-3xl bg-white shadow-lg">
-          <div className="flex items-center justify-between border-b border-neutral-20 px-200 py-200">
+        <div className="modal-surface-taupe w-full max-w-[420px] overflow-hidden rounded-3xl shadow-lg">
+          <div className="flex items-center justify-between px-200 py-200">
             <p className="font-accent text-[16px] font-bold text-neutral-800">
               {initial ? 'Modifier le produit' : 'Ajouter un produit'}
             </p>
@@ -299,95 +299,97 @@ function AddProductModal({ initial, onAdd, onClose }: {
             </button>
           </div>
 
-          <div className="space-y-200 px-200 py-200">
-            <div className="space-y-75">
-              <p className="widget-label widget-label-compact">Catégorie</p>
-              <Dropdown
-                value={category}
-                onChange={setCategory}
-                className="w-full"
-                options={(Object.keys(categoryConfig) as ProductCategory[]).map(c => ({
-                  value: c,
-                  label: categoryConfig[c].label,
-                }))}
-              />
-            </div>
-
-            <div className="space-y-75">
-              <p className="widget-label widget-label-compact">Nom</p>
-              <input
-                autoFocus
-                type="text"
-                placeholder="ex: Gel Maurten"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter' && mode === 'unit') submit() }}
-                className="input w-full py-100 text-[13px]"
-              />
-            </div>
-
-            <div className="space-y-75">
-              <div className="flex items-center gap-100">
-                <p className="widget-label widget-label-compact">Glucides</p>
-                <div className="flex items-center gap-50 text-[10px] font-bold">
-                  <button
-                    type="button"
-                    onClick={() => setMode('unit')}
-                    className={`outline-none ${mode === 'unit' ? 'text-neutral-800' : 'text-neutral-40 hover:text-neutral-600'}`}
-                  >
-                    g/unité
-                  </button>
-                  <span className="text-neutral-300">|</span>
-                  <button
-                    type="button"
-                    onClick={() => setMode('100g')}
-                    className={`outline-none ${mode === '100g' ? 'text-neutral-800' : 'text-neutral-40 hover:text-neutral-600'}`}
-                  >
-                    pour 100g
-                  </button>
-                </div>
+          <div className="px-200 py-200">
+            <div className="widget-card-glass space-y-200 p-200">
+              <div className="space-y-75">
+                <p className="widget-label widget-label-compact">Catégorie</p>
+                <Dropdown
+                  value={category}
+                  onChange={setCategory}
+                  className="w-full"
+                  options={(Object.keys(categoryConfig) as ProductCategory[]).map(c => ({
+                    value: c,
+                    label: categoryConfig[c].label,
+                  }))}
+                />
               </div>
 
-              {mode === 'unit' ? (
-                <div className="flex items-center gap-75">
-                  <NumberField
-                    placeholder="ex: 10"
-                    value={glucidesUnit}
-                    onChange={setGlucidesUnit}
-                    onEnter={submit}
-                    variant="pill"
-                  />
-                  <span className="shrink-0 text-[13px] font-medium text-neutral-400">g</span>
-                </div>
-              ) : (
-                <div className="grid grid-cols-[1fr_auto] items-center gap-x-75 gap-y-75">
-                  <NumberField
-                    placeholder="glucides/100g"
-                    value={glucides100g}
-                    onChange={setGlucides100g}
-                    variant="pill"
-                  />
-                  <span className="shrink-0 text-[12px] font-medium text-neutral-400">/100g</span>
-                  <NumberField
-                    placeholder="poids total"
-                    value={weight}
-                    onChange={setWeight}
-                    step={5}
-                    variant="pill"
-                  />
-                  <span className="shrink-0 text-[12px] font-medium text-neutral-400">g</span>
-                  <div className="col-span-2 flex items-center gap-75">
-                    <span className="shrink-0 text-[13px] font-bold text-neutral-400">=</span>
-                    <span className="w-14 shrink-0 text-center text-[13px] font-bold text-primary-700">
-                      {computedFrom100g != null ? `${computedFrom100g} g` : '—'}
-                    </span>
+              <div className="space-y-75">
+                <p className="widget-label widget-label-compact">Nom</p>
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="ex: Gel Maurten"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter' && mode === 'unit') submit() }}
+                  className="input w-full py-100 text-[13px]"
+                />
+              </div>
+
+              <div className="space-y-75">
+                <div className="flex items-center gap-100">
+                  <p className="widget-label widget-label-compact">Glucides</p>
+                  <div className="flex items-center gap-50 text-[10px] font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setMode('unit')}
+                      className={`outline-none ${mode === 'unit' ? 'text-neutral-800' : 'text-neutral-40 hover:text-neutral-600'}`}
+                    >
+                      g/unité
+                    </button>
+                    <span className="text-neutral-300">|</span>
+                    <button
+                      type="button"
+                      onClick={() => setMode('100g')}
+                      className={`outline-none ${mode === '100g' ? 'text-neutral-800' : 'text-neutral-40 hover:text-neutral-600'}`}
+                    >
+                      pour 100g
+                    </button>
                   </div>
                 </div>
-              )}
+
+                {mode === 'unit' ? (
+                  <div className="flex items-center gap-75">
+                    <NumberField
+                      placeholder="ex: 10"
+                      value={glucidesUnit}
+                      onChange={setGlucidesUnit}
+                      onEnter={submit}
+                      variant="pill"
+                    />
+                    <span className="shrink-0 text-[13px] font-medium text-neutral-400">g</span>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-[1fr_auto] items-center gap-x-75 gap-y-75">
+                    <NumberField
+                      placeholder="glucides/100g"
+                      value={glucides100g}
+                      onChange={setGlucides100g}
+                      variant="pill"
+                    />
+                    <span className="shrink-0 text-[12px] font-medium text-neutral-400">/100g</span>
+                    <NumberField
+                      placeholder="poids total"
+                      value={weight}
+                      onChange={setWeight}
+                      step={5}
+                      variant="pill"
+                    />
+                    <span className="shrink-0 text-[12px] font-medium text-neutral-400">g</span>
+                    <div className="col-span-2 flex items-center gap-75">
+                      <span className="shrink-0 text-[13px] font-bold text-neutral-400">=</span>
+                      <span className="w-14 shrink-0 text-center text-[13px] font-bold text-primary-700">
+                        {computedFrom100g != null ? `${computedFrom100g} g` : '—'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-100 border-t border-neutral-20 px-200 py-200">
+          <div className="flex items-center justify-end gap-100 px-200 py-200">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
             <button
               type="button"

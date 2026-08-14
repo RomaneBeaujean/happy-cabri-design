@@ -88,11 +88,11 @@ export default function AltimetryChart({ data, height = 130, segments = [], ravi
           type="number"
           domain={[0, 'dataMax']}
           ticks={xTicks}
-          tick={({ x, y, payload }: { x?: number; y?: number; payload?: { value?: number } }) => {
+          tick={({ x, y, payload }: { x?: string | number; y?: string | number; payload?: { value?: number } }) => {
             const v = payload?.value ?? 0
             const anchor = v === xTicks[0] ? 'start' : v === xTicks[xTicks.length - 1] ? 'end' : 'middle'
             return (
-              <text x={x} y={(y ?? 0) + 12} textAnchor={anchor} fontSize={9} fill="var(--color-neutral-80)" fontFamily="Outfit, sans-serif">
+              <text x={x} y={Number(y ?? 0) + 12} textAnchor={anchor} fontSize={9} fill="var(--color-neutral-80)" fontFamily="Outfit, sans-serif">
                 {v}km
               </text>
             )

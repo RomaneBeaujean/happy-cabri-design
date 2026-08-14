@@ -1,10 +1,11 @@
 import type { ComponentType, CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
-import { Bike, Dumbbell, Trophy, X } from 'lucide-react'
+import { Bike, Dumbbell, Trophy, X, Zap, Gauge, TrendingDown, TrendingUp, Mountain } from 'lucide-react'
 import Runner from './icons/Runner'
 import { initAllures, allureParams } from '../pages/RunnerProfile'
 import { getPaceColor, getPaceGradientStops } from '../pages/RacePlan/paceColors'
 import { secToPace } from '../pages/RacePlan/format'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 export type IconComponent = ComponentType<{ className?: string; strokeWidth?: number; style?: CSSProperties }>
 
@@ -103,8 +104,13 @@ export function formatAvgPace(session: DaySession): string | null {
  * colorée selon l'allure relative de la sortie (rapide → lente).
  */
 function ProfileAltimetryChart({ points }: { points: ProfilePoint[] }) {
-  const VW = 680, VH = 220
-  const MT = 12, MB = 24, ML = 40, MR = 44
+  const isMobile = useIsMobile()
+  const VW = 680
+  const VH = isMobile ? 150 : 220
+  // En mobile, les légendes d'altitude (gauche) et d'allure (droite) disparaissent : ML/MR n'ont
+  // plus besoin de réserver de place pour leur texte, ce qui réduit aussi la marge blanche
+  // haut/bas puisque le graphique gagne en hauteur utile relative.
+  const MT = isMobile ? 6 : 12, MB = isMobile ? 16 : 24, ML = isMobile ? 8 : 40, MR = isMobile ? 8 : 44
   const chartW = VW - ML - MR
   const chartH = VH - MT - MB
   const baseY = MT + chartH
@@ -141,8 +147,8 @@ function ProfileAltimetryChart({ points }: { points: ProfilePoint[] }) {
 
   return (
     <div>
-      <p className="widget-label widget-label-compact">Profil altimétrique &amp; allure</p>
-      <svg viewBox={`0 0 ${VW} ${VH}`} className="mt-100 block w-full" style={{ height: 220 }}>
+      <p className="widget-card-title">Profil altimétrique &amp; allure</p>
+      <svg viewBox={`0 0 ${VW} ${VH}`} className="mt-100 block w-full" style={{ height: VH }}>
         <defs>
           <linearGradient id="profile-alt-gradient" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--color-primary-500)" stopOpacity={0.16} />
@@ -159,7 +165,7 @@ function ProfileAltimetryChart({ points }: { points: ProfilePoint[] }) {
           })}
         </defs>
 
-        {altTicks.map(a => (
+        {!isMobile && altTicks.map(a => (
           <g key={a}>
             <line x1={ML} x2={VW - MR} y1={toY(a)} y2={toY(a)} stroke="var(--color-neutral-20)" strokeDasharray="2,3" strokeWidth={0.5} />
             <text x={ML - 6} y={toY(a)} textAnchor="end" dominantBaseline="middle" fontSize={9} fill="var(--color-neutral-80)">{a}m</text>
@@ -191,7 +197,7 @@ function ProfileAltimetryChart({ points }: { points: ProfilePoint[] }) {
                 </g>
               )
             })}
-            {[paceDomain.min, paceDomain.avg, paceDomain.max].map((sec, i) => (
+            {!isMobile && [paceDomain.min, paceDomain.avg, paceDomain.max].map((sec, i) => (
               <text key={i} x={VW - MR + 6} y={paceToY(sec)} dominantBaseline="middle" fontSize={9} fill="var(--color-neutral-80)">{secToPace(Math.round(sec))}</text>
             ))}
           </>
@@ -207,11 +213,20 @@ function ProfileAltimetryChart({ points }: { points: ProfilePoint[] }) {
 
 function StatItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="text-center">
+    <div className="flex-1 px-100 text-center first:pl-0 last:pr-0">
       <p className="widget-label widget-label-compact">{label}</p>
       <p className="mt-50 whitespace-nowrap text-[18px] font-extrabold text-neutral-800">{value}</p>
     </div>
   )
+}
+
+/** Icône par paramètre d'allure — même logique visuelle que les ColorTag de segment (Gauge/Zap/…). */
+const ALLURE_PARAM_ICON: Record<string, IconComponent> = {
+  min: Zap,
+  plat: Gauge,
+  descenteTechnique: TrendingDown,
+  max: TrendingUp,
+  kmEffort: Mountain,
 }
 
 export default function ActivityDetailModal({ session, onClose }: {
@@ -228,7 +243,7 @@ export default function ActivityDetailModal({ session, onClose }: {
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="max-h-[90vh] w-full max-w-[640px] overflow-x-hidden overflow-y-auto rounded-3xl bg-white shadow-lg">
+        <div className="modal-surface-taupe max-h-[90vh] w-full max-w-[640px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
           <div className="flex items-center justify-between gap-100 px-200 pt-200">
             <div className="flex min-w-0 items-center gap-150">
               <span className={`flex size-9 shrink-0 items-center justify-center rounded-full ${badge.bg} ${badge.text}`}>
@@ -246,30 +261,44 @@ export default function ActivityDetailModal({ session, onClose }: {
             </button>
           </div>
 
+          <div className="mt-200 px-200">
+            <div className="widget-card-glass flex items-stretch divide-x divide-neutral-30 p-200">
+              {session.distanceKm != null && <StatItem label="Distance" value={`${session.distanceKm} km`} />}
+              {avgPaceLabel != null && <StatItem label="Allure" value={avgPaceLabel} />}
+              {session.durationMin != null && <StatItem label="Durée" value={formatDuration(session.durationMin)} />}
+              {session.elevation != null && <StatItem label="D+" value={`+${session.elevation} m`} />}
+            </div>
+          </div>
+
           {profile.length > 0 && (
             <div className="mt-200 px-200">
-              <ProfileAltimetryChart points={profile} />
+              <div className="widget-card-glass p-200">
+                <ProfileAltimetryChart points={profile} />
+              </div>
             </div>
           )}
 
-          <div className="mt-200 grid grid-cols-2 gap-150 px-200 sm:grid-cols-4">
-            {session.distanceKm != null && <StatItem label="Distance" value={`${session.distanceKm} km`} />}
-            {avgPaceLabel != null && <StatItem label="Allure moyenne" value={avgPaceLabel} />}
-            {session.durationMin != null && <StatItem label="Durée" value={formatDuration(session.durationMin)} />}
-            {session.elevation != null && <StatItem label="D+" value={`+${session.elevation} m`} />}
-          </div>
-
           {allureRow && (
-            <div className="mt-200 space-y-75 px-200 pb-200">
-              <p className="widget-label widget-label-compact">Statistiques de l'activité</p>
-              {allureParams.map(param => (
-                <div key={param.key} className="flex items-center justify-between rounded-xl bg-neutral-10/50 px-150 py-100">
-                  <p className="text-[12px] font-medium text-neutral-600">{param.label}</p>
-                  <p className={`text-[13px] font-bold ${allureRow.color}`}>
-                    {allureRow[param.key]}{param.unit}
-                  </p>
+            <div className="mt-200 px-200 pb-200">
+              <div className="widget-card-glass p-200">
+                <p className="widget-card-title">Statistiques de l'activité</p>
+                <div className="mt-100 divide-y divide-neutral-30">
+                  {allureParams.map(param => {
+                    const Icon = ALLURE_PARAM_ICON[param.key]
+                    return (
+                      <div key={param.key} className="flex items-center gap-100 py-150">
+                        <Icon className="size-4 shrink-0 text-primary-400" strokeWidth={1.75} />
+                        <div className="min-w-0">
+                          <p className="truncate text-[11px] font-medium text-primary-400">{param.label}</p>
+                          <p className="mt-25 text-[16px] font-extrabold leading-none text-primary-600">
+                            {allureRow[param.key]}{param.unit}
+                          </p>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
-              ))}
+              </div>
             </div>
           )}
 
