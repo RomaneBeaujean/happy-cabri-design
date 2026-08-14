@@ -296,7 +296,7 @@ export default function SegmentSeparator({
       </div>
 
       {(editingRavito || editingCutoff || editingKm) && createPortal(
-        <div className="fixed inset-0 z-[998] bg-black/30" />,
+        <div className="fixed inset-0 z-[998] modal-overlay" />,
         document.body
       )}
     </div>

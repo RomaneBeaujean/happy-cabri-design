@@ -53,7 +53,7 @@ export interface ColorTagProps {
   label?: string
   color?: TagColor
   variant?: 'soft' | 'strong'
-  size?: 'medium' | 'small'
+  size?: 'medium' | 'small' | 'xsmall'
   fluid?: boolean
   /** Icône affichée à gauche du label. */
   icon?: ReactNode
@@ -90,12 +90,13 @@ export default function ColorTag({
         backgroundColor: background,
         color: textColor,
         width: fluid ? '100%' : 'auto',
-        height: size === 'medium' ? '32px' : '26px',
-        padding: '4px 10px',
+        height: size === 'medium' ? '32px' : size === 'small' ? '26px' : '20px',
+        padding: size === 'xsmall' ? '2px 8px' : '4px 10px',
         borderRadius: '9999px',
         fontFamily: 'var(--font-accent)',
         fontWeight: 500,
         lineHeight: 1,
+        ...(size === 'xsmall' ? { fontSize: '10px' } : {}),
         ...style,
       }}
     >

@@ -5,6 +5,13 @@
 @import "./styles/typography.css";
 @import "./styles/leaflet-tooltip.css";
 
+/* Recharts rend son SVG focusable au clic ; le navigateur dessine alors un
+   encadré de focus par défaut autour du graphique. On le désactive globalement. */
+.recharts-wrapper *:focus,
+.recharts-surface:focus {
+  outline: none !important;
+}
+
 /* Outfit — 100→900 */
 @import "@fontsource/outfit/100.css";
 @import "@fontsource/outfit/200.css";
@@ -145,7 +152,7 @@ body {
 @layer base {
   h1 {
     font-family: var(--font-accent);
-    font-weight: 400;
+    font-weight: 700;
     font-size: 36px;
   }
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Minus, Maximize2, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { AltimetryPoint } from './AltimetryChart'
 import { paceToSec } from '../pages/RacePlan/format'
 import type { PointStats } from '../pages/RacePlan/trackStats'
@@ -173,46 +173,46 @@ export default function SlopeAltimetryChart({
     return extrema
   }, [data])
 
-  // Pente lissée sur une fenêtre de ~500m (centrée, clampée aux bornes du parcours et à
-  // l'extremum le plus proche de part et d'autre) — utilisée uniquement pour la couleur du
-  // remplissage, afin d'éviter que le bruit du relevé altimétrique (pente instantanée entre deux
-  // échantillons très rapprochés) fasse changer la couleur trop souvent. Le contour noir du
-  // terrain, lui, reste fidèle aux données brutes.
-  const SLOPE_SMOOTH_KM = 0.5
-  function smoothedSlopeAtKm(km: number): number {
-    const half = SLOPE_SMOOTH_KM / 2
-    let kmA = Math.max(0, km - half)
-    let kmB = Math.min(maxKmFull, km + half)
-    for (const e of extremaKms) {
-      if (e > kmA && e <= km) kmA = e
-      if (e < kmB && e >= km) kmB = e
-    }
-    const dKm = kmB - kmA
-    return dKm > 0 ? ((altAtKm(kmB) - altAtKm(kmA)) / (dKm * 1000)) * 100 : 0
-  }
+  // Tronçons montée/descente/plat, chacun d'au moins MIN_SEGMENT_KM — les zones plus courtes
+  // (issues d'un simple changement de signe de pente dans le relevé brut) sont absorbées dans
+  // le tronçon voisin, dont la pente moyenne est recalculée sur toute la portion fusionnée
+  // (altitude réelle aux deux bornes, pas une moyenne des pentes voisines). Calculé une seule
+  // fois sur tout le parcours — indépendant du zoom — pour rester stable au pan/zoom.
+  const MIN_SEGMENT_KM = 0.3
+  const slopeSegments = useMemo(() => {
+    const bounds = [0, ...extremaKms, maxKmFull].filter((km, i, arr) => i === 0 || km - arr[i - 1] > 1e-6)
+    const rawIntervals: [number, number][] = []
+    for (let i = 0; i < bounds.length - 1; i++) rawIntervals.push([bounds[i], bounds[i + 1]])
 
-  // Interpolation fine (résolution adaptative au zoom) pour les bandes de pente colorées
-  const STEP = Math.max(0.03, viewSpan / 300)
-  const pts: AltimetryPoint[] = []
-  for (let km = view.start; km < view.end; km += STEP) {
-    pts.push({ km, alt: altAtKm(km) })
-  }
-  pts.push({ km: view.end, alt: altAtKm(view.end) })
-
-  // Regroupe les tranches consécutives de même couleur (pente lissée) en un seul polygone
-  // continu — dessiner un polygone par toute petite tranche laissait des liserés blancs entre
-  // trapèzes adjacents (anti-aliasing SVG) même quand ils partageaient la même couleur.
-  const slopeRuns: { points: AltimetryPoint[]; color: string }[] = []
-  for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[i], p1 = pts[i + 1]
-    const color = getSlopeColor(smoothedSlopeAtKm((p0.km + p1.km) / 2))
-    const current = slopeRuns[slopeRuns.length - 1]
-    if (current && current.color === color) {
-      current.points.push(p1)
-    } else {
-      slopeRuns.push({ points: [p0, p1], color })
+    const merged: [number, number][] = []
+    for (const [s, e] of rawIntervals) {
+      const prev = merged[merged.length - 1]
+      const prevLen = prev ? prev[1] - prev[0] : Infinity
+      if (prev && (prevLen < MIN_SEGMENT_KM || e - s < MIN_SEGMENT_KM)) {
+        prev[1] = e
+      } else {
+        merged.push([s, e])
+      }
     }
-  }
+    // Le dernier tronçon peut rester trop court (queue du parcours) : on le fond dans le précédent.
+    if (merged.length > 1 && merged[merged.length - 1][1] - merged[merged.length - 1][0] < MIN_SEGMENT_KM) {
+      const last = merged.pop()!
+      merged[merged.length - 1][1] = last[1]
+    }
+
+    return merged.map(([start, end]) => {
+      const dKm = end - start
+      const avgSlope = dKm > 0 ? ((altAtKm(end) - altAtKm(start)) / (dKm * 1000)) * 100 : 0
+      const inner = data.filter(p => p.km > start && p.km < end)
+      return {
+        start,
+        end,
+        color: getSlopeColor(avgSlope),
+        points: [{ km: start, alt: altAtKm(start) }, ...inner, { km: end, alt: altAtKm(end) }],
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, extremaKms, maxKmFull])
 
   // Altitude grid lines (échelle verticale stable, indépendante du zoom)
   const rawStep = Math.ceil(altRange / 3 / 100) * 100
@@ -253,7 +253,11 @@ export default function SlopeAltimetryChart({
   // Étapes colorées de la courbe d'allure — coloration relative à l'allure de la course
   // (rouge = rapide, vert = allure moyenne, bleu = lente), PAS à la pente du terrain.
   // Connecteurs verticaux en dégradé entre deux paliers, comme happy-cabri-beta.
-  const paceSteps = useMemo(() => {
+  // Recalculé à chaque rendu (comme le tracé du terrain) plutôt que mémoïsé :
+  // x0/x1/y/yNext dépendent de toX/paceToYFn, qui ferment sur chartW/VW/ML/MT — un useMemo
+  // avec une liste de dépendances incomplète faisait persister d'anciennes coordonnées après
+  // un redimensionnement (fenêtre, sidebar, bascule mobile) et la courbe se coupait/déformait.
+  const paceSteps = (() => {
     if (!segments || segments.length === 0 || !paceDomain) return null
     const secs = segments.map(s => paceToSec(s.pace))
     return segments.map((seg, i) => {
@@ -269,8 +273,7 @@ export default function SlopeAltimetryChart({
         connectorStops: getPaceGradientStops(sec, nextSec, paceDomain.avg, paceDomain.min, paceDomain.max),
       }
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [segments, paceDomain, view.start, view.end, chartH])
+  })()
 
   function kmFromClientX(clientX: number, rect: DOMRect, v: { start: number; end: number } = view): number {
     const relX = (clientX - rect.left) / rect.width
@@ -501,25 +504,32 @@ export default function SlopeAltimetryChart({
 
   return (
     <div className="relative">
-      {/* Contrôles de zoom — ancrés au coin haut-gauche du composant tout entier (même position
-          que sur la carte, remonté de 20px de plus). */}
-      <div className="absolute left-[10px] top-[-10px] z-10 flex flex-col overflow-hidden rounded-full border border-neutral-20 bg-white shadow-widget">
+      {/* Contrôles de zoom — mêmes boutons ronds indépendants que sur la carte (voir RouteMap),
+          plus un bouton "afficher le profil entier" qui réinitialise la vue. */}
+      <div className="absolute right-50 top-50 z-10 flex items-center gap-50">
         <button
           type="button"
           aria-label="Zoom avant"
           onClick={() => zoomBy(1 / 1.4)}
-          className="flex size-[26px] items-center justify-center text-neutral-600 transition-colors hover:bg-neutral-10"
+          className="flex size-9 items-center justify-center rounded-full bg-white text-neutral-600 shadow-md transition-colors hover:bg-neutral-10"
         >
-          <Plus className="size-[13px]" strokeWidth={2.5} />
+          <Plus className="size-4" strokeWidth={2} />
         </button>
-        <div className="h-px bg-neutral-20" />
         <button
           type="button"
-          aria-label="Zoom arrière"
+          aria-label="Dézoomer le profil"
           onClick={() => zoomBy(1.4)}
-          className="flex size-[26px] items-center justify-center text-neutral-600 transition-colors hover:bg-neutral-10"
+          className="flex size-9 items-center justify-center rounded-full bg-white text-neutral-600 shadow-md transition-colors hover:bg-neutral-10"
         >
-          <Minus className="size-[13px]" strokeWidth={2.5} />
+          <Minus className="size-4" strokeWidth={2} />
+        </button>
+        <button
+          type="button"
+          aria-label="Afficher le profil entier"
+          onClick={() => setView({ start: 0, end: maxKmFull })}
+          className="flex size-9 items-center justify-center rounded-full bg-white text-neutral-600 shadow-md transition-colors hover:bg-neutral-10"
+        >
+          <Maximize2 className="size-4" strokeWidth={2} />
         </button>
       </div>
 
@@ -593,18 +603,15 @@ export default function SlopeAltimetryChart({
             </g>
           ))}
 
-          {/* Slope-colored fill — un seul polygone continu par bande de couleur (pente lissée sur
-              ~300m), pas un par petite tranche : sinon les bords adjacents laissaient des liserés
-              blancs (anti-aliasing SVG) même entre deux tranches de la même couleur. */}
-          {slopeRuns.map((run, i) => {
-            const first = run.points[0]
-            const last = run.points[run.points.length - 1]
-            const top = run.points.map(p => `${toX(p.km).toFixed(1)},${toY(p.alt).toFixed(1)}`).join(' ')
+          {/* Slope-colored fill — un polygone continu par tronçon montée/descente/plat (300m
+              minimum, voir slopeSegments), suivant le profil réel du terrain sur sa portion. */}
+          {slopeSegments.map((seg, i) => {
+            const top = seg.points.map(p => `${toX(p.km).toFixed(1)},${toY(p.alt).toFixed(1)}`).join(' ')
             return (
               <polygon
                 key={i}
-                points={`${toX(first.km).toFixed(1)},${baseY} ${top} ${toX(last.km).toFixed(1)},${baseY}`}
-                fill={run.color}
+                points={`${toX(seg.start).toFixed(1)},${baseY} ${top} ${toX(seg.end).toFixed(1)},${baseY}`}
+                fill={seg.color}
                 opacity={0.92}
               />
             )

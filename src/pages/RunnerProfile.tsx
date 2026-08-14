@@ -1,12 +1,13 @@
-﻿import { useState, useRef, useLayoutEffect } from 'react'
+﻿import { useState, useRef, useLayoutEffect, useSyncExternalStore, type ChangeEvent } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Edit2, GripVertical, Droplets, ChevronUp, ChevronDown, Save,
-  Plus, Minus, X, Timer, Flame, AlertTriangle,
+  Plus, Minus, X, Flame, AlertTriangle, Trash2, Camera,
 } from 'lucide-react'
 import AppLayout from '../layouts/AppLayout'
 import ColorTag, { type TagColor } from '../components/ColorTag'
 import Dropdown from '../components/Dropdown'
+import { getAvatarUrl, setAvatarUrl, subscribeAvatarUrl } from '../stores/userAvatar'
 
 function paceToSec(p: string) {
   const [m, s = '0'] = p.split(':')
@@ -19,15 +20,6 @@ function secToPace(total: number) {
 }
 
 // ── Static data ───────────────────────────────────────────────────────────────
-
-const initChronos = [
-  { label: '1 km',          time: '4:12'  },
-  { label: '5 km',          time: '22:45' },
-  { label: '10 km',         time: '48:30' },
-  { label: 'Semi-marathon', time: '1h48'  },
-  { label: '30 km',         time: '2h55'  },
-  { label: 'Marathon',      time: '3h52'  },
-]
 
 type ProductCategory = 'gel' | 'barre' | 'compote' | 'boisson' | 'autre'
 
@@ -48,19 +40,20 @@ const initProducts: Product[] = [
   { id: 'p4', name: 'Clémentines fraîches',        glucides: 12, ratio: '1:1',   category: 'autre'   },
 ]
 
-const initAllures = [
-  { id: 'courte', label: 'Courte', range: '< 25 km',    color: 'text-fuchsia-700', dot: 'bg-fuchsia-600', max: '4:15', min: '10:00', descenteTechnique: '6:30', kmEffort: '15' },
-  { id: 'longue', label: 'Longue', range: '25 – 60 km', color: 'text-orange-700',  dot: 'bg-orange-600',  max: '4:40', min: '12:30', descenteTechnique: '7:30', kmEffort: '10' },
-  { id: 'ultra',  label: 'Ultra',  range: '> 60 km',     color: 'text-blue-900',   dot: 'bg-blue-900',    max: '5:10', min: '15:00', descenteTechnique: '9:00', kmEffort: '6'  },
+export const initAllures = [
+  { id: 'courte', label: 'Courte', range: '< 25 km',    color: 'text-fuchsia-700', dot: 'bg-fuchsia-600', max: '4:15', min: '10:00', plat: '4:45', descenteTechnique: '6:30', kmEffort: '15' },
+  { id: 'longue', label: 'Longue', range: '25 – 60 km', color: 'text-orange-700',  dot: 'bg-orange-600',  max: '4:40', min: '12:30', plat: '5:10', descenteTechnique: '7:30', kmEffort: '10' },
+  { id: 'ultra',  label: 'Ultra',  range: '> 60 km',     color: 'text-blue-900',   dot: 'bg-blue-900',    max: '5:10', min: '15:00', plat: '5:40', descenteTechnique: '9:00', kmEffort: '6'  },
 ]
 
-type AllureRow = typeof initAllures[number]
+export type AllureRow = typeof initAllures[number]
 
-const allureParams: { key: 'max' | 'min' | 'descenteTechnique' | 'kmEffort'; label: string; unit: string; kind: 'pace' | 'number' }[] = [
-  { key: 'max',               label: 'Allure max (plat / descente)', unit: '/km', kind: 'pace'   },
-  { key: 'min',               label: 'Allure min (montée raide)',    unit: '/km', kind: 'pace'   },
-  { key: 'descenteTechnique', label: 'Descente technique',           unit: '/km', kind: 'pace'   },
-  { key: 'kmEffort',          label: 'Km-effort moyen',              unit: '',    kind: 'number' },
+export const allureParams: { key: 'max' | 'min' | 'plat' | 'descenteTechnique' | 'kmEffort'; label: string; unit: string; kind: 'pace' | 'number' }[] = [
+  { key: 'min',               label: 'Allure la plus rapide sur 300m',   unit: '/km', kind: 'pace'   },
+  { key: 'plat',              label: 'Allure à plat',                    unit: '/km', kind: 'pace'   },
+  { key: 'descenteTechnique', label: 'Descente raide (>20%)',            unit: '/km', kind: 'pace'   },
+  { key: 'max',               label: 'Montée raide (>20%)',              unit: '/km', kind: 'pace'   },
+  { key: 'kmEffort',          label: 'Km-effort moyen',                  unit: '',    kind: 'number' },
 ]
 
 type CompetenceRow = { label: string; value: number } // /10
@@ -90,14 +83,7 @@ function NumberField({ value, onChange, placeholder, step = 1, min = 0, onEnter,
 
   if (variant === 'pill') {
     return (
-      <div className="flex min-w-0 flex-1 items-center gap-75 rounded-full border border-neutral-40 bg-white p-50 lg:w-fit lg:flex-none">
-        <button
-          type="button"
-          onMouseDown={e => { e.preventDefault(); bump(-1) }}
-          className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary-200 text-secondary-800 transition-colors hover:bg-secondary-300"
-        >
-          <Minus className="size-3.5" strokeWidth={2.5} />
-        </button>
+      <div className="input flex min-w-0 flex-1 items-center gap-75 py-50 pr-50">
         <input
           type="text"
           inputMode="decimal"
@@ -105,15 +91,24 @@ function NumberField({ value, onChange, placeholder, step = 1, min = 0, onEnter,
           value={value}
           onChange={e => onChange(e.target.value.replace(/[^\d.,]/g, ''))}
           onKeyDown={e => { if (e.key === 'Enter') onEnter?.() }}
-          className="w-full min-w-0 flex-1 bg-transparent text-center text-[14px] font-bold text-neutral-800 outline-none placeholder:text-neutral-60 lg:w-12 lg:flex-none"
+          className="w-full min-w-0 flex-1 bg-transparent text-left text-[14px] font-bold text-neutral-800 outline-none placeholder:text-[13px] placeholder:font-normal placeholder:text-neutral-60"
         />
-        <button
-          type="button"
-          onMouseDown={e => { e.preventDefault(); bump(1) }}
-          className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary-200 text-secondary-800 transition-colors hover:bg-secondary-300"
-        >
-          <Plus className="size-3.5" strokeWidth={2.5} />
-        </button>
+        <div className="flex shrink-0 items-center gap-25">
+          <button
+            type="button"
+            onMouseDown={e => { e.preventDefault(); bump(-1) }}
+            className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary-200 text-secondary-800 transition-colors hover:bg-secondary-300"
+          >
+            <Minus className="size-3.5" strokeWidth={2.5} />
+          </button>
+          <button
+            type="button"
+            onMouseDown={e => { e.preventDefault(); bump(1) }}
+            className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary-200 text-secondary-800 transition-colors hover:bg-secondary-300"
+          >
+            <Plus className="size-3.5" strokeWidth={2.5} />
+          </button>
+        </div>
       </div>
     )
   }
@@ -253,14 +248,15 @@ function EditToggleButton({ editing, onClick }: { editing: boolean; onClick: () 
   )
 }
 
-function AddProductModal({ onAdd, onClose }: {
+function AddProductModal({ initial, onAdd, onClose }: {
+  initial?: Product
   onAdd: (p: Product) => void
   onClose: () => void
 }) {
-  const [category, setCategory]         = useState<ProductCategory>('gel')
-  const [name, setName]                 = useState('')
+  const [category, setCategory]         = useState<ProductCategory>(initial?.category ?? 'gel')
+  const [name, setName]                 = useState(initial?.name ?? '')
   const [mode, setMode]                 = useState<'unit' | '100g'>('unit')
-  const [glucidesUnit, setGlucidesUnit] = useState('')
+  const [glucidesUnit, setGlucidesUnit] = useState(initial ? String(initial.glucides) : '')
   const [weight, setWeight]             = useState('')
   const [glucides100g, setGlucides100g] = useState('')
 
@@ -276,16 +272,24 @@ function AddProductModal({ onAdd, onClose }: {
 
   function submit() {
     if (!canSubmit || finalGlucides == null) return
-    onAdd({ id: `p${Date.now()}`, name: name.trim(), glucides: Math.round(finalGlucides), ratio: '—', category })
+    onAdd({
+      id: initial?.id ?? `p${Date.now()}`,
+      name: name.trim(),
+      glucides: Math.round(finalGlucides),
+      ratio: initial?.ratio ?? '—',
+      category,
+    })
   }
 
   return createPortal(
     <>
-      <div className="fixed inset-0 z-[998] bg-black/40" onClick={onClose} />
+      <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
         <div className="w-full max-w-[420px] overflow-hidden rounded-3xl bg-white shadow-lg">
           <div className="flex items-center justify-between border-b border-neutral-20 px-200 py-200">
-            <p className="font-accent text-[16px] font-bold text-neutral-800">Ajouter un produit</p>
+            <p className="font-accent text-[16px] font-bold text-neutral-800">
+              {initial ? 'Modifier le produit' : 'Ajouter un produit'}
+            </p>
             <button
               type="button"
               onClick={onClose}
@@ -356,25 +360,23 @@ function AddProductModal({ onAdd, onClose }: {
                   <span className="shrink-0 text-[13px] font-medium text-neutral-400">g</span>
                 </div>
               ) : (
-                <div className="flex flex-col gap-75 lg:flex-row lg:items-center">
-                  <div className="flex items-center gap-75">
-                    <NumberField
-                      placeholder="glucides/100g"
-                      value={glucides100g}
-                      onChange={setGlucides100g}
-                    />
-                    <span className="shrink-0 text-[12px] font-medium text-neutral-400">/100g</span>
-                  </div>
-                  <div className="flex items-center gap-75">
-                    <NumberField
-                      placeholder="poids total"
-                      value={weight}
-                      onChange={setWeight}
-                      step={5}
-                    />
-                    <span className="shrink-0 text-[12px] font-medium text-neutral-400">g</span>
-                  </div>
-                  <div className="flex items-center gap-75">
+                <div className="grid grid-cols-[1fr_auto] items-center gap-x-75 gap-y-75">
+                  <NumberField
+                    placeholder="glucides/100g"
+                    value={glucides100g}
+                    onChange={setGlucides100g}
+                    variant="pill"
+                  />
+                  <span className="shrink-0 text-[12px] font-medium text-neutral-400">/100g</span>
+                  <NumberField
+                    placeholder="poids total"
+                    value={weight}
+                    onChange={setWeight}
+                    step={5}
+                    variant="pill"
+                  />
+                  <span className="shrink-0 text-[12px] font-medium text-neutral-400">g</span>
+                  <div className="col-span-2 flex items-center gap-75">
                     <span className="shrink-0 text-[13px] font-bold text-neutral-400">=</span>
                     <span className="w-14 shrink-0 text-center text-[13px] font-bold text-primary-700">
                       {computedFrom100g != null ? `${computedFrom100g} g` : '—'}
@@ -393,7 +395,7 @@ function AddProductModal({ onAdd, onClose }: {
               disabled={!canSubmit}
               onClick={submit}
             >
-              Ajouter
+              {initial ? 'Enregistrer' : 'Ajouter'}
             </button>
           </div>
         </div>
@@ -410,7 +412,7 @@ function DeleteProductModal({ productName, onConfirm, onClose }: {
 }) {
   return createPortal(
     <>
-      <div className="fixed inset-0 z-[998] bg-black/40" onClick={onClose} />
+      <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
         <div className="w-full max-w-[380px] overflow-hidden rounded-3xl bg-white shadow-lg">
           <div className="flex items-start gap-150 px-200 pt-200">
@@ -473,8 +475,6 @@ function RatingBar({ value, max = 10, editing, onChange }: {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function RunnerProfile() {
-  const [chronos, setChronos]             = useState(initChronos)
-  const [editChronos, setEditChronos]     = useState(false)
   const [products, setProducts]           = useState(initProducts)
   const [editNutrition, setEditNutrition] = useState(false)
   const [waterPerHour, setWaterPerHour]   = useState(650)
@@ -485,10 +485,22 @@ export default function RunnerProfile() {
   const [editCompetences, setEditCompetences] = useState(false)
   const [dragId, setDragId]               = useState<string | null>(null)
   const [showAddProduct, setShowAddProduct] = useState(false)
+  const [editingProductId, setEditingProductId] = useState<string | null>(null)
   const [productToDelete, setProductToDelete] = useState<number | null>(null)
+  const avatarUrl = useSyncExternalStore(subscribeAvatarUrl, getAvatarUrl)
   const rowRefs = useRef(new Map<string, HTMLDivElement>())
   const prevRects = useRef(new Map<string, DOMRect>())
   const reorderLock = useRef(false)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+
+  function handleAvatarChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const prev = getAvatarUrl()
+    if (prev) URL.revokeObjectURL(prev)
+    setAvatarUrl(URL.createObjectURL(file))
+    e.target.value = ''
+  }
 
   const editAllure = (i: number, key: keyof AllureRow, val: string) =>
     setAllures(al => al.map((x, j) => j === i ? { ...x, [key]: val } : x))
@@ -535,16 +547,31 @@ export default function RunnerProfile() {
 
         {/* ── Header ── */}
         <section className="pt-100">
-          <p className="text-[11px] eyebrow text-neutral-90">
-            Mon profil
-          </p>
-          <div className="mt-200 flex items-center gap-300">
-            <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-primary-500 text-[24px] font-bold text-neutral-0">
-              RB
+          <div className="flex items-center gap-300">
+            <div className="relative shrink-0">
+              <div className="flex size-16 items-center justify-center overflow-hidden rounded-full bg-primary-500 text-[24px] font-bold text-neutral-0">
+                {avatarUrl
+                  ? <img src={avatarUrl} alt="" className="size-full object-cover" />
+                  : 'RB'}
+              </div>
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                aria-label={avatarUrl ? 'Modifier la photo' : 'Ajouter une photo'}
+                className="absolute right-0 bottom-0 flex size-6 cursor-pointer items-center justify-center rounded-full border-2 border-neutral-30 bg-white text-neutral-50 transition-colors hover:bg-neutral-10"
+              >
+                <Camera className="size-3" strokeWidth={2.5} />
+              </button>
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
             </div>
             <div>
               <h1 className="text-[24px] font-extrabold text-neutral-800">Romane Beaujean</h1>
-              <p className="mt-25 text-[14px] text-neutral-80">Traileur · Niveau intermédiaire</p>
             </div>
           </div>
         </section>
@@ -617,31 +644,6 @@ export default function RunnerProfile() {
           </div>
         </section>
 
-        {/* ── Références chronométriques ── */}
-        <section className="widget-card overflow-hidden p-100">
-          <div className="flex items-center justify-between px-200 py-150">
-            <div className="flex items-center gap-150">
-              <Timer className="size-4 text-primary-400 shrink-0" strokeWidth={2} />
-              <p className="widget-title">Références chronométriques</p>
-            </div>
-            <EditToggleButton editing={editChronos} onClick={() => setEditChronos(v => !v)} />
-          </div>
-          {chronos.map((c, i) => (
-            <div key={i} className="widget-row flex items-center justify-between px-200 py-150">
-              <p className="text-[14px] font-bold text-neutral-800">{c.label}</p>
-              {editChronos ? (
-                <input
-                  className="w-24 rounded-lg border border-neutral-30 bg-neutral-10 px-150 py-75 text-right text-[14px] font-bold text-primary-700 outline-none focus:border-primary-400"
-                  value={c.time}
-                  onChange={e => setChronos(ch => ch.map((x, j) => j === i ? { ...x, time: e.target.value } : x))}
-                />
-              ) : (
-                <p className="text-[16px] font-bold text-primary-700">{c.time}</p>
-              )}
-            </div>
-          ))}
-        </section>
-
         {/* ── Nutrition ── */}
         <section className="widget-card overflow-hidden p-100">
           <div className="flex items-center justify-between px-200 py-150">
@@ -677,12 +679,15 @@ export default function RunnerProfile() {
             Produits par préférence
           </p>
 
-          {/* Column headers */}
-          <div className={`grid items-center gap-x-150 px-200 pb-75 ${editNutrition ? 'grid-cols-[auto_1fr_auto_auto_auto]' : 'grid-cols-[1fr_auto_auto]'}`}>
+          {/* Column headers — colonnes à largeur fixe (et non "auto") pour que les repères
+              (drag/actions, vides ici) matchent exactement la largeur de leur équivalent rempli
+              dans les lignes ci-dessous ; avec des colonnes "auto", une case vide dans l'en-tête
+              et une case avec une icône dans la ligne n'ont pas la même largeur calculée, ce qui
+              décale Glucides par rapport aux valeurs. */}
+          <div className={`grid items-center gap-x-150 px-200 pb-75 ${editNutrition ? 'grid-cols-[24px_1fr_56px_60px]' : 'grid-cols-[1fr_56px]'}`}>
             {editNutrition && <span />}
             <span />
-            <p className="w-14 text-center text-[10px] eyebrow text-neutral-400">Glucides</p>
-            <p className="w-12 text-center text-[10px] eyebrow text-neutral-400">Glu:Fru</p>
+            <p className="text-center text-[10px] eyebrow text-neutral-400">Glucides</p>
             {editNutrition && <span />}
           </div>
 
@@ -704,27 +709,41 @@ export default function RunnerProfile() {
                 }}
                 onDrop={e => e.preventDefault()}
                 onDragEnd={() => setDragId(null)}
-                className={`widget-row grid items-center gap-x-150 px-200 py-150 ${editNutrition ? 'grid-cols-[auto_1fr_auto_auto_auto]' : 'grid-cols-[1fr_auto_auto]'} ${isGhost ? 'rounded-xl border border-dashed border-secondary-700 bg-secondary-50 opacity-50' : ''}`}
+                className={`widget-row group grid items-center gap-x-150 px-200 py-150 ${editNutrition ? 'grid-cols-[24px_1fr_56px_60px]' : 'grid-cols-[1fr_56px]'} ${isGhost ? 'rounded-xl border border-dashed border-secondary-700 bg-secondary-50 opacity-50' : ''}`}
               >
-                {editNutrition && <GripVertical className="size-4 shrink-0 cursor-grab text-neutral-40" strokeWidth={2} />}
+                {editNutrition && (
+                  <GripVertical className="size-4 shrink-0 cursor-grab text-neutral-40 transition-colors group-hover:text-neutral-500" strokeWidth={2} />
+                )}
                 <div className="flex min-w-0 items-center gap-100">
-                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-secondary-700 text-[10px] font-bold text-white">
+                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary-700 text-[10px] font-bold text-white">
                     {i + 1}
                   </span>
-                  <p className="min-w-0 flex-1 truncate text-[14px] font-semibold text-neutral-800">{p.name}</p>
                   <ColorTag label={categoryConfig[p.category].label} color={categoryConfig[p.category].color} size="small" />
+                  <p className="min-w-0 flex-1 truncate text-[14px] font-semibold text-neutral-800">{p.name}</p>
                 </div>
-                <p className="w-14 text-center text-[14px] font-bold text-primary-700">
+                <p className="text-center text-[14px] font-bold text-primary-700">
                   {p.glucides}<span className="ml-25 text-[10px] font-medium text-neutral-400">g</span>
                 </p>
-                <p className="w-12 text-center text-[12px] font-semibold text-neutral-600">{p.ratio}</p>
                 {editNutrition && (
-                  <button
-                    onClick={() => setProductToDelete(i)}
-                    className="btn btn-icon size-7 hover:bg-red-50! hover:text-red-500!"
-                  >
-                    <X className="size-3.5" strokeWidth={2.5} />
-                  </button>
+                  <div className="flex items-center justify-end gap-50">
+                    <button
+                      onClick={() => setEditingProductId(p.id)}
+                      className="btn btn-icon size-7 text-secondary-700 hover:bg-secondary-100! hover:text-secondary-800!"
+                    >
+                      <Edit2 className="size-3.5" strokeWidth={2} />
+                    </button>
+                    <div className="group/tooltip relative">
+                      <button
+                        onClick={() => setProductToDelete(i)}
+                        className="btn btn-icon size-7 text-secondary-700 hover:bg-secondary-100! hover:text-secondary-800!"
+                      >
+                        <Trash2 className="size-3.5" strokeWidth={2} />
+                      </button>
+                      <span className="pointer-events-none absolute right-1/2 bottom-full mb-50 translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-800 px-75 py-25 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover/tooltip:opacity-100">
+                        Supprimer
+                      </span>
+                    </div>
+                  </div>
                 )}
               </div>
             )
@@ -749,6 +768,14 @@ export default function RunnerProfile() {
         <AddProductModal
           onAdd={p => { setProducts(pr => [...pr, p]); setShowAddProduct(false) }}
           onClose={() => setShowAddProduct(false)}
+        />
+      )}
+
+      {editingProductId !== null && (
+        <AddProductModal
+          initial={products.find(p => p.id === editingProductId)}
+          onAdd={updated => { setProducts(pr => pr.map(p => p.id === updated.id ? updated : p)); setEditingProductId(null) }}
+          onClose={() => setEditingProductId(null)}
         />
       )}
 

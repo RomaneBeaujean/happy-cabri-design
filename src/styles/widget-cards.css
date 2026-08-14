@@ -60,6 +60,13 @@
   }
 }
 
+/* Fond des modales — assombri + flouté, cohérent sur toute l'app. */
+.modal-overlay {
+  background: rgba(10, 10, 10, 0.40);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
 .widget-row {
   border-radius: 14px;
   transition: background-color 0.2s ease, transform 0.2s ease;

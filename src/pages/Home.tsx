@@ -1,19 +1,36 @@
-﻿import { TrendingUp, Mountain, MapPin, Wind, Plus, Footprints, Bike, Activity, Target, Trophy, Clock } from 'lucide-react'
+import { useState } from 'react'
+import { TrendingUp, Mountain, MapPin, Plus, Target, Clock } from 'lucide-react'
 import AppLayout from '../layouts/AppLayout'
+import ActivityDetailModal, { TYPE_BADGE, formatDuration, formatAvgPace, navigateTo, type DaySession } from '../components/ActivityDetail'
 
 function navigateToNewPlan() {
-  window.history.pushState({}, '', '/plans/nouveau')
-  window.dispatchEvent(new PopStateEvent('popstate'))
+  navigateTo('/plans/nouveau')
+}
+
+const RECENT_SESSIONS: DaySession[] = [
+  { id: 'h1', type: 'run',  label: 'Sortie longue — Belledonne', distanceKm: 28, durationMin: 192, elevation: 1420 },
+  { id: 'h2', type: 'run',  label: 'Fractionné trail',           distanceKm: 12, durationMin: 64,  elevation: 340  },
+  { id: 'h3', type: 'bike', label: 'Vélo — Col du Glandon',      distanceKm: 64, durationMin: 168, elevation: 1850 },
+  { id: 'h4', type: 'run',  label: 'Récupération active',        distanceKm: 8,  durationMin: 52,  elevation: 110  },
+]
+
+const RECENT_SESSION_DATES: Record<string, string> = {
+  h1: 'Dim. 22 juin',
+  h2: 'Jeu. 19 juin',
+  h3: 'Sam. 21 juin',
+  h4: 'Mar. 17 juin',
 }
 
 export default function Home() {
+  const [activitySession, setActivitySession] = useState<DaySession | null>(null)
+
   return (
     <AppLayout activeItem="accueil" userInitials="RB">
       <div className="mx-auto max-w-3xl space-y-300">
 
         {/* ── Hero ── */}
         <section className="pt-100">
-          <h1 className="mt-150 text-[36px] text-primary-500 lg:text-[48px]">
+          <h1 className="mt-150 text-primary-500">
             Bonjour,{' '}
             <span className="text-primary-900 font-semibold">Romane</span>
           </h1>
@@ -29,39 +46,48 @@ export default function Home() {
         {/* ── Bento stats ── */}
         <section className="grid grid-cols-2 gap-150 lg:grid-cols-3 lg:gap-200">
 
-          {/* Km semaine */}
-          <div className="widget-card flex flex-col justify-between gap-200 p-300">
-            <div className="flex items-center gap-150">
+          {/* Cette semaine — distance et D+ */}
+          <div className="widget-card flex flex-col justify-between gap-200 p-200 lg:p-300">
+            <div className="flex items-center gap-100 lg:gap-150">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-20/70">
                 <TrendingUp className="size-5 text-neutral-300" strokeWidth={1.5} />
               </div>
               <p className="widget-label">Cette semaine</p>
             </div>
-            <p className="text-[36px] font-bold leading-none text-primary-500">
-              42<span className="ml-50 text-[16px] font-normal text-neutral-80"> km</span>
-            </p>
-            <span className="inline-flex w-fit items-center gap-75 rounded-full bg-secondary-400/25 px-150 py-[5px] text-[11px] font-semibold text-secondary-700">
-              <TrendingUp className="size-3 shrink-0" strokeWidth={2.5} />
-              +12 % vs sem. passée
-            </span>
+            <div className="space-y-200">
+              <div>
+                <p className="text-[11px] text-neutral-80">Distance</p>
+                <p className="mt-25 text-[28px] font-bold leading-none text-primary-500">42<span className="ml-50 text-[14px] font-normal text-neutral-80"> km</span></p>
+              </div>
+              <div>
+                <p className="text-[11px] text-neutral-80">Dénivelé positif</p>
+                <p className="mt-25 text-[28px] font-bold leading-none text-primary-500">1 840<span className="ml-50 text-[14px] font-normal text-neutral-80"> m</span></p>
+              </div>
+            </div>
           </div>
 
-          {/* Dénivelé */}
-          <div className="widget-card flex flex-col justify-between gap-200 p-300">
-            <div className="flex items-center gap-150">
+          {/* Cette année — distance et D+ */}
+          <div className="widget-card flex flex-col justify-between gap-200 p-200 lg:p-300">
+            <div className="flex items-center gap-100 lg:gap-150">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-20/70">
                 <Mountain className="size-5 text-neutral-300" strokeWidth={1.5} />
               </div>
-              <p className="widget-label">Dénivelé</p>
+              <p className="widget-label">Cette année</p>
             </div>
-            <p className="text-[36px] font-bold leading-none text-primary-500">
-              1 840<span className="ml-50 text-[16px] font-normal text-neutral-80"> m</span>
-            </p>
-            <p className="text-[12px] text-neutral-80">D+ cumulé</p>
+            <div className="space-y-200">
+              <div>
+                <p className="text-[11px] text-neutral-80">Distance</p>
+                <p className="mt-25 text-[28px] font-bold leading-none text-primary-500">342<span className="ml-50 text-[14px] font-normal text-neutral-80"> km</span></p>
+              </div>
+              <div>
+                <p className="text-[11px] text-neutral-80">Dénivelé positif</p>
+                <p className="mt-25 text-[28px] font-bold leading-none text-primary-500">8 200<span className="ml-50 text-[14px] font-normal text-neutral-80"> m</span></p>
+              </div>
+            </div>
           </div>
 
           {/* Prochain objectif — spanning 2 rows sur desktop */}
-          <div className="widget-card-secondary col-span-2 flex flex-col items-center justify-between gap-300 p-300 text-center lg:col-span-1 lg:row-span-2">
+          <div className="widget-card-secondary col-span-2 flex flex-col items-center justify-between gap-300 p-200 text-center lg:col-span-1 lg:row-span-2 lg:p-300">
             <div>
               <p className="widget-label">Prochain objectif</p>
               <h2 className="mt-200 text-[30px] font-extrabold leading-none text-neutral-0">
@@ -89,135 +115,103 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Sorties ce mois */}
-          <div className="widget-card flex flex-col justify-between gap-200 p-300">
-            <div className="flex items-center gap-150">
+          {/* Courses réalisées */}
+          <div className="widget-card flex flex-col gap-200 p-200 lg:p-300">
+            <div className="flex items-center gap-100 lg:gap-150">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-20/70">
                 <Target className="size-5 text-neutral-300" strokeWidth={1.5} />
               </div>
-              <p className="widget-label">Ce mois</p>
+              <p className="widget-label">Courses réalisées</p>
             </div>
-            <p className="text-[36px] font-bold leading-none text-primary-500">
-              3<span className="ml-50 text-[16px] font-normal text-neutral-80"> sorties</span>
-            </p>
-            <div className="space-y-75">
-              <div className="h-50 w-full overflow-hidden rounded-full bg-neutral-30">
-                <div className="h-full rounded-full bg-secondary-500" style={{ width: '37.5%' }} />
-              </div>
-              <p className="text-[11px] text-neutral-80">Objectif : 8 ce mois</p>
+            <div className="flex flex-1 items-center justify-center">
+              <p className="text-[36px] font-bold leading-none text-primary-500">3</p>
             </div>
           </div>
 
-          {/* Allure moyenne */}
-          <div className="widget-card flex flex-col justify-between gap-200 p-300">
-            <div className="flex items-center gap-150">
+          {/* Course la plus longue */}
+          <div className="widget-card flex flex-col justify-between gap-200 p-200 lg:p-300">
+            <div className="flex items-center gap-100 lg:gap-150">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-20/70">
-                <Activity className="size-5 text-neutral-300" strokeWidth={1.5} />
+                <Clock className="size-5 text-neutral-300" strokeWidth={1.5} />
               </div>
-              <p className="widget-label">Allure moy.</p>
+              <p className="widget-label">Course la plus longue</p>
             </div>
-            <p className="text-[36px] font-bold leading-none text-primary-500">
-              6:12<span className="ml-50 text-[16px] font-normal text-neutral-80"> /km</span>
-            </p>
-            <p className="text-[12px] text-neutral-80">30 derniers jours</p>
-          </div>
-
-        </section>
-
-        {/* ── Cette année ── */}
-        <section className="space-y-150">
-          <p className="widget-title">Cette année</p>
-          <div className="grid grid-cols-2 gap-150 lg:grid-cols-3">
-            {[
-              { label: 'Km parcourus',      value: '342',   unit: 'km',     Icon: TrendingUp },
-              { label: 'Dénivelé positif',  value: '8 200', unit: 'm',      Icon: Mountain   },
-              { label: 'Courses réalisées', value: '3',     unit: '',       Icon: Trophy     },
-            ].map(({ label, value, unit, Icon }) => (
-              <div key={label} className="widget-card flex flex-col justify-between gap-200 p-300">
-                <div className="flex items-center gap-150">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-20/70">
-                    <Icon className="size-5 text-neutral-300" strokeWidth={1.5} />
-                  </div>
-                  <p className="widget-label">{label}</p>
-                </div>
-                <p className="text-[36px] font-bold leading-none text-primary-500">
-                  {value}{unit && <span className="ml-50 text-[16px] font-normal text-neutral-80"> {unit}</span>}
-                </p>
+            <div className="space-y-200">
+              <p className="truncate text-[13px] font-semibold text-neutral-800">Grand Raid Belledonne</p>
+              <div>
+                <p className="text-[11px] text-neutral-80">Distance</p>
+                <p className="mt-25 text-[22px] font-bold leading-none text-primary-500">28<span className="ml-50 text-[13px] font-normal text-neutral-80"> km</span></p>
               </div>
-            ))}
-
-            {/* Course la plus longue — spanning */}
-            <div className="widget-card col-span-2 flex flex-col justify-between gap-200 p-300 lg:col-span-3">
-              <div className="flex items-center gap-150">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-20/70">
-                  <Clock className="size-5 text-neutral-300" strokeWidth={1.5} />
-                </div>
-                <div>
-                  <p className="widget-label">Course la plus longue</p>
-                  <p className="mt-25 text-[14px] font-semibold text-neutral-800">Grand Raid Belledonne</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-300">
-                <div>
-                  <p className="text-[30px] font-bold leading-none text-primary-500">28<span className="ml-50 text-[16px] font-normal text-neutral-80"> km</span></p>
-                  <p className="mt-75 text-[11px] text-neutral-80">distance</p>
-                </div>
-                <div className="h-10 w-px bg-neutral-30" />
-                <div>
-                  <p className="text-[30px] font-bold leading-none text-primary-500">3h12</p>
-                  <p className="mt-75 text-[11px] text-neutral-80">durée</p>
-                </div>
+              <div>
+                <p className="text-[11px] text-neutral-80">Durée</p>
+                <p className="mt-25 text-[22px] font-bold leading-none text-primary-500">3h12</p>
               </div>
             </div>
           </div>
+
         </section>
 
         {/* ── Dernières sorties ── */}
         <section className="widget-card overflow-hidden p-100">
           <div className="flex items-center justify-between px-200 py-150">
             <p className="widget-title">Dernières sorties</p>
-            <button className="btn btn-text">Voir tout</button>
+            <button className="btn btn-text" onClick={() => navigateTo('/calendrier')}>Voir tout</button>
           </div>
-          {[
-            { label: 'Sortie longue — Belledonne', date: 'Dim. 22 juin', km: '28 km', d: '1 420 m', time: '3h12', Icon: Footprints },
-            { label: 'Fractionné trail', date: 'Jeu. 19 juin', km: '12 km', d: '340 m', time: '1h04', Icon: Footprints },
-            { label: 'Vélo — Col du Glandon', date: 'Sam. 21 juin', km: '64 km', d: '1 850 m', time: '2h48', Icon: Bike },
-            { label: 'Récupération active', date: 'Mar. 17 juin', km: '8 km', d: '110 m', time: '52min', Icon: Footprints },
-          ].map((run, i) => (
-            <div
-              key={i}
-              className="widget-row flex cursor-pointer items-center justify-between px-200 py-200"
-            >
-              <div className="flex items-center gap-200">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-500 text-neutral-0">
-                  <run.Icon className="size-4 shrink-0" strokeWidth={1.75} />
+          {RECENT_SESSIONS.map(session => {
+            const badge = TYPE_BADGE[session.type]
+            const avgPaceLabel = formatAvgPace(session)
+            return (
+              <button
+                key={session.id}
+                type="button"
+                onClick={() => setActivitySession(session)}
+                className="widget-row flex w-full cursor-pointer items-center justify-between px-200 py-200 text-left"
+              >
+                <div className="flex items-center gap-200">
+                  <div className={`flex size-9 shrink-0 items-center justify-center rounded-full ${badge.bg} ${badge.text}`}>
+                    <badge.icon className="size-4 shrink-0" strokeWidth={1.75} />
+                  </div>
+                  <div>
+                    <p className="text-[14px] font-semibold text-neutral-800">{session.label}</p>
+                    <p className="mt-25 text-[12px] text-neutral-80">{RECENT_SESSION_DATES[session.id]}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[14px] font-semibold text-neutral-800">{run.label}</p>
-                  <p className="mt-25 text-[12px] text-neutral-80">{run.date}</p>
+                <div className="flex items-center gap-200 text-right">
+                  {session.distanceKm != null && (
+                    <div>
+                      <p className="text-[16px] font-bold text-primary-500">{session.distanceKm} km</p>
+                      {session.elevation != null && (
+                        <p className="text-[10px] text-neutral-80 flex items-center gap-50 justify-end">
+                          <Mountain className="size-3 shrink-0" strokeWidth={2} />
+                          {session.elevation} m
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  {session.durationMin != null && (
+                    <div>
+                      <p className="text-[16px] font-bold text-neutral-400">{formatDuration(session.durationMin)}</p>
+                      {avgPaceLabel && (
+                        <p className="text-[10px] text-neutral-80 flex items-center gap-50 justify-end">
+                          {avgPaceLabel}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="flex items-center gap-200 text-right">
-                <div>
-                  <p className="text-[16px] font-bold text-primary-500">{run.km}</p>
-                  <p className="text-[10px] text-neutral-80 flex items-center gap-50 justify-end">
-                    <Mountain className="size-3 shrink-0" strokeWidth={2} />
-                    {run.d}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[16px] font-bold text-neutral-400">{run.time}</p>
-                  <p className="text-[10px] text-neutral-80 flex items-center gap-50 justify-end">
-                    <Wind className="size-3 shrink-0" strokeWidth={2} />
-                    durée
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
+              </button>
+            )
+          })}
         </section>
 
       </div>
+
+      {activitySession && (
+        <ActivityDetailModal
+          session={activitySession}
+          onClose={() => setActivitySession(null)}
+        />
+      )}
     </AppLayout>
   )
 }

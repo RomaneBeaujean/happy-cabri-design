@@ -5,6 +5,8 @@ import RacePlans from './pages/RacePlans'
 import NewRacePlan from './pages/NewRacePlan'
 import RacePlan from './pages/RacePlan'
 import RunnerProfile from './pages/RunnerProfile'
+import AccountSettings from './pages/AccountSettings'
+import AccountSubscription from './pages/AccountSubscription'
 
 const routes: Record<string, () => React.ReactElement> = {
   '/': Home,
@@ -12,6 +14,8 @@ const routes: Record<string, () => React.ReactElement> = {
   '/plans': RacePlans,
   '/plans/nouveau': NewRacePlan,
   '/profil': RunnerProfile,
+  '/compte/parametres': AccountSettings,
+  '/compte/abonnement': AccountSubscription,
 }
 
 export default function App() {

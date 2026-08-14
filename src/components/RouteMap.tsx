@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Plus, Minus } from 'lucide-react'
+import { Plus, Minus, Satellite, Map as MapIcon } from 'lucide-react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { TrackPoint } from '../pages/RacePlan/trackData'
@@ -501,11 +501,6 @@ export default function RouteMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [track, segments, points, getStats, activePointId])
 
-  const MODES: { key: LayerKey; label: string }[] = [
-    { key: 'satellite', label: 'Satellite' },
-    { key: 'terrain', label: 'Terrain' },
-  ]
-
   return (
     <div className="relative" style={{ height }}>
       <div className="absolute inset-0 overflow-hidden">
@@ -534,44 +529,33 @@ export default function RouteMap({
         )
       })()}
 
-      {/* Contrôles de zoom — remplace le zoomControl natif de Leaflet (carré) par le même style
-          arrondi que les contrôles de zoom du profil altimétrique. */}
-      <div className="absolute left-[10px] top-[10px] z-[1000] flex flex-col overflow-hidden rounded-full border border-neutral-20 bg-white shadow-widget">
+      {/* Contrôles de zoom + bascule satellite/plan — boutons ronds indépendants, même style que
+          les contrôles du profil altimétrique (voir SlopeAltimetryChart). */}
+      <div className="absolute right-100 top-100 z-[1000] flex items-center gap-50">
         <button
           type="button"
           aria-label="Zoom avant"
           onClick={() => mapRef.current?.zoomIn()}
-          className="flex size-[26px] items-center justify-center text-neutral-600 transition-colors hover:bg-neutral-10"
+          className="flex size-9 items-center justify-center rounded-full bg-white text-neutral-600 shadow-md transition-colors hover:bg-neutral-10"
         >
-          <Plus className="size-[13px]" strokeWidth={2.5} />
+          <Plus className="size-4" strokeWidth={2} />
         </button>
-        <div className="h-px bg-neutral-20" />
         <button
           type="button"
           aria-label="Zoom arrière"
           onClick={() => mapRef.current?.zoomOut()}
-          className="flex size-[26px] items-center justify-center text-neutral-600 transition-colors hover:bg-neutral-10"
+          className="flex size-9 items-center justify-center rounded-full bg-white text-neutral-600 shadow-md transition-colors hover:bg-neutral-10"
         >
-          <Minus className="size-[13px]" strokeWidth={2.5} />
+          <Minus className="size-4" strokeWidth={2} />
         </button>
-      </div>
-
-      {/* Layer toggle */}
-      <div className="absolute right-[10px] top-[10px] z-[1000] flex overflow-hidden rounded-lg border border-neutral-20 bg-white shadow-widget">
-        {MODES.map(m => (
-          <button
-            key={m.key}
-            onClick={() => setMode(m.key)}
-            className={[
-              'px-150 py-75 text-[11px] font-semibold transition-colors',
-              mode === m.key
-                ? 'bg-primary-500 text-white'
-                : 'bg-white text-neutral-600 hover:bg-neutral-10',
-            ].join(' ')}
-          >
-            {m.label}
-          </button>
-        ))}
+        <button
+          type="button"
+          aria-label={mode === 'satellite' ? 'Afficher le plan' : 'Afficher le satellite'}
+          onClick={() => setMode(m => m === 'satellite' ? 'terrain' : 'satellite')}
+          className="flex size-9 items-center justify-center rounded-full bg-white text-neutral-600 shadow-md transition-colors hover:bg-neutral-10"
+        >
+          {mode === 'satellite' ? <MapIcon className="size-4" strokeWidth={2} /> : <Satellite className="size-4" strokeWidth={2} />}
+        </button>
       </div>
     </div>
   )

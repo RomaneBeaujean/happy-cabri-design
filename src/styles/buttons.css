@@ -63,10 +63,12 @@
   border-color: var(--color-secondary-600);
 }
 
-/* ── Text — transparent, sans bordure ── */
+/* ── Text — transparent, sans bordure, padding latéral réduit (pas de fond à respirer) ── */
 .btn-text {
   background: transparent;
   color: var(--color-neutral-400);
+  padding-left: var(--spacing-100);
+  padding-right: var(--spacing-100);
 }
 
 .btn-text:hover {

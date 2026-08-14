@@ -1,6 +1,13 @@
-﻿import { type ReactNode, useState, useEffect } from 'react'
-import { Calendar, Home, Mountain, User, Settings, Bell, type LucideIcon } from 'lucide-react'
+﻿import { type ReactNode, useState, useEffect, useRef, useSyncExternalStore } from 'react'
+import { createPortal } from 'react-dom'
+import { Calendar, Home, Mountain, User, Settings, CreditCard, LogOut, type LucideIcon } from 'lucide-react'
 import logoMain from '../assets/logo.svg'
+import { getAvatarUrl, subscribeAvatarUrl } from '../stores/userAvatar'
+
+export const ACCOUNT_MENU_ITEMS = [
+  { label: 'Modifier les paramètres du compte', sublabel: 'Email, mot de passe, téléphone', href: '/compte/parametres', icon: Settings },
+  { label: 'Gérer l’abonnement et les achats', sublabel: 'Formule, moyens de paiement, factures', href: '/compte/abonnement', icon: CreditCard },
+] as const
 
 export const MAIN_NAV_ITEMS = [
   { id: 'accueil',    label: 'Accueil',        mobileLabel: 'Accueil',    href: '/',           icon: Home },
@@ -27,33 +34,104 @@ interface AppLayoutProps {
 
 function UserAvatar({
   initials,
-  href,
   isActive,
   size = 'md',
   className = '',
 }: {
   initials: string
-  href: string
   isActive: boolean
   size?: 'sm' | 'md'
   className?: string
 }) {
+  const avatarUrl = useSyncExternalStore(subscribeAvatarUrl, getAvatarUrl)
+  const [open, setOpen] = useState(false)
+  const [pos, setPos] = useState({ top: 0, right: 0 })
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function onDocMouseDown(e: MouseEvent) {
+      const target = e.target as Node
+      if (btnRef.current?.contains(target) || panelRef.current?.contains(target)) return
+      setOpen(false)
+    }
+    document.addEventListener('mousedown', onDocMouseDown)
+    return () => document.removeEventListener('mousedown', onDocMouseDown)
+  }, [open])
+
+  function toggle() {
+    if (!open && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect()
+      setPos({ top: r.bottom + 8, right: window.innerWidth - r.right })
+    }
+    setOpen(o => !o)
+  }
+
+  function logout() {
+    setOpen(false)
+    window.history.pushState({}, '', '/')
+    window.dispatchEvent(new PopStateEvent('popstate'))
+  }
+
   return (
-    <a
-      href={href}
-      aria-label="Compte"
-      aria-current={isActive ? 'page' : undefined}
-      className={[
-        'flex shrink-0 items-center justify-center rounded-full bg-primary-500 font-semibold text-neutral-0 transition-all',
-        size === 'md' ? 'size-10 text-[14px]' : 'size-8 text-[12px]',
-        isActive
-          ? 'ring-2 ring-primary-400 ring-offset-2'
-          : 'hover:bg-primary-600',
-        className,
-      ].join(' ')}
-    >
-      {initials}
-    </a>
+    <>
+      <button
+        ref={btnRef}
+        type="button"
+        onClick={toggle}
+        aria-label="Compte"
+        aria-current={isActive ? 'page' : undefined}
+        className={[
+          'flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary-500 font-semibold text-neutral-0 transition-all',
+          size === 'md' ? 'size-10 text-[14px]' : 'size-8 text-[12px]',
+          isActive || open
+            ? 'ring-2 ring-primary-400 ring-offset-2'
+            : 'hover:bg-primary-600',
+          className,
+        ].join(' ')}
+      >
+        {avatarUrl
+          ? <img src={avatarUrl} alt="" className="size-full object-cover" />
+          : initials}
+      </button>
+
+      {open && createPortal(
+        <>
+          <div className="fixed inset-0 z-[998]" onClick={() => setOpen(false)} />
+          <div
+            ref={panelRef}
+            className="fixed z-[999] w-72 rounded-2xl border border-neutral-20 bg-white py-50 shadow-lg"
+            style={{ top: pos.top, right: pos.right }}
+          >
+            {ACCOUNT_MENU_ITEMS.map(item => (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-75 px-150 py-100 text-left hover:bg-neutral-20"
+              >
+                <item.icon className="size-3.5 shrink-0 text-neutral-400" strokeWidth={1.75} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[13px] font-medium text-neutral-700">{item.label}</span>
+                  <span className="block truncate text-[11px] text-neutral-400">{item.sublabel}</span>
+                </span>
+              </a>
+            ))}
+            <div className="my-50 border-t border-neutral-20" />
+            <button
+              type="button"
+              onClick={logout}
+              className="flex w-full items-center gap-75 px-150 py-100 text-left hover:bg-neutral-20"
+            >
+              <LogOut className="size-3.5 shrink-0 text-neutral-400" strokeWidth={1.75} />
+              <span className="text-[13px] font-medium text-neutral-700">Se déconnecter</span>
+            </button>
+          </div>
+        </>,
+        document.body
+      )}
+    </>
   )
 }
 
@@ -109,26 +187,11 @@ export default function AppLayout({
         <a href="/">
           <img src={logoMain} alt="Happy Cabri" className="h-11 w-auto" />
         </a>
-        <div className="flex items-center gap-[3px] rounded-full border border-neutral-40/50 bg-white/60 px-[5px] py-[5px] backdrop-blur-xl">
-          <button
-            aria-label="Notifications"
-            className="flex size-8 shrink-0 items-center justify-center rounded-full text-neutral-500 transition-all hover:bg-neutral-0/60 hover:text-neutral-800"
-          >
-            <Bell className="size-4" strokeWidth={1.75} />
-          </button>
-          <button
-            aria-label="Paramètres"
-            className="flex size-8 shrink-0 items-center justify-center rounded-full text-neutral-500 transition-all hover:bg-neutral-0/60 hover:text-neutral-800"
-          >
-            <Settings className="size-4" strokeWidth={1.75} />
-          </button>
-          <UserAvatar
-            initials={userInitials}
-            href={ACCOUNT_NAV.href}
-            isActive={activeItem === ACCOUNT_NAV.id}
-            size="sm"
-          />
-        </div>
+        <UserAvatar
+          initials={userInitials}
+          isActive={activeItem === ACCOUNT_NAV.id}
+          size="sm"
+        />
       </header>
 
       {/* ── Top bar — desktop ── */}
@@ -166,26 +229,9 @@ export default function AppLayout({
             </div>
           </nav>
 
-          {/* Settings */}
-          <button
-            aria-label="Paramètres"
-            className="flex size-10 shrink-0 items-center justify-center rounded-full border border-neutral-40/50 bg-neutral-0/55 text-neutral-500 backdrop-blur-2xl transition-all hover:bg-neutral-0 hover:text-neutral-800"
-          >
-            <Settings className="size-[17px]" strokeWidth={1.75} />
-          </button>
-
-          {/* Notifications */}
-          <button
-            aria-label="Notifications"
-            className="flex size-10 shrink-0 items-center justify-center rounded-full border border-neutral-40/50 bg-neutral-0/55 text-neutral-500 backdrop-blur-2xl transition-all hover:bg-neutral-0 hover:text-neutral-800"
-          >
-            <Bell className="size-[17px]" strokeWidth={1.75} />
-          </button>
-
           {/* Avatar */}
           <UserAvatar
             initials={userInitials}
-            href={ACCOUNT_NAV.href}
             isActive={activeItem === ACCOUNT_NAV.id}
           />
         </div>
