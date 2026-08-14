@@ -408,7 +408,7 @@ function Step2({
             onFocus={() => setFocused('location')} onBlur={() => setFocused(null)} />
         </div>
 
-        <div className="grid grid-cols-2 gap-100">
+        <div className="grid grid-cols-1 gap-100 lg:grid-cols-2">
           <div className="space-y-100">
             <label className={labelCls('date')}>Date de la course</label>
             <input className={inputCls()} type="date" value={raceDate}
@@ -626,7 +626,7 @@ function Step3Objectif({ customTarget, setCustomTarget, durationMins, setDuratio
         </div>
 
         {customTarget && (
-          <div className="grid grid-cols-3 gap-150 border-t border-neutral-20 px-300 py-200">
+          <div className="grid grid-cols-1 gap-150 border-t border-neutral-20 px-300 py-200 lg:grid-cols-3">
             {fields.map(({ id, label, unit, display, onUp, onDown }) => (
               <div key={id} className="space-y-75">
                 <p className={`text-[10px] font-semibold transition-colors ${focused === id ? 'text-primary-500' : 'text-neutral-80'}`}>{label}</p>

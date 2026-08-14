@@ -26,3 +26,14 @@
     padding-left: 32px;
   }
 }
+
+/* iOS/Android zooment la page au focus d'un champ dont le font-size calculé est < 16px. Règle
+   hors @layer (donc prioritaire sur les utilitaires Tailwind comme text-[13px]) pour garantir
+   qu'aucun champ, même stylé plus petit, ne déclenche ce zoom sur mobile. */
+@media (max-width: 1023px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

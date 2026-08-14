@@ -57,7 +57,7 @@ function ChangePlanModal({ draft, cancelled, onSelect, onConfirm, onCancel, onCl
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="modal-surface-taupe w-full max-w-[420px] overflow-hidden rounded-3xl shadow-lg">
+        <div className="modal-surface-taupe max-h-[calc(100vh-24px)] w-full max-w-[420px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
           <div className="flex items-center justify-between px-200 py-200">
             <p className="font-accent text-[16px] font-bold text-neutral-800">Modifier mon abonnement</p>
             <button
@@ -103,7 +103,7 @@ function CancelSubscriptionModal({ renewalDate, onConfirm, onClose }: {
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="modal-surface-taupe w-full max-w-[380px] overflow-hidden rounded-3xl shadow-lg">
+        <div className="modal-surface-taupe max-h-[calc(100vh-24px)] w-full max-w-[380px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
           <div className="flex items-start gap-150 px-200 pt-200">
             <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-500">
               <AlertTriangle className="size-4.5" strokeWidth={2} />
@@ -148,7 +148,7 @@ function EditCardModal({ number, expiry, cvc, onNumberChange, onExpiryChange, on
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="modal-surface-taupe w-full max-w-[420px] overflow-hidden rounded-3xl shadow-lg">
+        <div className="modal-surface-taupe max-h-[calc(100vh-24px)] w-full max-w-[420px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
           <div className="flex items-center justify-between px-200 py-200">
             <p className="font-accent text-[16px] font-bold text-neutral-800">Modifier la carte</p>
             <button

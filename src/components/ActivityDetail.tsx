@@ -243,7 +243,7 @@ export default function ActivityDetailModal({ session, onClose }: {
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="modal-surface-taupe max-h-[90vh] w-full max-w-[640px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
+        <div className="modal-surface-taupe max-h-[calc(100vh-24px)] w-full max-w-[640px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
           <div className="flex items-center justify-between gap-100 px-200 pt-200">
             <div className="flex min-w-0 items-center gap-150">
               <span className={`flex size-9 shrink-0 items-center justify-center rounded-full ${badge.bg} ${badge.text}`}>

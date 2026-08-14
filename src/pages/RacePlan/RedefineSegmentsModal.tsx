@@ -79,7 +79,7 @@ export default function RedefineSegmentsModal({ totalKm, initialKms, initialRavi
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="flex max-h-[85vh] w-full max-w-[440px] flex-col overflow-hidden rounded-3xl bg-white shadow-lg">
+        <div className="flex max-h-[calc(100vh-24px)] w-full max-w-[440px] flex-col overflow-hidden rounded-3xl bg-white shadow-lg">
           <div className="flex items-center justify-between border-b border-neutral-20 px-200 py-200">
             <p className="font-accent text-[16px] font-bold text-neutral-800">Redéfinir les segments</p>
             <button

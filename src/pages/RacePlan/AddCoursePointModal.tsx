@@ -55,7 +55,7 @@ export default function AddCoursePointModal({ totalKm, onAdd, onClose }: Props) 
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="modal-surface-taupe w-full max-w-[420px] overflow-hidden rounded-3xl shadow-lg">
+        <div className="modal-surface-taupe max-h-[calc(100vh-24px)] w-full max-w-[420px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
           <div className="flex items-center justify-between px-200 py-200">
             <p className="font-accent text-[16px] font-bold text-neutral-800">Ajouter un point de parcours</p>
             <button

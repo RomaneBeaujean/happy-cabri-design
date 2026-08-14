@@ -354,7 +354,7 @@ function GoalModal({ goals, elevationGoal, enabled, onSave, onClose }: {
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="modal-surface-taupe w-full max-w-[380px] overflow-hidden rounded-3xl shadow-lg">
+        <div className="modal-surface-taupe max-h-[calc(100vh-24px)] w-full max-w-[380px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
           <div className="px-200 pt-200">
             <p className="font-accent text-[16px] font-bold text-neutral-800">Objectif hebdomadaire</p>
             <p className="mt-50 text-[13px] text-neutral-600">Définissez votre volume cible pour chaque sport.</p>
