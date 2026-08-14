@@ -57,8 +57,8 @@ function ChangePlanModal({ draft, cancelled, onSelect, onConfirm, onCancel, onCl
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="modal-surface-taupe max-h-[calc(100vh-24px)] w-full max-w-[420px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
-          <div className="flex items-center justify-between px-200 py-200">
+        <div className="modal-surface-taupe flex max-h-[calc(100dvh-24px)] w-full max-w-[420px] flex-col overflow-hidden rounded-3xl shadow-lg">
+          <div className="flex shrink-0 items-center justify-between px-200 py-200">
             <p className="font-accent text-[16px] font-bold text-neutral-800">Modifier mon abonnement</p>
             <button
               type="button"
@@ -69,7 +69,7 @@ function ChangePlanModal({ draft, cancelled, onSelect, onConfirm, onCancel, onCl
             </button>
           </div>
 
-          <div className="space-y-100 px-200 py-200">
+          <div className="min-h-0 flex-1 space-y-100 overflow-x-hidden overflow-y-auto px-200 py-200">
             <PlanOption id="monthly" selected={draft === 'monthly'} onSelect={() => onSelect('monthly')} />
             <PlanOption id="annual" selected={draft === 'annual'} onSelect={() => onSelect('annual')} />
             {!cancelled && (
@@ -83,7 +83,7 @@ function ChangePlanModal({ draft, cancelled, onSelect, onConfirm, onCancel, onCl
             )}
           </div>
 
-          <div className="flex items-center justify-end gap-100 px-200 py-200">
+          <div className="flex shrink-0 items-center justify-end gap-100 px-200 py-200">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
             <button type="button" className="btn btn-primary" onClick={onConfirm}>Confirmer</button>
           </div>
@@ -103,20 +103,22 @@ function CancelSubscriptionModal({ renewalDate, onConfirm, onClose }: {
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="modal-surface-taupe max-h-[calc(100vh-24px)] w-full max-w-[380px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
-          <div className="flex items-start gap-150 px-200 pt-200">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-500">
-              <AlertTriangle className="size-4.5" strokeWidth={2} />
-            </span>
-            <div>
-              <p className="font-accent text-[16px] font-bold text-neutral-800">Résilier mon abonnement ?</p>
-              <p className="mt-50 text-[13px] text-neutral-600">
-                Vous garderez l'accès à l'offre Premium jusqu'au {renewalDate}, puis votre compte repassera en formule gratuite.
-              </p>
+        <div className="modal-surface-taupe flex max-h-[calc(100dvh-24px)] w-full max-w-[380px] flex-col overflow-hidden rounded-3xl shadow-lg">
+          <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-200 pt-200">
+            <div className="flex items-start gap-150">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-500">
+                <AlertTriangle className="size-4.5" strokeWidth={2} />
+              </span>
+              <div>
+                <p className="font-accent text-[16px] font-bold text-neutral-800">Résilier mon abonnement ?</p>
+                <p className="mt-50 text-[13px] text-neutral-600">
+                  Vous garderez l'accès à l'offre Premium jusqu'au {renewalDate}, puis votre compte repassera en formule gratuite.
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-100 px-200 py-200">
+          <div className="flex shrink-0 items-center justify-end gap-100 px-200 py-200">
             <button type="button" className="btn btn-text" onClick={onClose}>Annuler</button>
             <button
               type="button"
@@ -148,8 +150,8 @@ function EditCardModal({ number, expiry, cvc, onNumberChange, onExpiryChange, on
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="modal-surface-taupe max-h-[calc(100vh-24px)] w-full max-w-[420px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
-          <div className="flex items-center justify-between px-200 py-200">
+        <div className="modal-surface-taupe flex max-h-[calc(100dvh-24px)] w-full max-w-[420px] flex-col overflow-hidden rounded-3xl shadow-lg">
+          <div className="flex shrink-0 items-center justify-between px-200 py-200">
             <p className="font-accent text-[16px] font-bold text-neutral-800">Modifier la carte</p>
             <button
               type="button"
@@ -160,7 +162,7 @@ function EditCardModal({ number, expiry, cvc, onNumberChange, onExpiryChange, on
             </button>
           </div>
 
-          <div className="space-y-150 px-200 py-200">
+          <div className="min-h-0 flex-1 space-y-150 overflow-x-hidden overflow-y-auto px-200 py-200">
             <div className="space-y-75">
               <p className="widget-label widget-label-compact">Numéro de carte</p>
               <input
@@ -199,7 +201,7 @@ function EditCardModal({ number, expiry, cvc, onNumberChange, onExpiryChange, on
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-100 px-200 py-200">
+          <div className="flex shrink-0 items-center justify-end gap-100 px-200 py-200">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
             <button
               type="button"

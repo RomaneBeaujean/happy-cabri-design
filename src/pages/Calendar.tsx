@@ -354,13 +354,13 @@ function GoalModal({ goals, elevationGoal, enabled, onSave, onClose }: {
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="modal-surface-taupe max-h-[calc(100vh-24px)] w-full max-w-[380px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
-          <div className="px-200 pt-200">
+        <div className="modal-surface-taupe flex max-h-[calc(100dvh-24px)] w-full max-w-[380px] flex-col overflow-hidden rounded-3xl shadow-lg">
+          <div className="shrink-0 px-200 pt-200">
             <p className="font-accent text-[16px] font-bold text-neutral-800">Objectif hebdomadaire</p>
             <p className="mt-50 text-[13px] text-neutral-600">Définissez votre volume cible pour chaque sport.</p>
           </div>
 
-          <div className="space-y-150 px-200 py-200">
+          <div className="min-h-0 flex-1 space-y-150 overflow-x-hidden overflow-y-auto px-200 py-200">
             {(Object.keys(SPORT_META) as SportFilter[]).map(sport => {
               const meta = SPORT_META[sport]
               const sportEnabled = enabledDraft[sport]
@@ -403,7 +403,7 @@ function GoalModal({ goals, elevationGoal, enabled, onSave, onClose }: {
             })}
           </div>
 
-          <div className="flex items-center justify-end gap-100 px-200 py-200">
+          <div className="flex shrink-0 items-center justify-end gap-100 px-200 py-200">
             <button type="button" className="btn btn-text" onClick={onClose}>Annuler</button>
             <button type="button" className="btn btn-primary" onClick={() => onSave(draft, elevationDraft, enabledDraft)}>Enregistrer</button>
           </div>

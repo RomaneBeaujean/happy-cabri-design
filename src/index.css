@@ -144,6 +144,13 @@
   --spacing-900: 72px;
 }
 
+html, body {
+  /* Filet de sécurité mobile (iOS surtout) : empêche un élément trop large (ex. input
+     type="date"/"time" natif) de créer un débordement horizontal visible de la page. */
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   font-family: var(--font-primary);
   color: var(--color-neutral-900);

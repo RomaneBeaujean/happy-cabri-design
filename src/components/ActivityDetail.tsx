@@ -243,8 +243,8 @@ export default function ActivityDetailModal({ session, onClose }: {
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="modal-surface-taupe max-h-[calc(100vh-24px)] w-full max-w-[640px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
-          <div className="flex items-center justify-between gap-100 px-200 pt-200">
+        <div className="modal-surface-taupe flex max-h-[calc(100dvh-24px)] w-full max-w-[640px] flex-col overflow-hidden rounded-3xl shadow-lg">
+          <div className="flex shrink-0 items-center justify-between gap-100 px-200 pt-200">
             <div className="flex min-w-0 items-center gap-150">
               <span className={`flex size-9 shrink-0 items-center justify-center rounded-full ${badge.bg} ${badge.text}`}>
                 <badge.icon className="size-4" strokeWidth={1.75} />
@@ -261,48 +261,50 @@ export default function ActivityDetailModal({ session, onClose }: {
             </button>
           </div>
 
-          <div className="mt-200 px-200">
-            <div className="widget-card-glass flex items-stretch divide-x divide-neutral-30 p-200">
-              {session.distanceKm != null && <StatItem label="Distance" value={`${session.distanceKm} km`} />}
-              {avgPaceLabel != null && <StatItem label="Allure" value={avgPaceLabel} />}
-              {session.durationMin != null && <StatItem label="Durée" value={formatDuration(session.durationMin)} />}
-              {session.elevation != null && <StatItem label="D+" value={`+${session.elevation} m`} />}
-            </div>
-          </div>
-
-          {profile.length > 0 && (
+          <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
             <div className="mt-200 px-200">
-              <div className="widget-card-glass p-200">
-                <ProfileAltimetryChart points={profile} />
+              <div className="widget-card-glass flex items-stretch divide-x divide-neutral-30 p-200">
+                {session.distanceKm != null && <StatItem label="Distance" value={`${session.distanceKm} km`} />}
+                {avgPaceLabel != null && <StatItem label="Allure" value={avgPaceLabel} />}
+                {session.durationMin != null && <StatItem label="Durée" value={formatDuration(session.durationMin)} />}
+                {session.elevation != null && <StatItem label="D+" value={`+${session.elevation} m`} />}
               </div>
             </div>
-          )}
 
-          {allureRow && (
-            <div className="mt-200 px-200 pb-200">
-              <div className="widget-card-glass p-200">
-                <p className="widget-card-title">Statistiques de l'activité</p>
-                <div className="mt-100 divide-y divide-neutral-30">
-                  {allureParams.map(param => {
-                    const Icon = ALLURE_PARAM_ICON[param.key]
-                    return (
-                      <div key={param.key} className="flex items-center gap-100 py-150">
-                        <Icon className="size-4 shrink-0 text-primary-400" strokeWidth={1.75} />
-                        <div className="min-w-0">
-                          <p className="truncate text-[11px] font-medium text-primary-400">{param.label}</p>
-                          <p className="mt-25 text-[16px] font-extrabold leading-none text-primary-600">
-                            {allureRow[param.key]}{param.unit}
-                          </p>
-                        </div>
-                      </div>
-                    )
-                  })}
+            {profile.length > 0 && (
+              <div className="mt-200 px-200">
+                <div className="widget-card-glass p-200">
+                  <ProfileAltimetryChart points={profile} />
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {!allureRow && <div className="pb-200" />}
+            {allureRow && (
+              <div className="mt-200 px-200 pb-200">
+                <div className="widget-card-glass p-200">
+                  <p className="widget-card-title">Statistiques de l'activité</p>
+                  <div className="mt-100 divide-y divide-neutral-30">
+                    {allureParams.map(param => {
+                      const Icon = ALLURE_PARAM_ICON[param.key]
+                      return (
+                        <div key={param.key} className="flex items-center gap-100 py-150">
+                          <Icon className="size-4 shrink-0 text-primary-400" strokeWidth={1.75} />
+                          <div className="min-w-0">
+                            <p className="truncate text-[11px] font-medium text-primary-400">{param.label}</p>
+                            <p className="mt-25 text-[16px] font-extrabold leading-none text-primary-600">
+                              {allureRow[param.key]}{param.unit}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!allureRow && <div className="pb-200" />}
+          </div>
         </div>
       </div>
     </>,

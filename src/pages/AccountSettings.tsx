@@ -42,8 +42,8 @@ function EditFieldModal({ field, title, canSave, onSave, onClose, children }: {
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="modal-surface-taupe max-h-[calc(100vh-24px)] w-full max-w-[420px] overflow-x-hidden overflow-y-auto rounded-3xl shadow-lg">
-          <div className="flex items-center justify-between px-200 py-200">
+        <div className="modal-surface-taupe flex max-h-[calc(100dvh-24px)] w-full max-w-[420px] flex-col overflow-hidden rounded-3xl shadow-lg">
+          <div className="flex shrink-0 items-center justify-between px-200 py-200">
             <p className="font-accent text-[16px] font-bold text-neutral-800">{title}</p>
             <button
               type="button"
@@ -54,11 +54,11 @@ function EditFieldModal({ field, title, canSave, onSave, onClose, children }: {
             </button>
           </div>
 
-          <div className="space-y-150 px-200 py-200" key={field}>
+          <div className="min-h-0 flex-1 space-y-150 overflow-x-hidden overflow-y-auto px-200 py-200" key={field}>
             {children}
           </div>
 
-          <div className="flex items-center justify-end gap-100 px-200 py-200">
+          <div className="flex shrink-0 items-center justify-end gap-100 px-200 py-200">
             <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
             <button
               type="button"

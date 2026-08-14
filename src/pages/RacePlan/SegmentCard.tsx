@@ -144,12 +144,15 @@ export default function SegmentCard({ seg, index, typeLabel, globalEdit, canDele
     setWaterDraft(String(Math.max(0, current + delta)))
   }
 
+  const PRODUCT_MENU_WIDTH = 220
+
   function openProductMenu(e: MouseEvent) {
     e.stopPropagation()
     if (menuBtnRef.current) {
       const r = menuBtnRef.current.getBoundingClientRect()
       const goAbove = r.bottom + 240 > window.innerHeight
-      setMenuPos({ top: goAbove ? r.top - 244 : r.bottom + 4, left: r.left })
+      const left = Math.min(r.left, window.innerWidth - PRODUCT_MENU_WIDTH - 8)
+      setMenuPos({ top: goAbove ? r.top - 244 : r.bottom + 4, left: Math.max(8, left) })
     }
     setProductMenuOpen(v => !v)
   }

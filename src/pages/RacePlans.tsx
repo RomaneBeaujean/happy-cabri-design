@@ -299,20 +299,22 @@ function DeletePlanModal({ planName, onConfirm, onClose }: {
     <>
       <div className="fixed inset-0 z-[998] modal-overlay" onClick={onClose} />
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-200">
-        <div className="max-h-[calc(100vh-24px)] w-full max-w-[380px] overflow-x-hidden overflow-y-auto rounded-3xl bg-white shadow-lg">
-          <div className="flex items-start gap-150 px-200 pt-200">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-500">
-              <AlertTriangle className="size-4.5" strokeWidth={2} />
-            </span>
-            <div>
-              <p className="font-accent text-[16px] font-bold text-neutral-800">Supprimer ce plan de course ?</p>
-              <p className="mt-50 text-[13px] text-neutral-600">
-                {planName} sera définitivement supprimé. Cette action est irréversible.
-              </p>
+        <div className="flex max-h-[calc(100dvh-24px)] w-full max-w-[380px] flex-col overflow-hidden rounded-3xl bg-white shadow-lg">
+          <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-200 pt-200">
+            <div className="flex items-start gap-150">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-500">
+                <AlertTriangle className="size-4.5" strokeWidth={2} />
+              </span>
+              <div>
+                <p className="font-accent text-[16px] font-bold text-neutral-800">Supprimer ce plan de course ?</p>
+                <p className="mt-50 text-[13px] text-neutral-600">
+                  {planName} sera définitivement supprimé. Cette action est irréversible.
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-100 px-200 py-200">
+          <div className="flex shrink-0 items-center justify-end gap-100 px-200 py-200">
             <button type="button" className="btn btn-text" onClick={onClose}>Annuler</button>
             <button
               type="button"
